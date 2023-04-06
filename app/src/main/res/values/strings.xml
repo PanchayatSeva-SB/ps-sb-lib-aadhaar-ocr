@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name" translatable="false">OCR presenter</string>
+    <string name="aadhaar_back_side_pic" translatable="false">Scan Aadhaar Card Back Side</string>
+    <string name="aadhaar_front_side_pic" translatable="false">Scan Aadhaar Card Front Side</string>
+    <string name="qr_code">QR Code</string>
+    <string name="scan_card">Scan Card</string>
+    <string name="choose_aadhaar_options_title">Select Aadhaar Scan Method</string>
+    <string name="toast_image_intent_null">Image Picker Option is missing!!!</string>
+    <string name="scan_new_card">Click Here to Scan Card</string>
+    <string name="click_for_photo">Click_For_Photo</string>
+
+</resources>
