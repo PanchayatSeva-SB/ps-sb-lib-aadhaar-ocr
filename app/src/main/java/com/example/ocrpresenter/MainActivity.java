@@ -24,6 +24,7 @@ import com.karumi.dexter.MultiplePermissionsReport;
 import com.karumi.dexter.PermissionToken;
 import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
+import com.sayukth.aadhaar_ocr.SayukthUtils;
 
 import java.io.IOException;
 import java.text.StringCharacterIterator;
@@ -49,6 +50,7 @@ public class MainActivity extends AppCompatActivity implements DetectAadhaarCont
         tvOcrData = findViewById(R.id.tv_aadhaar_data);
         ivOcr = findViewById(R.id.iv_ocr);
         tvOcrImageText = findViewById(R.id.tv_ocr_image_data);
+
 
 
         try {

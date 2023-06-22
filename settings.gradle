@@ -16,3 +16,4 @@ dependencyResolutionManagement {
 }
 rootProject.name = "OCR presenter"
 include ':app'
+include ':aadhaar-ocr'
