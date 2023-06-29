@@ -73,16 +73,19 @@ dependencies {
 
 
 
-//publishing {
-//    publications {
-//        release(MavenPublication) {
-//            groupId = 'com.github.vinchamp77'
-//            artifactId = 'demo-simple-android-lib'
-//            version = '0.0.0'
-//
-//            afterEvaluate {
-//                from components.release
-//            }
-//        }
-//    }
-//}
+// 5. Publishing:
+publishing {
+    publications {
+        maven(MavenPublication) {
+            groupId = 'com.github.sayukth'
+            artifactId = 'panchayatseva-aadhaar-ocr'
+            version = "0.1"
+            pom {
+                description = 'DESCRIPTION'
+            }
+        }
+    }
+    repositories {               // << --- ADD This
+        mavenLocal()
+    }
+}
