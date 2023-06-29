@@ -1,11 +1,12 @@
-package com.example.ocrpresenter.utils;
+package com.sayukth.aadhaar_ocr.utils;
 
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.net.ParseException;
 
-import com.example.ocrpresenter.error.ActivityException;
 //import com.sayukth.panchayatseva.survey.error.ActivityException;
+
+import com.sayukth.aadhaar_ocr.error.ActivityException;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;

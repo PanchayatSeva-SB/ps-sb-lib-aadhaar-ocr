@@ -64,6 +64,8 @@ dependencies {
 //    implementation 'com.google.firebase:firebase-ml-vision:'
 //    implementation 'com.github.tesseract-ocr:tess-two:9.1.0'
 
+//    implementation 'com.github.nagasailanka-sayukth:panchayatseva-aadhaar-ocr-kotlin:0.1'
+
 
 
 

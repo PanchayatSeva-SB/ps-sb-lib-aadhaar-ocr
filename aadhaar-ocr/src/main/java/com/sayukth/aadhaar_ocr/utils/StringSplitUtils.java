@@ -1,6 +1,6 @@
-package com.example.ocrpresenter.utils;
+package com.sayukth.aadhaar_ocr.utils;
 
-import com.example.ocrpresenter.error.ActivityException;
+import com.sayukth.aadhaar_ocr.error.ActivityException;
 
 public class StringSplitUtils {
 

@@ -1,4 +1,4 @@
-package com.example.ocrpresenter.ui.OCR;
+package com.sayukth.aadhaar_ocr.ui;
 
 import static androidx.core.content.FileProvider.getUriForFile;
 
@@ -22,19 +22,19 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
-import com.example.ocrpresenter.R;
-import com.example.ocrpresenter.preferenceOCR.PreferenceHelper;
+
 import com.karumi.dexter.Dexter;
 import com.karumi.dexter.MultiplePermissionsReport;
 import com.karumi.dexter.PermissionToken;
 import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
+import com.sayukth.aadhaar_ocr.R;
 import com.yalantis.ucrop.UCrop;
 
 import java.io.File;
 import java.util.List;
 
-public class AadhaarDetectActivity extends AppCompatActivity {
+public class DetectAadhaarActivity extends AppCompatActivity {
 
     public static final String INTENT_IMAGE_PICKER_OPTION = "image_picker_option";
     public static final String INTENT_ASPECT_RATIO_X = "aspect_ratio_x";
@@ -46,7 +46,7 @@ public class AadhaarDetectActivity extends AppCompatActivity {
     public static final String INTENT_BITMAP_MAX_HEIGHT = "max_height";
     public static final int REQUEST_IMAGE_CAPTURE = 0;
     public static final int REQUEST_GALLERY_IMAGE = 1;
-    private static final String TAG = AadhaarDetectActivity.class.getSimpleName();
+    private static final String TAG = DetectAadhaarActivity.class.getSimpleName();
     public static String fileName;
     private boolean lockAspectRatio = false, setBitmapMaxWidthHeight = false;
     private int ASPECT_RATIO_X = 16, ASPECT_RATIO_Y = 9, bitmapMaxWidth = 1000, bitmapMaxHeight = 1000;
@@ -146,7 +146,7 @@ public class AadhaarDetectActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_aadhaar_detect);
+        setContentView(R.layout.activity_detect_aadhaar);
 
         Intent intent = getIntent();
         if (intent == null) {
@@ -310,7 +310,7 @@ public class AadhaarDetectActivity extends AppCompatActivity {
         File path = new File(getExternalCacheDir(), "camera");
         if (!path.exists()) path.mkdirs();
         File image = new File(path, fileName);
-        return getUriForFile(AadhaarDetectActivity.this, getPackageName() + ".provider", image);
+        return getUriForFile(DetectAadhaarActivity.this, getPackageName() + ".provider", image);
     }
 
     public interface PickerOptionListener {

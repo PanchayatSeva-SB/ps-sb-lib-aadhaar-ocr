@@ -1,4 +1,4 @@
-package com.example.ocrpresenter.error;
+package com.sayukth.aadhaar_ocr.error;
 
 public class ActivityException extends Exception {
 
@@ -10,4 +10,9 @@ public class ActivityException extends Exception {
     public ActivityException(String message) {
         super(message);
     }
+
 }
+
+
+
+

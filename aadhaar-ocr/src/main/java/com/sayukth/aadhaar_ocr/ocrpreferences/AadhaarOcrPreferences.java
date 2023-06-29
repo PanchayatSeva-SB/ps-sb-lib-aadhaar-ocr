@@ -1,14 +1,15 @@
-package com.example.ocrpresenter.preferenceOCR;
+package com.sayukth.aadhaar_ocr.ocrpreferences;
 
 import android.content.Context;
 import android.content.SharedPreferences;
 
-import com.example.ocrpresenter.OcrWordApplication;
+import com.sayukth.aadhaar_ocr.AadhaarOcrApplication;
 
-public class PreferenceHelper {
+
+public class AadhaarOcrPreferences {
 //    public static final int CAMERA_REQUEST = 999;
     private static final String SETTINGS_NAME = "default_settings";
-    private static PreferenceHelper sSharedPrefs;
+    private static AadhaarOcrPreferences sSharedPrefs;
     private SharedPreferences mPref;
     private SharedPreferences.Editor mEditor;
     private boolean mBulkUpdate = false;
@@ -21,19 +22,19 @@ public class PreferenceHelper {
         OCR_TYPE,SAMPLE_STR,
         SAMPLE_INT
     }
-    private PreferenceHelper(Context context) {
+    private AadhaarOcrPreferences(Context context) {
         mPref = context.getSharedPreferences(SETTINGS_NAME, Context.MODE_PRIVATE);
     }
 
 
-    public static PreferenceHelper getInstance(Context context) {
+    public static AadhaarOcrPreferences getInstance(Context context) {
         if (sSharedPrefs == null) {
-            sSharedPrefs = new PreferenceHelper(context.getApplicationContext());
+            sSharedPrefs = new AadhaarOcrPreferences(context.getApplicationContext());
         }
         return sSharedPrefs;
     }
 
-    public static PreferenceHelper getInstance() {
+    public static AadhaarOcrPreferences getInstance() {
         if (sSharedPrefs != null) {
             return sSharedPrefs;
         }
@@ -44,7 +45,7 @@ public class PreferenceHelper {
         //Option 2:
         // Alternatively, you can create a new instance here
         // with something like this:
-        return getInstance(OcrWordApplication.getAppContext());
+        return getInstance(AadhaarOcrApplication.getAppContext());
     }
     public void put(Key key, String val) {
         doEdit();

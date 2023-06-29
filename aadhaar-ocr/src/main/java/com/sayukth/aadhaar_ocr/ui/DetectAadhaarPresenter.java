@@ -1,23 +1,22 @@
-package com.example.ocrpresenter.ui.OCR;
+package com.sayukth.aadhaar_ocr.ui;
 
 import android.app.Activity;
 import android.graphics.Bitmap;
 import android.util.Log;
 import android.util.SparseArray;
 
-import com.example.ocrpresenter.error.ActivityException;
-import com.example.ocrpresenter.utils.DateUtils;
-import com.example.ocrpresenter.utils.StringSplitUtils;
 import com.google.android.gms.vision.Frame;
 import com.google.android.gms.vision.text.TextBlock;
 import com.google.android.gms.vision.text.TextRecognizer;
+import com.sayukth.aadhaar_ocr.error.ActivityException;
+import com.sayukth.aadhaar_ocr.ui.DetectAadhaarContract;
+import com.sayukth.aadhaar_ocr.utils.DateUtils;
+import com.sayukth.aadhaar_ocr.utils.StringSplitUtils;
 
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import kotlin.text.Regex;
 
 public class DetectAadhaarPresenter implements DetectAadhaarContract.Presenter {
     private static final String TAG = "DetectAadhaarPresent";
@@ -260,18 +259,13 @@ public class DetectAadhaarPresenter implements DetectAadhaarContract.Presenter {
     }
 
     private String getFormatedDate(String datevalue) throws ActivityException {
-        try {
-            datevalue = (datevalue != null && !datevalue.isEmpty()) ? datevalue.trim() : "";
+        datevalue = (datevalue != null && !datevalue.isEmpty()) ? datevalue.trim() : "";
 
-            if (datevalue.matches("\\d{4}")) {
-                //This block will execute when we have only year in the aadhaar card
-                return "01-01-" + datevalue;
-            } else {
-                return DateUtils.aAdhaarDateFormated(datevalue);
-            }
-        } catch (ActivityException execption) {
-            Log.i(TAG, execption.getMessage());
-            throw new ActivityException(execption);
+        if (datevalue.matches("\\d{4}")) {
+            //This block will execute when we have only year in the aadhaar card
+            return "01-01-" + datevalue;
+        } else {
+            return DateUtils.aAdhaarDateFormated(datevalue);
         }
     }
 
