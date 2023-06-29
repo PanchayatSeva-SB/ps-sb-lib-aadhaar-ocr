@@ -1,2 +1,8 @@
+# configuration file for building snapshots and releases with jitpack.io
 jdk:
-  - openjdk11
+  - openjdk1_8
+before_install:
+  - ./scripts/prepareJitpackEnvironment.sh
+install:
+  - FILE="-Dfile=aadhaar-ocr-debug.aar"
+  - mvn install:install-file $FILE -DgroupId=com.github.sayukth -DartifactId=panchayatseva_aadhaar_ocr -Dversion=0.1 -Dpackaging=aar
