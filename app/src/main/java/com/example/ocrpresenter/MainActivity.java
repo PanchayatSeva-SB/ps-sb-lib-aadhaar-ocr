@@ -7,6 +7,7 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -159,7 +160,9 @@ public class MainActivity extends AppCompatActivity implements DetectAadhaarCont
     public void showAadharInfo(HashMap<String, String> map) {
         try {
 
-            map.forEach((k, v) -> System.out.println(("K: "+k + ":" + "V"+v)));
+            Log.i("Aadhaar : ", String.valueOf(map));
+
+            map.forEach((k, v) -> System.out.println(("K: "+k + ":" + "V: "+v)));
 
             StringBuilder aadhaarData = new StringBuilder("Aadhaar Data : \n");
 //            Log.i("MainActivity", map + " ");
