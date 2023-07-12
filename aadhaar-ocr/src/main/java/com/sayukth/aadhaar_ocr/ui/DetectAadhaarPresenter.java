@@ -9,7 +9,6 @@ import com.google.android.gms.vision.Frame;
 import com.google.android.gms.vision.text.TextBlock;
 import com.google.android.gms.vision.text.TextRecognizer;
 import com.sayukth.aadhaar_ocr.error.ActivityException;
-import com.sayukth.aadhaar_ocr.ui.DetectAadhaarContract;
 import com.sayukth.aadhaar_ocr.utils.DateUtils;
 import com.sayukth.aadhaar_ocr.utils.StringSplitUtils;
 
@@ -48,7 +47,7 @@ public class DetectAadhaarPresenter implements DetectAadhaarContract.Presenter {
         for (int i = 0; i < textBlockSparseArray.size(); i++) {
             TextBlock textBlock = textBlockSparseArray.get(textBlockSparseArray.keyAt(i));
             imageText = textBlock.getValue();
-            ocrImageText.append(textBlock.getValue()+"\n");
+            ocrImageText.append(textBlock.getValue() + "\n");
             Log.d("Language : ", imageText + " : " + textBlock.getLanguage());
             stringBuilder.append("#" + imageText + "#");
             stringBuilder.append("\n");
@@ -79,12 +78,12 @@ public class DetectAadhaarPresenter implements DetectAadhaarContract.Presenter {
 
                 if (valArr.length > 0) {
                     for (int newlineIdx = 0; newlineIdx < valArr.length; newlineIdx++) {
-                        System.out.println(" if : "+ valArr[newlineIdx]);
+                        System.out.println(" if : " + valArr[newlineIdx]);
                         setMetaData(valArr[newlineIdx]);
                     }
                 }
             } else {
-                System.out.println(" else : "+ val);
+                System.out.println(" else : " + val);
                 setMetaData(val);
             }
         } catch (ActivityException e) {
@@ -105,7 +104,7 @@ public class DetectAadhaarPresenter implements DetectAadhaarContract.Presenter {
             String fsnameWithCareOf = StringSplitUtils.getFirstPartOfStringBySplitString(text.toString(), ",");
 //            System.out.println("FS : "+ fsnameWithCareOf);
             String fsname = StringSplitUtils.getLastPartOfStringBySplitString(fsnameWithCareOf.trim(), " ");
-            System.out.println("FS : "+fsname);
+            System.out.println("FS : " + fsname);
 
             metadataMap.put(metaData, fsname.trim());
         }
@@ -138,7 +137,7 @@ public class DetectAadhaarPresenter implements DetectAadhaarContract.Presenter {
                 }
 
             } else if (srcVal.contains("YEAR") || srcVal.contains("BIRTH") || srcVal.contains("DATE") || srcVal.contains("DOB") ||
-                    srcVal.contains("YEAR OF") || srcVal.contains("YOB") ) {
+                    srcVal.contains("YEAR OF") || srcVal.contains("YOB")) {
                 metaData = "DATE_OF_YEAR";
 
                 if (val.contains(":")) {
@@ -179,8 +178,8 @@ public class DetectAadhaarPresenter implements DetectAadhaarContract.Presenter {
 
             metadataMap.put(metaData, tgtVal.trim());
         } catch (ActivityException e) {
-            Log.i(TAG,e.getMessage());
-            Log.i(TAG,e.getMessage());
+            Log.i(TAG, e.getMessage());
+            Log.i(TAG, e.getMessage());
             throw new ActivityException(e);
         }
     }
@@ -207,8 +206,6 @@ public class DetectAadhaarPresenter implements DetectAadhaarContract.Presenter {
 
         return patternMatcher;
     }
-
-
 
 
 }

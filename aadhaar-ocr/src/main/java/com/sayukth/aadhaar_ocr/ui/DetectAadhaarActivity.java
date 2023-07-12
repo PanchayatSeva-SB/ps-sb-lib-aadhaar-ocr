@@ -22,7 +22,6 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
-
 import com.karumi.dexter.Dexter;
 import com.karumi.dexter.MultiplePermissionsReport;
 import com.karumi.dexter.PermissionToken;
@@ -51,7 +50,7 @@ public class DetectAadhaarActivity extends AppCompatActivity {
     private boolean lockAspectRatio = false, setBitmapMaxWidthHeight = false;
     private int ASPECT_RATIO_X = 16, ASPECT_RATIO_Y = 9, bitmapMaxWidth = 1000, bitmapMaxHeight = 1000;
     private int IMAGE_COMPRESSION = 80;
-    static boolean aadharInputTypeFlag=false;
+    static boolean aadharInputTypeFlag = false;
 
     public static void showImagePickerOptions(Context context, PickerOptionListener listener) {
 
@@ -76,7 +75,7 @@ public class DetectAadhaarActivity extends AppCompatActivity {
 //                PreferenceHelper.getInstance().put(AADHAAR_INPUT_TYPE, Constants.OCR);
                 listener.onChooseAadhaarQrCodeScanner();
                 alertD.dismiss();
-                aadharInputTypeFlag=false;
+                aadharInputTypeFlag = false;
 
             }
 
@@ -88,7 +87,7 @@ public class DetectAadhaarActivity extends AppCompatActivity {
 //                PreferenceHelper.getInstance().put(AADHAAR_INPUT_TYPE, Constants.OCR);
                 listener.onChooseAadhaarQrCodeScanner();
                 alertD.dismiss();
-                aadharInputTypeFlag=false;
+                aadharInputTypeFlag = false;
 
             }
 
@@ -100,7 +99,7 @@ public class DetectAadhaarActivity extends AppCompatActivity {
 //                PreferenceHelper.getInstance().put(AADHAAR_INPUT_TYPE, Constants.OCR);
                 listener.onTakeCameraSelected();
                 alertD.dismiss();
-                aadharInputTypeFlag=true;
+                aadharInputTypeFlag = true;
 
             }
 
@@ -111,7 +110,7 @@ public class DetectAadhaarActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 //PreferenceHelper.getInstance().put(AADHAAR_INPUT_TYPE, Constants.OCR);
-                aadharInputTypeFlag=true;
+                aadharInputTypeFlag = true;
                 listener.onTakeCameraSelected();
                 alertD.dismiss();
             }
