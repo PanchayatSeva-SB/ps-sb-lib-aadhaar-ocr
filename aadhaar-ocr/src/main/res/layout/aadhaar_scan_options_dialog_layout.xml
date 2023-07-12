@@ -5,6 +5,40 @@
     android:layout_centerInParent="true"
     android:orientation="vertical">
 
+    <View
+        android:layout_width="0dp"
+        android:layout_height="@dimen/spacing_mlarge" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/_8dp"
+        android:textStyle="bold"
+        android:text="@string/qr_code"/>
+
+
+    <Button
+        android:id="@+id/small_qr_scan_btn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/spacing_smlarge"
+        android:background="@drawable/square_blue_background"
+        android:text="@string/small_qr_code"
+        android:textAllCaps="false"
+        android:textColor="@color/white"
+        android:textSize="18sp" />
+
+    <Button
+        android:id="@+id/big_qr_scan_btn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/spacing_smlarge"
+        android:background="@drawable/square_blue_background"
+        android:text="@string/big_qr_code"
+        android:textAllCaps="false"
+        android:textColor="@color/white"
+        android:textSize="18sp" />
+
 
     <View
         android:layout_width="0dp"

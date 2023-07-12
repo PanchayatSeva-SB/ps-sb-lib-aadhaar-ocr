@@ -1,5 +1,7 @@
 package com.example.ocrpresenter;
 
+import static com.sayukth.aadhaar_ocr.constants.Constants.AADHAAR_REQUEST_IMAGE;
+
 import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
@@ -32,7 +34,6 @@ import java.util.HashMap;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements DetectAadhaarContract.View {
-    private static final int AADHAAR_REQUEST_IMAGE = 100;
     TextView tvOcrData;
     ImageView ivOcr;
     TextView tvOcrImageText;
@@ -92,6 +93,11 @@ public class MainActivity extends AppCompatActivity implements DetectAadhaarCont
             public void onTakeCameraSelected() {
                 launchCameraIntent();
             }
+
+            @Override
+            public void onChooseAadhaarQrCodeScanner() {
+                // leave it empty
+            }
         });
     }
 
@@ -111,6 +117,7 @@ public class MainActivity extends AppCompatActivity implements DetectAadhaarCont
                 if (resultCode == Activity.RESULT_OK) {
                     Uri uri = intent.getParcelableExtra("path");
                     try {
+                        Log.i("Uri : ", uri.toString());
                         // You can update this bitmap to your server
                         Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), uri);
 //                        extractText(bitmap);
@@ -157,7 +164,7 @@ public class MainActivity extends AppCompatActivity implements DetectAadhaarCont
 
 
     @Override
-    public void showAadharInfo(HashMap<String, String> map) {
+    public void showAadhaarInfo(HashMap<String, String> map) {
         try {
 
             Log.i("Aadhaar : ", String.valueOf(map));
@@ -165,7 +172,7 @@ public class MainActivity extends AppCompatActivity implements DetectAadhaarCont
             map.forEach((k, v) -> System.out.println(("K: "+k + ":" + "V: "+v)));
 
             StringBuilder aadhaarData = new StringBuilder("Aadhaar Data : \n");
-//            Log.i("MainActivity", map + " ");
+
             String aadharId = map.get("AADHAR");
             if (aadharId != null) {
                 aadharId = aadharId.replaceAll("\\s", "");

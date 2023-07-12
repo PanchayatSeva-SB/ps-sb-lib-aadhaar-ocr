@@ -12,7 +12,7 @@ public interface DetectAadhaarContract {
 
         void showImageText(String imageText);
 
-        void showAadharInfo(HashMap<String, String> map);
+        void showAadhaarInfo(HashMap<String, String> map);
     }
 
     interface Presenter {

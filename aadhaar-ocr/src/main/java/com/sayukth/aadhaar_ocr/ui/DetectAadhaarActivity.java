@@ -56,18 +56,45 @@ public class DetectAadhaarActivity extends AppCompatActivity {
     public static void showImagePickerOptions(Context context, PickerOptionListener listener) {
 
         LayoutInflater layoutInflater = LayoutInflater.from(context);
-        View promptView = layoutInflater.inflate(R.layout.detect_aadhaar_options_dialog, null);
+        View promptView = layoutInflater.inflate(R.layout.aadhaar_scan_options_dialog_layout, null);
 
         final AlertDialog alertD = new AlertDialog.Builder(context).create();
 
         alertD.setTitle(context.getString(R.string.choose_aadhaar_options_title));
-        Button frontAadhaarCard = (Button) promptView.findViewById(R.id.front_aadhaar_capture_btn);
 
-        Button backAadhaarCard = (Button) promptView.findViewById(R.id.back_aadhaar_capture_btn);
+        Button btnSmallQrCodeScan = (Button) promptView.findViewById(R.id.small_qr_scan_btn);
 
+        Button btnBigQrCodeScan = (Button) promptView.findViewById(R.id.big_qr_scan_btn);
 
+        Button btnFrontAadhaarCapture = (Button) promptView.findViewById(R.id.front_aadhaar_capture_btn);
 
-        frontAadhaarCard.setOnClickListener(new View.OnClickListener() {
+        Button btnBackAadhaarCapture = (Button) promptView.findViewById(R.id.back_aadhaar_capture_btn);
+
+        btnSmallQrCodeScan.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+//                PreferenceHelper.getInstance().put(AADHAAR_INPUT_TYPE, Constants.OCR);
+                listener.onChooseAadhaarQrCodeScanner();
+                alertD.dismiss();
+                aadharInputTypeFlag=false;
+
+            }
+
+        });
+
+        btnBigQrCodeScan.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+//                PreferenceHelper.getInstance().put(AADHAAR_INPUT_TYPE, Constants.OCR);
+                listener.onChooseAadhaarQrCodeScanner();
+                alertD.dismiss();
+                aadharInputTypeFlag=false;
+
+            }
+
+        });
+
+        btnFrontAadhaarCapture.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 //                PreferenceHelper.getInstance().put(AADHAAR_INPUT_TYPE, Constants.OCR);
@@ -80,7 +107,7 @@ public class DetectAadhaarActivity extends AppCompatActivity {
 
         });
 
-        backAadhaarCard.setOnClickListener(new View.OnClickListener() {
+        btnBackAadhaarCapture.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 //PreferenceHelper.getInstance().put(AADHAAR_INPUT_TYPE, Constants.OCR);
@@ -95,28 +122,6 @@ public class DetectAadhaarActivity extends AppCompatActivity {
 
         alertD.show();
 
-
-       /* // setup the alert builder
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        builder.setTitle(context.getString(R.string.choose_aadhaar_options_title));
-
-        // add a list
-//        String[] animals = {context.getString(R.string.aadhaar_front_side_pic),context.getString(R.string.aadhaar_back_side_pic), context.getString(R.string.scan_qr_aadhaar)};
-//        builder.setItems(animals, (dialog, which) -> {
-//            switch (which) {
-//                case 0:
-//                case 1:
-//                    listener.onTakeCameraSelected();
-//                    break;
-//                case 2 :
-//                    listener.onChooseAadharScanner();
-//                    break;
-//            }
-//        });
-
-        // create and show the alert dialog
-        AlertDialog dialog = builder.create();
-        dialog.show();*/
     }
 
     private static String queryName(ContentResolver resolver, Uri uri) {
@@ -127,6 +132,7 @@ public class DetectAadhaarActivity extends AppCompatActivity {
         returnCursor.moveToFirst();
         String name = returnCursor.getString(nameIndex);
         returnCursor.close();
+        Log.i("query name : ", name);
         return name;
     }
 
@@ -290,6 +296,8 @@ public class DetectAadhaarActivity extends AppCompatActivity {
     private void setResultOk(Uri imagePath) {
         Intent intent = new Intent();
         intent.putExtra("path", imagePath);
+        Log.e("setResultOk : path", imagePath.toString());
+
         setResult(Activity.RESULT_OK, intent);
 //        if(aadharInputTypeFlag==true) {
 //            PreferenceHelper.getInstance().put(AADHAAR_INPUT_TYPE, AadhaarInputType.OCR.name());
@@ -315,5 +323,7 @@ public class DetectAadhaarActivity extends AppCompatActivity {
 
     public interface PickerOptionListener {
         void onTakeCameraSelected();
+
+        void onChooseAadhaarQrCodeScanner();
     }
 }

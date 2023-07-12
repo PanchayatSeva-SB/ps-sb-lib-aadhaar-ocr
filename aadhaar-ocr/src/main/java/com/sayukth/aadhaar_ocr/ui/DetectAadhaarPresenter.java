@@ -64,7 +64,7 @@ public class DetectAadhaarPresenter implements DetectAadhaarContract.Presenter {
             }
         }
 
-        detectAadharView.showAadharInfo(metadataMap);
+        detectAadharView.showAadhaarInfo(metadataMap);
 
     }
 

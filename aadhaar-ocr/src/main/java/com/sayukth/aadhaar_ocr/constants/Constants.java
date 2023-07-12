@@ -1,4 +1,4 @@
-package com.example.ocrpresenter.constants;
+package com.sayukth.aadhaar_ocr.constants;
 
 public class Constants {
 

@@ -9,4 +9,8 @@
     <string name="scan_new_card">Click Here to Scan Card</string>
     <string name="click_for_photo">Click_For_Photo</string>
 
+
+    <string name="big_qr_code">Big QR Code</string>
+    <string name="small_qr_code">Small QR Code</string>
+
 </resources>
