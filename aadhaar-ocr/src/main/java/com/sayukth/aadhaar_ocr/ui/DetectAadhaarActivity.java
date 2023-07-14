@@ -1,6 +1,15 @@
 package com.sayukth.aadhaar_ocr.ui;
 
 import static androidx.core.content.FileProvider.getUriForFile;
+import static com.sayukth.aadhaar_ocr.constants.AadhaarOcrConstants.AADHAAR_OCR_BACK_SIDE;
+import static com.sayukth.aadhaar_ocr.constants.AadhaarOcrConstants.AADHAAR_OCR_FRONT_SIDE;
+import static com.sayukth.aadhaar_ocr.constants.AadhaarOcrConstants.BIG_QR_CODE;
+import static com.sayukth.aadhaar_ocr.constants.AadhaarOcrConstants.OCR;
+import static com.sayukth.aadhaar_ocr.constants.AadhaarOcrConstants.QRCODE;
+import static com.sayukth.aadhaar_ocr.constants.AadhaarOcrConstants.SMALL_QR_CODE;
+import static com.sayukth.aadhaar_ocr.ocrpreferences.AadhaarOcrPreferences.Key.AADHAAR_INPUT_TYPE;
+import static com.sayukth.aadhaar_ocr.ocrpreferences.AadhaarOcrPreferences.Key.AADHAAR_OCR_SCAN_SIDE;
+import static com.sayukth.aadhaar_ocr.ocrpreferences.AadhaarOcrPreferences.Key.QR_CODE_SCAN_TYPE_KEY;
 
 import android.Manifest;
 import android.app.Activity;
@@ -28,6 +37,7 @@ import com.karumi.dexter.PermissionToken;
 import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
 import com.sayukth.aadhaar_ocr.R;
+import com.sayukth.aadhaar_ocr.ocrpreferences.AadhaarOcrPreferences;
 import com.yalantis.ucrop.UCrop;
 
 import java.io.File;
@@ -52,6 +62,8 @@ public class DetectAadhaarActivity extends AppCompatActivity {
     private int IMAGE_COMPRESSION = 80;
     static boolean aadharInputTypeFlag = false;
 
+    AadhaarOcrPreferences aadhaarOcrPreferences;
+
     public static void showImagePickerOptions(Context context, PickerOptionListener listener) {
 
         LayoutInflater layoutInflater = LayoutInflater.from(context);
@@ -72,7 +84,9 @@ public class DetectAadhaarActivity extends AppCompatActivity {
         btnSmallQrCodeScan.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-//                PreferenceHelper.getInstance().put(AADHAAR_INPUT_TYPE, Constants.OCR);
+
+                AadhaarOcrPreferences.getInstance().put(QR_CODE_SCAN_TYPE_KEY, SMALL_QR_CODE);
+
                 listener.onChooseAadhaarQrCodeScanner();
                 alertD.dismiss();
                 aadharInputTypeFlag = false;
@@ -84,7 +98,9 @@ public class DetectAadhaarActivity extends AppCompatActivity {
         btnBigQrCodeScan.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-//                PreferenceHelper.getInstance().put(AADHAAR_INPUT_TYPE, Constants.OCR);
+
+                AadhaarOcrPreferences.getInstance().put(QR_CODE_SCAN_TYPE_KEY, BIG_QR_CODE);
+
                 listener.onChooseAadhaarQrCodeScanner();
                 alertD.dismiss();
                 aadharInputTypeFlag = false;
@@ -96,10 +112,13 @@ public class DetectAadhaarActivity extends AppCompatActivity {
         btnFrontAadhaarCapture.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-//                PreferenceHelper.getInstance().put(AADHAAR_INPUT_TYPE, Constants.OCR);
+
+                AadhaarOcrPreferences.getInstance().put(AADHAAR_OCR_SCAN_SIDE, AADHAAR_OCR_FRONT_SIDE);
+
                 listener.onTakeCameraSelected();
                 alertD.dismiss();
                 aadharInputTypeFlag = true;
+
 
             }
 
@@ -109,10 +128,13 @@ public class DetectAadhaarActivity extends AppCompatActivity {
         btnBackAadhaarCapture.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //PreferenceHelper.getInstance().put(AADHAAR_INPUT_TYPE, Constants.OCR);
-                aadharInputTypeFlag = true;
+
+                AadhaarOcrPreferences.getInstance().put(AADHAAR_OCR_SCAN_SIDE, AADHAAR_OCR_BACK_SIDE);
+
                 listener.onTakeCameraSelected();
                 alertD.dismiss();
+                aadharInputTypeFlag = true;
+
             }
         });
 
@@ -152,6 +174,8 @@ public class DetectAadhaarActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detect_aadhaar);
+
+        aadhaarOcrPreferences = AadhaarOcrPreferences.getInstance(this);
 
         Intent intent = getIntent();
         if (intent == null) {
@@ -298,12 +322,14 @@ public class DetectAadhaarActivity extends AppCompatActivity {
         Log.e("setResultOk : path", imagePath.toString());
 
         setResult(Activity.RESULT_OK, intent);
-//        if(aadharInputTypeFlag==true) {
-//            PreferenceHelper.getInstance().put(AADHAAR_INPUT_TYPE, AadhaarInputType.OCR.name());
-//
-//        } else {
-//            PreferenceHelper.getInstance().put(AADHAAR_INPUT_TYPE, AadhaarInputType.QRCODE.name());
-//        }
+
+        if (aadharInputTypeFlag == true) {
+            AadhaarOcrPreferences.getInstance().put(AADHAAR_INPUT_TYPE, OCR);
+
+        } else {
+            AadhaarOcrPreferences.getInstance().put(AADHAAR_INPUT_TYPE, QRCODE);
+        }
+
         finish();
     }
 

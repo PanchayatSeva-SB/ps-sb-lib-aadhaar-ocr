@@ -1,5 +1,9 @@
 package com.sayukth.aadhaar_ocr.ui;
 
+import static com.sayukth.aadhaar_ocr.constants.AadhaarOcrConstants.AADHAAR_OCR_BACK_SIDE;
+import static com.sayukth.aadhaar_ocr.constants.AadhaarOcrConstants.AADHAAR_OCR_FRONT_SIDE;
+import static com.sayukth.aadhaar_ocr.ocrpreferences.AadhaarOcrPreferences.Key.AADHAAR_OCR_SCAN_SIDE;
+
 import android.app.Activity;
 import android.graphics.Bitmap;
 import android.util.Log;
@@ -9,6 +13,7 @@ import com.google.android.gms.vision.Frame;
 import com.google.android.gms.vision.text.TextBlock;
 import com.google.android.gms.vision.text.TextRecognizer;
 import com.sayukth.aadhaar_ocr.error.ActivityException;
+import com.sayukth.aadhaar_ocr.ocrpreferences.AadhaarOcrPreferences;
 import com.sayukth.aadhaar_ocr.utils.DateUtils;
 import com.sayukth.aadhaar_ocr.utils.StringSplitUtils;
 
@@ -33,8 +38,10 @@ public class DetectAadhaarPresenter implements DetectAadhaarContract.Presenter {
 
     @Override
     public void getImageDataAsText(Bitmap photo) {
+
+        String aadhaarOcrScanSide = AadhaarOcrPreferences.getInstance().getString(AADHAAR_OCR_SCAN_SIDE, "");
+
         ocrImageText.setLength(0);
-//        metadataMap.clear();
         TextRecognizer textRecognizer = new TextRecognizer.Builder(activity).build();
         Frame imageFrame = new Frame.Builder()
                 .setBitmap(photo)
@@ -52,13 +59,14 @@ public class DetectAadhaarPresenter implements DetectAadhaarContract.Presenter {
             stringBuilder.append("#" + imageText + "#");
             stringBuilder.append("\n");
 
-            if (imageText.contains("Address")) {
+
+            if (aadhaarOcrScanSide.equals(AADHAAR_OCR_BACK_SIDE)) {
                 try {
                     setFatherOrSpouseMetaData(imageText.toString());
                 } catch (ActivityException e) {
-                    e.printStackTrace();
+                    throw new RuntimeException(e);
                 }
-            } else {
+            } else if (aadhaarOcrScanSide.equals(AADHAAR_OCR_FRONT_SIDE)) {
                 getTextType(imageText);
             }
         }

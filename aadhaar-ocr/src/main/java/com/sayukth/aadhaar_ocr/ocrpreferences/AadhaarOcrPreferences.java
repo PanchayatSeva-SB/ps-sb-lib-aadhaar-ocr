@@ -18,10 +18,12 @@ public class AadhaarOcrPreferences {
     public static void setOcrWordApplication(Object ocrWordApplicaiton) {
     }
 
-    public enum Key{
-        OCR_TYPE,SAMPLE_STR,
-        SAMPLE_INT
+    public enum Key {
+        AADHAAR_OCR_SCAN_SIDE,
+        AADHAAR_INPUT_TYPE,
+        QR_CODE_SCAN_TYPE_KEY
     }
+
     private AadhaarOcrPreferences(Context context) {
         mPref = context.getSharedPreferences(SETTINGS_NAME, Context.MODE_PRIVATE);
     }

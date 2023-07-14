@@ -1,6 +1,6 @@
 package com.example.ocrpresenter;
 
-import static com.sayukth.aadhaar_ocr.constants.Constants.AADHAAR_REQUEST_IMAGE;
+import static com.sayukth.aadhaar_ocr.constants.AadhaarOcrConstants.AADHAAR_REQUEST_IMAGE;
 
 import android.Manifest;
 import android.app.Activity;
@@ -16,16 +16,16 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.sayukth.aadhaar_ocr.ui.DetectAadhaarActivity;
-import com.sayukth.aadhaar_ocr.ui.DetectAadhaarContract;
-import com.sayukth.aadhaar_ocr.ui.DetectAadhaarPresenter;
-import com.sayukth.aadhaar_ocr.utils.StringSplitUtils;
 import com.karumi.dexter.Dexter;
 import com.karumi.dexter.MultiplePermissionsReport;
 import com.karumi.dexter.PermissionToken;
 import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
 import com.sayukth.aadhaar_ocr.SayukthUtils;
+import com.sayukth.aadhaar_ocr.ui.DetectAadhaarActivity;
+import com.sayukth.aadhaar_ocr.ui.DetectAadhaarContract;
+import com.sayukth.aadhaar_ocr.ui.DetectAadhaarPresenter;
+import com.sayukth.aadhaar_ocr.utils.StringSplitUtils;
 
 import java.io.IOException;
 import java.text.StringCharacterIterator;
