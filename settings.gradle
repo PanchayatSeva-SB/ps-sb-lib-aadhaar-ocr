@@ -12,7 +12,9 @@ dependencyResolutionManagement {
         google()
         mavenCentral()
         maven { url "https://jitpack.io" }
+        mavenLocal()
     }
 }
-rootProject.name = "OCR presenter"
+rootProject.name = "panchayatseva-aadhaar-ocr"
 include ':app'
+include ':aadhaar-ocr'

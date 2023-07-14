@@ -1,5 +1,7 @@
 package com.example.ocrpresenter;
 
+import static com.sayukth.aadhaar_ocr.constants.Constants.AADHAAR_REQUEST_IMAGE;
+
 import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
@@ -14,26 +16,24 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.ocrpresenter.ui.OCR.AadhaarDetectActivity;
-import com.example.ocrpresenter.ui.OCR.DetectAadhaarContract;
-import com.example.ocrpresenter.ui.OCR.DetectAadhaarPresenter;
-import com.example.ocrpresenter.utils.StringSplitUtils;
-import com.google.android.gms.vision.barcode.Barcode;
+import com.sayukth.aadhaar_ocr.ui.DetectAadhaarActivity;
+import com.sayukth.aadhaar_ocr.ui.DetectAadhaarContract;
+import com.sayukth.aadhaar_ocr.ui.DetectAadhaarPresenter;
+import com.sayukth.aadhaar_ocr.utils.StringSplitUtils;
 import com.karumi.dexter.Dexter;
 import com.karumi.dexter.MultiplePermissionsReport;
 import com.karumi.dexter.PermissionToken;
 import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
+import com.sayukth.aadhaar_ocr.SayukthUtils;
 
 import java.io.IOException;
 import java.text.StringCharacterIterator;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class MainActivity extends AppCompatActivity implements DetectAadhaarContract.View {
-    private static final int AADHAAR_REQUEST_IMAGE = 100;
     TextView tvOcrData;
     ImageView ivOcr;
     TextView tvOcrImageText;
@@ -50,6 +50,7 @@ public class MainActivity extends AppCompatActivity implements DetectAadhaarCont
         ivOcr = findViewById(R.id.iv_ocr);
         tvOcrImageText = findViewById(R.id.tv_ocr_image_data);
 
+        SayukthUtils.getName();
 
         try {
             presenter = new DetectAadhaarPresenter(this, MainActivity.this);
@@ -87,10 +88,15 @@ public class MainActivity extends AppCompatActivity implements DetectAadhaarCont
 
     @Override
     public void showCameraOptions() {
-        AadhaarDetectActivity.showImagePickerOptions(this, new AadhaarDetectActivity.PickerOptionListener() {
+        DetectAadhaarActivity.showImagePickerOptions(this, new DetectAadhaarActivity.PickerOptionListener() {
             @Override
             public void onTakeCameraSelected() {
                 launchCameraIntent();
+            }
+
+            @Override
+            public void onChooseAadhaarQrCodeScanner() {
+                // leave it empty
             }
         });
     }
@@ -111,6 +117,7 @@ public class MainActivity extends AppCompatActivity implements DetectAadhaarCont
                 if (resultCode == Activity.RESULT_OK) {
                     Uri uri = intent.getParcelableExtra("path");
                     try {
+                        Log.i("Uri : ", uri.toString());
                         // You can update this bitmap to your server
                         Bitmap bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), uri);
 //                        extractText(bitmap);
@@ -139,31 +146,33 @@ public class MainActivity extends AppCompatActivity implements DetectAadhaarCont
 
 
     private void launchCameraIntent() {
-        Intent intent = new Intent(MainActivity.this, AadhaarDetectActivity.class);
-        intent.putExtra(AadhaarDetectActivity.INTENT_IMAGE_PICKER_OPTION, AadhaarDetectActivity.REQUEST_IMAGE_CAPTURE);
+        Intent intent = new Intent(MainActivity.this, DetectAadhaarActivity.class);
+        intent.putExtra(DetectAadhaarActivity.INTENT_IMAGE_PICKER_OPTION, DetectAadhaarActivity.REQUEST_IMAGE_CAPTURE);
 
         // setting aspect ratio
-        intent.putExtra(AadhaarDetectActivity.INTENT_LOCK_ASPECT_RATIO, true);
-        intent.putExtra(AadhaarDetectActivity.INTENT_ASPECT_RATIO_X, 1); // 16x9, 1x1, 3:4, 3:2
-        intent.putExtra(AadhaarDetectActivity.INTENT_ASPECT_RATIO_Y, 1);
+        intent.putExtra(DetectAadhaarActivity.INTENT_LOCK_ASPECT_RATIO, true);
+        intent.putExtra(DetectAadhaarActivity.INTENT_ASPECT_RATIO_X, 1); // 16x9, 1x1, 3:4, 3:2
+        intent.putExtra(DetectAadhaarActivity.INTENT_ASPECT_RATIO_Y, 1);
 
         // setting maximum bitmap width and height
-        intent.putExtra(AadhaarDetectActivity.INTENT_SET_BITMAP_MAX_WIDTH_HEIGHT, true);
-        intent.putExtra(AadhaarDetectActivity.INTENT_BITMAP_MAX_WIDTH, 1000);
-        intent.putExtra(AadhaarDetectActivity.INTENT_BITMAP_MAX_HEIGHT, 1000);
+        intent.putExtra(DetectAadhaarActivity.INTENT_SET_BITMAP_MAX_WIDTH_HEIGHT, true);
+        intent.putExtra(DetectAadhaarActivity.INTENT_BITMAP_MAX_WIDTH, 1000);
+        intent.putExtra(DetectAadhaarActivity.INTENT_BITMAP_MAX_HEIGHT, 1000);
 
         startActivityForResult(intent, AADHAAR_REQUEST_IMAGE);
     }
 
 
     @Override
-    public void showAadharInfo(HashMap<String, String> map) {
+    public void showAadhaarInfo(HashMap<String, String> map) {
         try {
 
-            map.forEach((k, v) -> System.out.println(("K: "+k + ":" + "V"+v)));
+            Log.i("Aadhaar : ", String.valueOf(map));
+
+            map.forEach((k, v) -> System.out.println(("K: "+k + ":" + "V: "+v)));
 
             StringBuilder aadhaarData = new StringBuilder("Aadhaar Data : \n");
-//            Log.i("MainActivity", map + " ");
+
             String aadharId = map.get("AADHAR");
             if (aadharId != null) {
                 aadharId = aadharId.replaceAll("\\s", "");

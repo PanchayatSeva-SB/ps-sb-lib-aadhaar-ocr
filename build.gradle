@@ -3,3 +3,14 @@ plugins {
     id 'com.android.application' version '7.3.1' apply false
     id 'com.android.library' version '7.3.1' apply false
 }
+
+dependencies {
+//    implementation(project(':aadhaar-ocr'))s
+
+//    implementation project(path: ':aadhaar-ocr')
+
+//    implementation project(':aadhaar-ocr')
+
+
+
+}
