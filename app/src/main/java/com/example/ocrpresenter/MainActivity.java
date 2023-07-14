@@ -65,7 +65,7 @@ public class MainActivity extends AppCompatActivity implements DetectAadhaarCont
     @Override
     public void showAadhaarDetectOptions() {
         Dexter.withActivity(MainActivity.this)
-                .withPermissions(Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                .withPermissions(Manifest.permission.CAMERA)
                 .withListener(new MultiplePermissionsListener() {
                     @Override
                     public void onPermissionsChecked(MultiplePermissionsReport report) {

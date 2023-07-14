@@ -185,7 +185,7 @@ public class DetectAadhaarActivity extends AppCompatActivity {
 //        startActivityForResult(cameraIntent, REQUEST_IMAGE_CAPTURE);
 
         Dexter.withActivity(this)
-                .withPermissions(Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                .withPermissions(Manifest.permission.CAMERA)
                 .withListener(new MultiplePermissionsListener() {
                     @Override
                     public void onPermissionsChecked(MultiplePermissionsReport report) {
