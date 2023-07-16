@@ -21,6 +21,7 @@ import com.karumi.dexter.MultiplePermissionsReport;
 import com.karumi.dexter.PermissionToken;
 import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
+import com.sayukth.aadhaar_ocr.AadhaarOcrLibraryApplication;
 import com.sayukth.aadhaar_ocr.SayukthUtils;
 import com.sayukth.aadhaar_ocr.ui.DetectAadhaarActivity;
 import com.sayukth.aadhaar_ocr.ui.DetectAadhaarContract;
@@ -45,6 +46,8 @@ public class MainActivity extends AppCompatActivity implements DetectAadhaarCont
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        AadhaarOcrLibraryApplication.init(getApplicationContext());
 
         tvOcrData = findViewById(R.id.tv_aadhaar_data);
         ivOcr = findViewById(R.id.iv_ocr);
@@ -171,7 +174,7 @@ public class MainActivity extends AppCompatActivity implements DetectAadhaarCont
 
             map.forEach((k, v) -> System.out.println(("K: "+k + ":" + "V: "+v)));
 
-            StringBuilder aadhaarData = new StringBuilder("Aadhaar Data : \n");
+            StringBuilder aadhaarData = new StringBuilder();
 
             String aadharId = map.get("AADHAR");
             if (aadharId != null) {
@@ -182,27 +185,27 @@ public class MainActivity extends AppCompatActivity implements DetectAadhaarCont
             String name = map.get("NAME");
             if (name != null   && name != " ")
             {
-                aadhaarData.append(" Sur Name : " +StringSplitUtils.getFirstPartOfStringBySplitString(name," ") + ", \n");
-                aadhaarData.append("  Name : " + StringSplitUtils.getLastPartOfStringBySplitString(name, " ") + ", \n");
+                aadhaarData.append(" Sur Name : " + StringSplitUtils.getFirstPartOfStringBySplitString(name, " ") + ", \n");
+                aadhaarData.append(" Name : " + StringSplitUtils.getLastPartOfStringBySplitString(name, " ") + ", \n");
             }
             String fsname = map.get("FATHER");
             if(fsname != null && fsname != " "){
-                aadhaarData.append(" FatherNameorSpouse : " + fsname + ", \n");
+                aadhaarData.append(" Father or Spouse Name : " + fsname + ", \n");
             }
 
             String dob = map.get("DATE_OF_YEAR");
             if (dob != null) {
-                aadhaarData.append(" Dob : " + dob + " , \n");
+                aadhaarData.append(" Dob : " + dob + ", \n");
             }
 
             String genderStr = map.get("GENDER");
             if (genderStr != "" && genderStr != null) {
                 if (genderStr.equals("M") || genderStr.startsWith("M")) {
-                    aadhaarData.append(" Gender : Male " + ", \n");
+                    aadhaarData.append(" Gender : Male" + ", \n");
                 } else if (genderStr.equals("F") || genderStr.startsWith("F")) {
-                    aadhaarData.append(" Gender : Female " + ", \n");
+                    aadhaarData.append(" Gender : Female" + ", \n");
                 } else {
-                    aadhaarData.append(" Gender : Other " + ", \n");
+                    aadhaarData.append(" Gender : Other" + ", \n");
                 }
             }
 
@@ -215,15 +218,13 @@ public class MainActivity extends AppCompatActivity implements DetectAadhaarCont
 
 
             String otherStr = map.get("FATHER");
-//            PanchayatSevaUtilities.showToast(otherStr + " ");
             if (otherStr != null && !otherStr.equals(" ")) {
 
                     String nameRegex = "^[a-zA-Z\\s]*$";
                     String fsNameStr= Arrays.toString(otherStr.split(nameRegex, 1));
                     fatherOrSpouseName.setText(otherStr);
                     aadhaarData.append("FATHER NAME:").append(fatherOrSpouseName).append(" ,\n");
-//                   String fsNameStr = PanchayatSevaUtilities.splitString(otherStr);
-//                    fatherOrSpouseName.setText(PanchayatSevaUtilities.stringToTitleCaseString(fsNameStr));
+
 
             }
 
