@@ -13,7 +13,7 @@
         android:layout_height="120dp"
         android:layout_margin="10dp"
         android:layout_marginLeft="10dp"
-        android:background="@drawable/rounded_background"
+        android:background="@drawable/square_blue_background"
         android:onClick="scanAadhaar"
         android:orientation="horizontal"
         android:padding="5dp">
@@ -50,13 +50,26 @@
     </LinearLayout>
 
     <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:text="Aadhaar Data :"
+        android:textStyle="bold" />
+
+    <TextView
         android:id="@+id/tv_aadhaar_data"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="16dp"
         android:layout_marginVertical="16dp"
-        android:text="Aadhaar Data : N/A" />
+        android:text="" />
 
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:text="Ocr Image Data :"
+        android:textStyle="bold" />
 
     <TextView
         android:id="@+id/tv_ocr_image_data"
@@ -64,7 +77,7 @@
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="16dp"
         android:layout_marginVertical="16dp"
-        android:text="Ocr Image Data : N/A" />
+        android:text="" />
 
     <ImageView
         android:id="@+id/iv_ocr"
@@ -72,7 +85,8 @@
         android:layout_height="200dp"
         android:layout_gravity="center"
         android:layout_marginTop="32dp"
-        android:background="@color/black_effective" />
+        android:background="@drawable/square_blue_background"
+        android:scaleType="fitXY" />
 
 
 </LinearLayout>

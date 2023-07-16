@@ -3,25 +3,24 @@ package com.sayukth.aadhaar_ocr.ocrpreferences;
 import android.content.Context;
 import android.content.SharedPreferences;
 
-import com.sayukth.aadhaar_ocr.AadhaarOcrApplication;
+import com.sayukth.aadhaar_ocr.AadhaarOcrLibraryApplication;
 
 
 public class AadhaarOcrPreferences {
-//    public static final int CAMERA_REQUEST = 999;
-    private static final String SETTINGS_NAME = "default_settings";
+    //    public static final int CAMERA_REQUEST = 999;
+    private static final String SETTINGS_NAME = "aadhaar_ocr_settings";
     private static AadhaarOcrPreferences sSharedPrefs;
     private SharedPreferences mPref;
     private SharedPreferences.Editor mEditor;
     private boolean mBulkUpdate = false;
 
 
-    public static void setOcrWordApplication(Object ocrWordApplicaiton) {
+    public enum Key {
+        AADHAAR_OCR_SCAN_SIDE,
+        AADHAAR_INPUT_TYPE,
+        QR_CODE_SCAN_TYPE_KEY
     }
 
-    public enum Key{
-        OCR_TYPE,SAMPLE_STR,
-        SAMPLE_INT
-    }
     private AadhaarOcrPreferences(Context context) {
         mPref = context.getSharedPreferences(SETTINGS_NAME, Context.MODE_PRIVATE);
     }
@@ -45,7 +44,7 @@ public class AadhaarOcrPreferences {
         //Option 2:
         // Alternatively, you can create a new instance here
         // with something like this:
-        return getInstance(AadhaarOcrApplication.getAppContext());
+        return getInstance(AadhaarOcrLibraryApplication.getAppContext());
     }
     public void put(Key key, String val) {
         doEdit();
