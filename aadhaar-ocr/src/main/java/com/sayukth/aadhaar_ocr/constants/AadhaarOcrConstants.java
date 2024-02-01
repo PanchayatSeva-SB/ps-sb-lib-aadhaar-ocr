@@ -15,4 +15,6 @@ public class AadhaarOcrConstants {
 
     public static final String AADHAAR_OCR_BACK_SIDE = "Aadhaar Ocr Back Side";
 
+    public static final String AADHAAR_BIGQR_OCR ="Aadhaar Big QR Ocr Front Side";
+
 }

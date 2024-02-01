@@ -1,5 +1,6 @@
 package com.sayukth.aadhaar_ocr.ui;
 
+import static com.sayukth.aadhaar_ocr.constants.AadhaarOcrConstants.AADHAAR_BIGQR_OCR;
 import static com.sayukth.aadhaar_ocr.constants.AadhaarOcrConstants.AADHAAR_OCR_BACK_SIDE;
 import static com.sayukth.aadhaar_ocr.constants.AadhaarOcrConstants.AADHAAR_OCR_FRONT_SIDE;
 import static com.sayukth.aadhaar_ocr.ocrpreferences.AadhaarOcrPreferences.Key.AADHAAR_OCR_SCAN_SIDE;
@@ -54,6 +55,7 @@ public class DetectAadhaarPresenter implements DetectAadhaarContract.Presenter {
         for (int i = 0; i < textBlockSparseArray.size(); i++) {
             TextBlock textBlock = textBlockSparseArray.get(textBlockSparseArray.keyAt(i));
             imageText = textBlock.getValue();
+            Log.d("IMAGEtEXT", "Text Block: " + imageText);
             ocrImageText.append(textBlock.getValue() + "\n");
             Log.d("Language : ", imageText + " : " + textBlock.getLanguage());
             stringBuilder.append("#" + imageText + "#");
@@ -69,6 +71,10 @@ public class DetectAadhaarPresenter implements DetectAadhaarContract.Presenter {
             } else if (aadhaarOcrScanSide.equals(AADHAAR_OCR_FRONT_SIDE)) {
                 getTextType(imageText);
             }
+            else if(aadhaarOcrScanSide.equals(AADHAAR_BIGQR_OCR)){
+                getTextTypeBigQR(imageText);
+
+            }
         }
 
         detectAadharView.showAadhaarInfo(metadataMap);
@@ -79,7 +85,7 @@ public class DetectAadhaarPresenter implements DetectAadhaarContract.Presenter {
         try {
             String type = " ";
 
-//            Log.e("RAMESH","RAMSVALUE"+val);
+//           Log.e("RAMESH","RAMSVALUE"+val);
 
             if (val.contains("\n")) {
                 String valArr[] = val.split("\n");
@@ -88,6 +94,33 @@ public class DetectAadhaarPresenter implements DetectAadhaarContract.Presenter {
                     for (int newlineIdx = 0; newlineIdx < valArr.length; newlineIdx++) {
                         System.out.println(" if : " + valArr[newlineIdx]);
                         setMetaData(valArr[newlineIdx]);
+                        setAadhaarId(valArr[newlineIdx]);
+                    }
+                }
+            } else {
+                System.out.println(" else : " + val);
+                setMetaData(val);
+            }
+        } catch (ActivityException e) {
+
+        }
+
+    }
+
+    public void getTextTypeBigQR(String val) {
+        try {
+            String type = " ";
+
+//           Log.e("RAMESH","RAMSVALUE"+val);
+
+            if (val.contains("\n")) {
+                String valArr[] = val.split("\n");
+
+                if (valArr.length > 0) {
+                    for (int newlineIdx = 0; newlineIdx < valArr.length; newlineIdx++) {
+                        System.out.println(" if : " + valArr[newlineIdx]);
+//                        setMetaData(valArr[newlineIdx]);
+                        setAadhaarId(valArr[newlineIdx]);
                     }
                 }
             } else {
@@ -101,6 +134,7 @@ public class DetectAadhaarPresenter implements DetectAadhaarContract.Presenter {
     }
 
     public void setFatherOrSpouseMetaData(String val) throws ActivityException {
+        Log.e("in setFatherOrSpouseMetaData","setFatherOrSpouseMetaData");
         detectAadharView.showImageText(String.valueOf(ocrImageText));
 
         String srcVal = val.toUpperCase();
@@ -108,19 +142,38 @@ public class DetectAadhaarPresenter implements DetectAadhaarContract.Presenter {
             String metaData = "FATHER";
 
             String text = StringSplitUtils.getLastPartOfStringBySplitString(ocrImageText.toString(), ":");
-//            System.out.println("Text : "+ text);
+//           System.out.println("Text : "+ text);
             String fsnameWithCareOf = StringSplitUtils.getFirstPartOfStringBySplitString(text.toString(), ",");
 //            System.out.println("FS : "+ fsnameWithCareOf);
             String fsname = StringSplitUtils.getLastPartOfStringBySplitString(fsnameWithCareOf.trim(), " ");
-            System.out.println("FS : " + fsname);
+//            System.out.println("FS : " + fsname);
 
             metadataMap.put(metaData, fsname.trim());
         }
 
     }
 
+    public void setAadhaarId(String val) throws ActivityException{
+//        Log.e("in setAadhaarId","setAadhaarId");
+        detectAadharView.showImageText(String.valueOf(ocrImageText));
+        String aadharRegex = "^[2-9]{1}[0-9]{3}\\s[0-9]{4}\\s[0-9]{4}$";
+
+//        String aadharRegex = "^[2-9]{1}[0-9]{3}\\s[0-9]{4}\\s[0-9]{4}$|\\d{12}";
+        Matcher aadharMatcher = getPatternMatcher(aadharRegex, val);
+
+        String metaData = "AADHAR";
+        String tgtVal = val;
+
+
+        if (aadharMatcher.matches()) {
+
+            metadataMap.put(metaData, tgtVal.trim());
+        }
+    }
+
 
     public void setMetaData(String val) throws ActivityException {
+
         try {
             detectAadharView.showImageText(String.valueOf(ocrImageText));
 

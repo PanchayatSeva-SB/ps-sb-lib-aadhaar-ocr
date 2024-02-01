@@ -27,6 +27,14 @@
         android:textAllCaps="false"
         android:textColor="@color/white"
         android:textSize="18sp" />
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/_8dp"
+        android:textStyle="bold"
+        android:text="Big QR Code"
+        android:autofillHints="smsOTPCode"
+        android:importantForAutofill="yes"/>
 
     <Button
         android:id="@+id/big_qr_scan_btn"
@@ -37,7 +45,20 @@
         android:text="@string/big_qr_code"
         android:textAllCaps="false"
         android:textColor="@color/white"
-        android:textSize="18sp" />
+        android:textSize="18sp"
+        />
+    <Button
+        android:id="@+id/big_qr_ocr_btn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/spacing_smlarge"
+        android:background="@drawable/square_blue_background"
+        android:text="Aadhaar Scan"
+        android:onClick="setAadhaarId"
+        android:textAllCaps="false"
+        android:textColor="@color/white"
+        android:textSize="18sp"
+        />
 
 
     <View
