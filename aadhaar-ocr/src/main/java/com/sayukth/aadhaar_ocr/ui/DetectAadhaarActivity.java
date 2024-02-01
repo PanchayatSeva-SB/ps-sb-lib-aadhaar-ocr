@@ -1,6 +1,7 @@
 package com.sayukth.aadhaar_ocr.ui;
 
 import static androidx.core.content.FileProvider.getUriForFile;
+import static com.sayukth.aadhaar_ocr.constants.AadhaarOcrConstants.AADHAAR_BIGQR_OCR;
 import static com.sayukth.aadhaar_ocr.constants.AadhaarOcrConstants.AADHAAR_OCR_BACK_SIDE;
 import static com.sayukth.aadhaar_ocr.constants.AadhaarOcrConstants.AADHAAR_OCR_FRONT_SIDE;
 import static com.sayukth.aadhaar_ocr.constants.AadhaarOcrConstants.BIG_QR_CODE;
@@ -77,6 +78,8 @@ public class DetectAadhaarActivity extends AppCompatActivity {
 
         Button btnBigQrCodeScan = (Button) promptView.findViewById(R.id.big_qr_scan_btn);
 
+        Button btnBigQrCodeOCR =(Button)  promptView.findViewById(R.id.big_qr_ocr_btn);
+
         Button btnFrontAadhaarCapture = (Button) promptView.findViewById(R.id.front_aadhaar_capture_btn);
 
         Button btnBackAadhaarCapture = (Button) promptView.findViewById(R.id.back_aadhaar_capture_btn);
@@ -84,6 +87,7 @@ public class DetectAadhaarActivity extends AppCompatActivity {
         btnSmallQrCodeScan.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
 
                 AadhaarOcrPreferences.getInstance().put(QR_CODE_SCAN_TYPE_KEY, SMALL_QR_CODE);
 
@@ -99,6 +103,7 @@ public class DetectAadhaarActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
+
                 AadhaarOcrPreferences.getInstance().put(QR_CODE_SCAN_TYPE_KEY, BIG_QR_CODE);
 
                 listener.onChooseAadhaarQrCodeScanner();
@@ -107,6 +112,17 @@ public class DetectAadhaarActivity extends AppCompatActivity {
 
             }
 
+        });
+
+        btnBigQrCodeOCR.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                AadhaarOcrPreferences.getInstance().put(AADHAAR_OCR_SCAN_SIDE, AADHAAR_BIGQR_OCR);
+
+                listener.onTakeCameraSelected();
+                alertD.dismiss();
+                aadharInputTypeFlag = true;
+            }
         });
 
         btnFrontAadhaarCapture.setOnClickListener(new View.OnClickListener() {
