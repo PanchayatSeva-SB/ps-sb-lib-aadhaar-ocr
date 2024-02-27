@@ -9,12 +9,13 @@
         android:layout_width="0dp"
         android:layout_height="@dimen/spacing_mlarge" />
 
+
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/_8dp"
         android:textStyle="bold"
-        android:text="@string/qr_code"/>
+        android:text="Method 1: Small QR Code"/>
 
 
     <Button
@@ -26,13 +27,17 @@
         android:text="@string/small_qr_code"
         android:textAllCaps="false"
         android:textColor="@color/white"
-        android:textSize="18sp" />
+        android:textSize="18sp"
+        android:drawableRight="@drawable/small_round_qr_code_24"
+       />
+
+
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/_8dp"
         android:textStyle="bold"
-        android:text="Big QR Code"
+        android:text="Method 2: Big QR Code"
         android:autofillHints="smsOTPCode"
         android:importantForAutofill="yes"/>
 
@@ -46,6 +51,7 @@
         android:textAllCaps="false"
         android:textColor="@color/white"
         android:textSize="18sp"
+        android:drawableRight="@drawable/big_round_qr_code_24"
         />
     <Button
         android:id="@+id/big_qr_ocr_btn"
@@ -53,7 +59,7 @@
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/spacing_smlarge"
         android:background="@drawable/square_blue_background"
-        android:text="Aadhaar Scan"
+        android:text="Step 2: Take Photo of Aadhaar Number"
         android:onClick="setAadhaarId"
         android:textAllCaps="false"
         android:textColor="@color/white"
@@ -70,7 +76,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/_8dp"
         android:textStyle="bold"
-        android:text="@string/scan_card"/>
+        android:text="Method 3: Capture Photo"/>
 
 
     <Button
@@ -79,7 +85,7 @@
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/spacing_smlarge"
         android:background="@drawable/centre_background"
-        android:text="@string/aadhaar_front_side_pic"
+        android:text="Step 1: Take Aadhaar Card Front Side Photo"
         android:textAllCaps="false"
         android:textColor="@color/white"
         android:textSize="18sp" />
@@ -92,7 +98,7 @@
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/spacing_smlarge"
         android:background="@drawable/centre_background"
-        android:text="@string/aadhaar_back_side_pic"
+        android:text="Step 2: Take Aadhaar Card Back Side Photo"
         android:textAllCaps="false"
         android:textColor="@color/white"
         android:textSize="18sp" />

@@ -227,6 +227,37 @@ public class DateUtils {
                 str2 = tokenizer.nextToken();
                 str3 = tokenizer.nextToken();
             }
+            str1 = str1.toLowerCase();
+            str2 = str2.toLowerCase();
+            str3 = str3.toLowerCase();
+
+            if(str1.contains("o")  || str2.contains("o")  || str3.contains("o") ){
+                str1 =str1.replace("o","0");
+                str2 =str2.replace("o","0");
+                str3 =str3.replace("o","0");
+            }
+
+            if(str1.contains("t") || str2.contains("t") || str3.contains("t") ){
+                str1 =str1.replace("t","1");
+                str2 =str2.replace("t","1");
+                str3 =str3.replace("t","1");
+            }
+
+            if(str1.contains("i") || str2.contains("i") || str3.contains("i") ){
+                str1 =str1.replace("i","1");
+                str2 =str2.replace("i","1");
+                str3 =str3.replace("i","1");
+            }
+            if(str1.contains("s") || str2.contains("s") || str3.contains("s")){
+                str1 =str1.replace("s","9");
+                str2 =str2.replace("s","9");
+                str3 =str3.replace("s","9");
+            }
+            if(str1.contains("!") || str2.contains("!") || str3.contains("!")){
+                str1 =str1.replace("!","1") ;
+                str2 =str2.replace("!","1");
+                str3 =str3.replace("!","1");
+            }
             if (str1.length() == 4) {
                 year = str1;
                 month = str2;

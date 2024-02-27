@@ -1,16 +1,16 @@
 <resources>
     <string name="app_name" translatable="false">OCR presenter</string>
-    <string name="aadhaar_back_side_pic" translatable="false">Scan Aadhaar Card Back Side</string>
-    <string name="aadhaar_front_side_pic" translatable="false">Scan Aadhaar Card Front Side</string>
-    <string name="qr_code">QR Code</string>
-    <string name="scan_card">Scan Card</string>
+    <string name="aadhaar_back_side_pic" translatable="false">Step 2: Capture Aadhaar Card Back Side Photo</string>
+    <string name="aadhaar_front_side_pic" translatable="false">Step 1: Capture Aadhaar Card Front Side Photo</string>
+    <string name="qr_code">Method 1: Small QR Code</string>
+    <string name="scan_card">Method 3: Capture Photo</string>
     <string name="choose_aadhaar_options_title">Select Aadhaar Scan Method</string>
     <string name="toast_image_intent_null">Image Picker Option is missing!!!</string>
     <string name="scan_new_card">Click Here to Scan Card</string>
     <string name="click_for_photo">Click_For_Photo</string>
 
 
-    <string name="big_qr_code">Big QR Code</string>
+    <string name="big_qr_code">Step 1: Big QR Code</string>
     <string name="small_qr_code">Small QR Code</string>
 
 </resources>
