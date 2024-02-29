@@ -10,7 +10,7 @@
     <string name="click_for_photo">Click_For_Photo</string>
 
 
-    <string name="big_qr_code">Step 1: Big QR Code</string>
-    <string name="small_qr_code">Small QR Code</string>
+    <string name="big_qr_code">Step 1: Scan Big QR Code</string>
+    <string name="small_qr_code">Scan Small QR Code</string>
 
 </resources>

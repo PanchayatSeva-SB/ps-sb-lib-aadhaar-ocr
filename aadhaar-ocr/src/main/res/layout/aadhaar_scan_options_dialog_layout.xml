@@ -1,107 +1,247 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_centerInParent="true"
     android:orientation="vertical">
 
-    <View
-        android:layout_width="0dp"
-        android:layout_height="@dimen/spacing_mlarge" />
-
-
-    <TextView
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/_8dp"
-        android:textStyle="bold"
-        android:text="Method 1: Small QR Code"/>
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="@dimen/spacing_mlarge" />
 
 
-    <Button
-        android:id="@+id/small_qr_scan_btn"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="@dimen/spacing_smlarge"
-        android:background="@drawable/square_blue_background"
-        android:text="@string/small_qr_code"
-        android:textAllCaps="false"
-        android:textColor="@color/white"
-        android:textSize="18sp"
-        android:drawableRight="@drawable/small_round_qr_code_24"
-       />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/_8dp"
+                android:text="Method 1: Small QR Code"
+                android:textStyle="bold" />
 
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/_8dp"
-        android:textStyle="bold"
-        android:text="Method 2: Big QR Code"
-        android:autofillHints="smsOTPCode"
-        android:importantForAutofill="yes"/>
+            <LinearLayout
+                android:id="@+id/ll_small_qr_scan"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/spacing_smlarge"
+                android:background="@drawable/square_blue_background"
+                android:orientation="horizontal"
+                android:paddingVertical="8dp">
 
-    <Button
-        android:id="@+id/big_qr_scan_btn"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="@dimen/spacing_smlarge"
-        android:background="@drawable/square_blue_background"
-        android:text="@string/big_qr_code"
-        android:textAllCaps="false"
-        android:textColor="@color/white"
-        android:textSize="18sp"
-        android:drawableRight="@drawable/big_round_qr_code_24"
-        />
-    <Button
-        android:id="@+id/big_qr_ocr_btn"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="@dimen/spacing_smlarge"
-        android:background="@drawable/square_blue_background"
-        android:text="Step 2: Take Photo of Aadhaar Number"
-        android:onClick="setAadhaarId"
-        android:textAllCaps="false"
-        android:textColor="@color/white"
-        android:textSize="18sp"
-        />
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginEnd="@dimen/_8dp"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:importantForAutofill="yes"
+                    android:text="@string/small_qr_code"
+                    android:textAlignment="center"
+                    android:textAllCaps="false"
+                    android:textColor="@color/white"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
 
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginEnd="@dimen/_8dp"
+                    android:layout_weight="0.3"
+                    android:orientation="vertical">
 
-    <View
-        android:layout_width="0dp"
-        android:layout_height="@dimen/spacing_mlarge" />
+                    <ImageView
+                        android:layout_width="60dp"
+                        android:layout_height="60dp"
+                        android:layout_gravity="center"
+                        android:background="@drawable/small_qr"
+                        tools:ignore="ContentDescription" />
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/_8dp"
-        android:textStyle="bold"
-        android:text="Method 3: Capture Photo"/>
+                </LinearLayout>
 
 
-    <Button
-        android:id="@+id/front_aadhaar_capture_btn"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="@dimen/spacing_smlarge"
-        android:background="@drawable/centre_background"
-        android:text="Step 1: Take Aadhaar Card Front Side Photo"
-        android:textAllCaps="false"
-        android:textColor="@color/white"
-        android:textSize="18sp" />
+            </LinearLayout>
 
 
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/_8dp"
+                android:autofillHints="smsOTPCode"
+                android:importantForAutofill="yes"
+                android:text="Method 2: Big QR Code"
+                android:textStyle="bold" />
 
-    <Button
-        android:id="@+id/back_aadhaar_capture_btn"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="@dimen/spacing_smlarge"
-        android:background="@drawable/centre_background"
-        android:text="Step 2: Take Aadhaar Card Back Side Photo"
-        android:textAllCaps="false"
-        android:textColor="@color/white"
-        android:textSize="18sp" />
+            <LinearLayout
+                android:id="@+id/ll_big_qr_scan"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/spacing_smlarge"
+                android:background="@drawable/square_blue_background"
+                android:orientation="horizontal"
+                android:paddingVertical="8dp">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginEnd="@dimen/_8dp"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:importantForAutofill="yes"
+                    android:text="@string/big_qr_code"
+                    android:textAlignment="center"
+                    android:textAllCaps="false"
+                    android:textColor="@color/white"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginEnd="@dimen/_8dp"
+                    android:layout_weight="0.3"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:layout_width="60dp"
+                        android:layout_height="60dp"
+                        android:layout_gravity="center"
+                        android:background="@drawable/big_qr"
+                        tools:ignore="ContentDescription" />
+
+                </LinearLayout>
+
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/ll_big_qr_ocr"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/spacing_smlarge"
+                android:background="@drawable/square_blue_background"
+                android:orientation="horizontal"
+                android:paddingVertical="8dp">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginEnd="@dimen/_8dp"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:importantForAutofill="yes"
+                    android:text="Step 2: Take Photo of Aadhaar Number"
+                    android:textAlignment="center"
+                    android:textAllCaps="false"
+                    android:textColor="@color/white"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
+
+
+            <!--            <Button-->
+            <!--                android:id="@+id/big_qr_ocr_btn"-->
+            <!--                android:layout_width="match_parent"-->
+            <!--                android:layout_height="wrap_content"-->
+            <!--                android:layout_margin="@dimen/spacing_smlarge"-->
+            <!--                android:background="@drawable/square_blue_background"-->
+            <!--                android:text="Step 2: Take Photo of Aadhaar Number"-->
+            <!--                android:onClick="setAadhaarId"-->
+            <!--                android:textAllCaps="false"-->
+            <!--                android:textStyle="bold"-->
+            <!--                android:textColor="@color/white"-->
+            <!--                android:textSize="16sp"-->
+            <!--                />-->
+
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="@dimen/spacing_mlarge" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/_8dp"
+                android:text="Method 3: Capture Photo"
+                android:textStyle="bold" />
+
+
+            <!--            <Button-->
+            <!--                android:id="@+id/front_aadhaar_capture_btn"-->
+            <!--                android:layout_width="match_parent"-->
+            <!--                android:layout_height="wrap_content"-->
+            <!--                android:layout_margin="@dimen/spacing_smlarge"-->
+            <!--                android:background="@drawable/centre_background"-->
+            <!--                android:text="Step 1: Take Aadhaar Card Front Side Photo"-->
+            <!--                android:textAllCaps="false"-->
+            <!--                android:textStyle="bold"-->
+            <!--                android:textColor="@color/white"-->
+            <!--                android:textSize="16sp" />-->
+
+            <LinearLayout
+                android:id="@+id/ll_front_aadhaar_capture"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/spacing_smlarge"
+                android:background="@drawable/centre_background"
+                android:orientation="horizontal"
+                android:paddingVertical="8dp">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginEnd="@dimen/_8dp"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:importantForAutofill="yes"
+                    android:text="Step 1: Take Aadhaar Card Front Side Photo"
+                    android:textAlignment="center"
+                    android:textAllCaps="false"
+                    android:textColor="@color/white"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/ll_back_aadhaar_capture"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/spacing_smlarge"
+                android:background="@drawable/centre_background"
+                android:orientation="horizontal"
+                android:paddingVertical="8dp">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginEnd="@dimen/_8dp"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:importantForAutofill="yes"
+                    android:text="Step 2: Take Aadhaar Card Back Side Photo"
+                    android:textAlignment="center"
+                    android:textAllCaps="false"
+                    android:textColor="@color/white"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
+
+
+        </LinearLayout>
+
+
+    </androidx.core.widget.NestedScrollView>
 
 
 </LinearLayout>
