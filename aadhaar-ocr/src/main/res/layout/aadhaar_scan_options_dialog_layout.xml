@@ -62,7 +62,7 @@
                         android:layout_width="60dp"
                         android:layout_height="60dp"
                         android:layout_gravity="center"
-                        android:background="@drawable/small_qr"
+                        android:background="@drawable/final_small_qr"
                         tools:ignore="ContentDescription" />
 
                 </LinearLayout>
@@ -114,7 +114,7 @@
                         android:layout_width="60dp"
                         android:layout_height="60dp"
                         android:layout_gravity="center"
-                        android:background="@drawable/big_qr"
+                        android:background="@drawable/big_qr_code_final"
                         tools:ignore="ContentDescription" />
 
                 </LinearLayout>
