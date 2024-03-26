@@ -9,4 +9,13 @@
     <string name="scan_new_card">Click Here to Scan Card</string>
     <string name="click_for_photo">Click_For_Photo</string>
 
+    <string name="big_qr_code">Step 1: Scan Big QR Code</string>
+    <string name="small_qr_code">Scan Small QR Code</string>
+    <string name="method_1_small_qr_code">Method 1: Small QR Code</string>
+    <string name="method_2_big_qr_code">Method 2: Big QR Code</string>
+    <string name="method_3_capture_photo">Method 3: Take Aadhaar Card Photo</string>
+    <string name="big_qr_aadhaar_number">Step 2: Take Photo of Aadhaar Number</string>
+    <string name="aadhaar_card_front_side_photo">Step 1: Take Aadhaar Card Front Side Photo</string>
+    <string name="aadhaar_card_back_side_photo">Step 2: Take Aadhaar Card Back Side Photo</string>
+
 </resources>

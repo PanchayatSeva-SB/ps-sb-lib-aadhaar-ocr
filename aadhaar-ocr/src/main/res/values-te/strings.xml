@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name" translatable="false">OCR presenter</string>
+    <string name="aadhaar_back_side_pic" translatable="false">Scan Aadhaar Card Back Side</string>
+    <string name="aadhaar_front_side_pic" translatable="false">Scan Aadhaar Card Front Side</string>
+    <string name="qr_code">QR Code</string>
+    <string name="scan_card">Scan Card</string>
+    <string name="choose_aadhaar_options_title">Select Aadhaar Scan Method</string>
+    <string name="toast_image_intent_null">Image Picker Option is missing!!!</string>
+    <string name="scan_new_card">Click Here to Scan Card</string>
+    <string name="click_for_photo">Click_For_Photo</string>
+
+    <string name="big_qr_code">స్టెప్ 1: పెద్ద QR కోడ్‌ని స్కాన్ చేయండి</string>
+    <string name="small_qr_code">చిన్న QR కోడ్‌ని స్కాన్ చేయండి</string>
+    <string name="method_1_small_qr_code">మెథడ్ 1: చిన్న QR కోడ్</string>
+    <string name="method_2_big_qr_code">మెథడ్ 2: పెద్ద QR కోడ్</string>
+    <string name="method_3_capture_photo">మెథడ్ 3: ఫోటోను క్యాప్చర్ చేయండి</string>
+    <string name="big_qr_aadhaar_number">స్టెప్ 2: ఆధార్ నంబర్ ఫోటో తీయండి</string>
+    <string name="aadhaar_card_front_side_photo">స్టెప్ 1: ఆధార్ కార్డ్ ముందు వైపు ఫోటో తీయండి</string>
+    <string name="aadhaar_card_back_side_photo">స్టెప్ 2: ఆధార్ కార్డ్ వెనుక వైపు ఫోటో తీయండి</string>
+
+    <string name="or">(లేదా)</string>
+
+</resources>
