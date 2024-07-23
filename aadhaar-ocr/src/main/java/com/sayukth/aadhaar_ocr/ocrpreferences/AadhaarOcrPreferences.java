@@ -18,7 +18,7 @@ public class AadhaarOcrPreferences {
     public enum Key {
         AADHAAR_OCR_SCAN_SIDE,
         AADHAAR_INPUT_TYPE,
-        QR_CODE_SCAN_TYPE_KEY
+        AADHAAR_SCAN_TYPE_KEY,
     }
 
     private AadhaarOcrPreferences(Context context) {
