@@ -25,7 +25,7 @@ import android.provider.OpenableColumns;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
@@ -74,32 +74,28 @@ public class DetectAadhaarActivity extends AppCompatActivity {
 
         alertD.setTitle(context.getString(R.string.choose_aadhaar_options_title));
 
-        Button btnSmallQrCodeScan = (Button) promptView.findViewById(R.id.small_qr_scan_btn);
+        LinearLayout llSmallQrCodeScan = (LinearLayout) promptView.findViewById(R.id.ll_small_qr_scan);
 
-        Button btnBigQrCodeScan = (Button) promptView.findViewById(R.id.big_qr_scan_btn);
+        LinearLayout llBigQrCodeScan = (LinearLayout) promptView.findViewById(R.id.ll_big_qr_scan);
 
-        Button btnBigQrCodeOCR =(Button)  promptView.findViewById(R.id.big_qr_ocr_btn);
+        LinearLayout llBigQrCodeOCR = (LinearLayout) promptView.findViewById(R.id.ll_big_qr_ocr);
 
-        Button btnFrontAadhaarCapture = (Button) promptView.findViewById(R.id.front_aadhaar_capture_btn);
+        LinearLayout llFrontAadhaarCapture = (LinearLayout) promptView.findViewById(R.id.ll_front_aadhaar_capture);
 
-        Button btnBackAadhaarCapture = (Button) promptView.findViewById(R.id.back_aadhaar_capture_btn);
+        LinearLayout llBackAadhaarCapture = (LinearLayout) promptView.findViewById(R.id.ll_back_aadhaar_capture);
 
-        btnSmallQrCodeScan.setOnClickListener(new View.OnClickListener() {
+        llSmallQrCodeScan.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
-
-
+            public void onClick(View v) {
                 AadhaarOcrPreferences.getInstance().put(QR_CODE_SCAN_TYPE_KEY, SMALL_QR_CODE);
 
                 listener.onChooseAadhaarQrCodeScanner();
                 alertD.dismiss();
                 aadharInputTypeFlag = false;
-
             }
-
         });
 
-        btnBigQrCodeScan.setOnClickListener(new View.OnClickListener() {
+        llBigQrCodeScan.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
@@ -114,7 +110,7 @@ public class DetectAadhaarActivity extends AppCompatActivity {
 
         });
 
-        btnBigQrCodeOCR.setOnClickListener(new View.OnClickListener() {
+        llBigQrCodeOCR.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 AadhaarOcrPreferences.getInstance().put(AADHAAR_OCR_SCAN_SIDE, AADHAAR_BIGQR_OCR);
@@ -125,7 +121,7 @@ public class DetectAadhaarActivity extends AppCompatActivity {
             }
         });
 
-        btnFrontAadhaarCapture.setOnClickListener(new View.OnClickListener() {
+        llFrontAadhaarCapture.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
@@ -141,7 +137,7 @@ public class DetectAadhaarActivity extends AppCompatActivity {
 
         });
 
-        btnBackAadhaarCapture.setOnClickListener(new View.OnClickListener() {
+        llBackAadhaarCapture.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 

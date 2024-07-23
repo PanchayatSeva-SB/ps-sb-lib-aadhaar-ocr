@@ -16,6 +16,7 @@
     <dimen name="card_radius">4dp</dimen>
     <dimen name="bg_cover_height">180dp</dimen>
     <dimen name="_8dp">8dp</dimen>
+    <dimen name="_15dp">15dp</dimen>
     <dimen name="divider_size">8dp</dimen>
     <dimen name="_4dp">4dp</dimen>
 

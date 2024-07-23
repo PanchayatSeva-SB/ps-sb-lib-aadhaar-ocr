@@ -15,6 +15,8 @@ import java.util.Locale;
 import java.util.StringTokenizer;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -192,7 +194,7 @@ public class DateUtils {
             SimpleDateFormat df = null;
             if (aMask == null) {
                 return "";
-            }  else {
+            } else {
                 df = new SimpleDateFormat(aMask);
                 returnValue = df.format(date);
             }
@@ -213,11 +215,10 @@ public class DateUtils {
     }
 
 
-
     public static String aAdhaarDateFormated(String dateString) throws ActivityException {
         try {
             String delimeter = "/-";
-            String year, month, day;
+            String year, month, day, finalDate;
             String str1 = new String();
             String str2 = new String();
             String str3 = new String();
@@ -227,26 +228,79 @@ public class DateUtils {
                 str2 = tokenizer.nextToken();
                 str3 = tokenizer.nextToken();
             }
+            str1 = str1.toLowerCase();
+            str2 = str2.toLowerCase();
+            str3 = str3.toLowerCase();
+
+            if (str1.contains("o") || str2.contains("o") || str3.contains("o")) {
+                str1 = str1.replace("o", "0");
+                str2 = str2.replace("o", "0");
+                str3 = str3.replace("o", "0");
+            }
+
+            if (str1.contains("t") || str2.contains("t") || str3.contains("t")) {
+                str1 = str1.replace("t", "1");
+                str2 = str2.replace("t", "1");
+                str3 = str3.replace("t", "1");
+            }
+
+            if (str1.contains("i") || str2.contains("i") || str3.contains("i")) {
+                str1 = str1.replace("i", "1");
+                str2 = str2.replace("i", "1");
+                str3 = str3.replace("i", "1");
+            }
+            if (str1.contains("s") || str2.contains("s") || str3.contains("s")) {
+                str1 = str1.replace("s", "9");
+                str2 = str2.replace("s", "9");
+                str3 = str3.replace("s", "9");
+            }
+            if (str1.contains("!") || str2.contains("!") || str3.contains("!")) {
+                str1 = str1.replace("!", "1");
+                str2 = str2.replace("!", "1");
+                str3 = str3.replace("!", "1");
+            }
             if (str1.length() == 4) {
                 year = str1;
                 month = str2;
                 day = str3;
-                return String.format("%2s-%2s-%4s", day, month, year);
+                finalDate = String.format("%2s-%2s-%4s", day, month, year);
+//                return String.format("%2s-%2s-%4s", day, month, year);
+
             } else {
                 day = str1;
                 month = str2;
                 year = str3;
-                return String.format("%2s-%2s-%4s", day, month, year);
+                finalDate = String.format("%2s-%2s-%4s", day, month, year);
+//                return String.format("%2s-%2s-%4s", day, month, year);
+
             }
+
+            if (isValidAadhaarDateFormat(finalDate)) {
+                return finalDate;
+            } else {
+                return "";
+            }
+
+
 //            return "";
         } catch (Exception e) {
             throw new ActivityException(e);
         }
     }
 
+    public static boolean isValidAadhaarDateFormat(String dateString) {
+        // Define the regular expression pattern for dd-MM-yyyy format
+        String pattern = "\\d{2}-\\d{2}-\\d{4}";
 
+        // Compile the pattern into a regex object
+        Pattern regex = Pattern.compile(pattern);
 
+        // Match the given date string against the pattern
+        Matcher matcher = regex.matcher(dateString);
 
+        // Return true if the date string matches the pattern, false otherwise
+        return matcher.matches();
+    }
 
 
 }

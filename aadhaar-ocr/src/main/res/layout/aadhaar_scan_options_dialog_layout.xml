@@ -1,101 +1,282 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_centerInParent="true"
+    android:background="@color/white"
     android:orientation="vertical">
 
-    <View
-        android:layout_width="0dp"
-        android:layout_height="@dimen/spacing_mlarge" />
-
-    <TextView
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/_8dp"
-        android:textStyle="bold"
-        android:text="@string/qr_code"/>
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
 
 
-    <Button
-        android:id="@+id/small_qr_scan_btn"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="@dimen/spacing_smlarge"
-        android:background="@drawable/square_blue_background"
-        android:text="@string/small_qr_code"
-        android:textAllCaps="false"
-        android:textColor="@color/white"
-        android:textSize="18sp" />
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/_8dp"
-        android:textStyle="bold"
-        android:text="Big QR Code"
-        android:autofillHints="smsOTPCode"
-        android:importantForAutofill="yes"/>
+            <!-- 1. Small QR Code -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/_8dp"
+                android:background="@drawable/rounded_corners_aadhaar_bg"
+                android:orientation="vertical">
 
-    <Button
-        android:id="@+id/big_qr_scan_btn"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="@dimen/spacing_smlarge"
-        android:background="@drawable/square_blue_background"
-        android:text="@string/big_qr_code"
-        android:textAllCaps="false"
-        android:textColor="@color/white"
-        android:textSize="18sp"
-        />
-    <Button
-        android:id="@+id/big_qr_ocr_btn"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="@dimen/spacing_smlarge"
-        android:background="@drawable/square_blue_background"
-        android:text="Aadhaar Scan"
-        android:onClick="setAadhaarId"
-        android:textAllCaps="false"
-        android:textColor="@color/white"
-        android:textSize="18sp"
-        />
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/method_1_small_qr_code"
+                    android:textStyle="bold" />
 
 
-    <View
-        android:layout_width="0dp"
-        android:layout_height="@dimen/spacing_mlarge" />
+                <LinearLayout
+                    android:id="@+id/ll_small_qr_scan"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="@dimen/_4dp"
+                    android:layout_marginTop="@dimen/_8dp"
+                    android:background="@drawable/square_blue_background"
+                    android:orientation="horizontal"
+                    android:paddingVertical="8dp">
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/_8dp"
-        android:textStyle="bold"
-        android:text="@string/scan_card"/>
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_marginEnd="@dimen/_8dp"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:importantForAutofill="yes"
+                        android:text="@string/small_qr_code"
+                        android:textAlignment="center"
+                        android:textAllCaps="false"
+                        android:textColor="@color/white"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_marginEnd="@dimen/_8dp"
+                        android:layout_weight="0.3"
+                        android:orientation="vertical">
+
+                        <ImageView
+                            android:layout_width="60dp"
+                            android:layout_height="60dp"
+                            android:layout_gravity="center"
+                            android:background="@drawable/final_small_qr"
+                            tools:ignore="ContentDescription" />
+
+                    </LinearLayout>
 
 
-    <Button
-        android:id="@+id/front_aadhaar_capture_btn"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="@dimen/spacing_smlarge"
-        android:background="@drawable/centre_background"
-        android:text="@string/aadhaar_front_side_pic"
-        android:textAllCaps="false"
-        android:textColor="@color/white"
-        android:textSize="18sp" />
+                </LinearLayout>
 
 
+            </LinearLayout>
 
-    <Button
-        android:id="@+id/back_aadhaar_capture_btn"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="@dimen/spacing_smlarge"
-        android:background="@drawable/centre_background"
-        android:text="@string/aadhaar_back_side_pic"
-        android:textAllCaps="false"
-        android:textColor="@color/white"
-        android:textSize="18sp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/or"
+                android:textAlignment="center"
+                android:textColor="@color/black"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+
+            <!-- 2. Big QR Code -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/_8dp"
+                android:background="@drawable/rounded_corners_aadhaar_bg"
+                android:orientation="vertical">
+
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:autofillHints="smsOTPCode"
+                    android:importantForAutofill="yes"
+                    android:text="@string/method_2_big_qr_code"
+                    android:textStyle="bold" />
+
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="12dp" />
+
+                <LinearLayout
+                    android:id="@+id/ll_big_qr_scan"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="@dimen/_4dp"
+                    android:background="@drawable/square_blue_background"
+                    android:orientation="horizontal"
+                    android:paddingVertical="8dp">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_marginEnd="@dimen/_8dp"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:importantForAutofill="yes"
+                        android:text="@string/big_qr_code"
+                        android:textAlignment="center"
+                        android:textAllCaps="false"
+                        android:textColor="@color/white"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_marginEnd="@dimen/_8dp"
+                        android:layout_weight="0.3"
+                        android:orientation="vertical">
+
+                        <ImageView
+                            android:layout_width="60dp"
+                            android:layout_height="60dp"
+                            android:layout_gravity="center"
+                            android:background="@drawable/big_qr_code_final"
+                            tools:ignore="ContentDescription" />
+
+                    </LinearLayout>
+
+
+                </LinearLayout>
+
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="12dp" />
+
+                <LinearLayout
+                    android:id="@+id/ll_big_qr_ocr"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="@dimen/_4dp"
+                    android:background="@drawable/square_blue_background"
+                    android:orientation="horizontal"
+                    android:paddingVertical="8dp">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_marginEnd="@dimen/_8dp"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:importantForAutofill="yes"
+                        android:text="@string/big_qr_aadhaar_number"
+                        android:textAlignment="center"
+                        android:textAllCaps="false"
+                        android:textColor="@color/white"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/or"
+                android:textAlignment="center"
+                android:textColor="@color/black"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <!-- 3. Take Aadhaar Card Photo -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/_8dp"
+                android:background="@drawable/rounded_corners_aadhaar_bg"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/method_3_capture_photo"
+                    android:textStyle="bold" />
+
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="12dp" />
+
+
+                <LinearLayout
+                    android:id="@+id/ll_front_aadhaar_capture"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="@dimen/_4dp"
+                    android:background="@drawable/centre_background"
+                    android:orientation="horizontal"
+                    android:paddingVertical="8dp">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_marginEnd="@dimen/_8dp"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:importantForAutofill="yes"
+                        android:text="@string/aadhaar_card_front_side_photo"
+                        android:textAlignment="center"
+                        android:textAllCaps="false"
+                        android:textColor="@color/white"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+
+                </LinearLayout>
+
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="12dp" />
+
+                <LinearLayout
+                    android:id="@+id/ll_back_aadhaar_capture"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="@dimen/_4dp"
+                    android:background="@drawable/centre_background"
+                    android:orientation="horizontal"
+                    android:paddingVertical="8dp">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_marginEnd="@dimen/_8dp"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:importantForAutofill="yes"
+                        android:text="@string/aadhaar_card_back_side_photo"
+                        android:textAlignment="center"
+                        android:textAllCaps="false"
+                        android:textColor="@color/white"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+
+                </LinearLayout>
+
+
+            </LinearLayout>
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="12dp" />
+
+
+        </LinearLayout>
+
+
+    </androidx.core.widget.NestedScrollView>
 
 
 </LinearLayout>
