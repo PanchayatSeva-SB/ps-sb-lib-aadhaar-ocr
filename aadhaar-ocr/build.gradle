@@ -84,22 +84,28 @@ dependencies {
 
 }
 
+afterEvaluate {
+    publishing {
+        publications {
+            maven(MavenPublication) {
+                groupId = 'com.github.sayukth'
+                artifactId = 'panchayatseva-aadhaar-ocr'
+                version = "0.1"
 
+                // ✅ Manually specify the AAR file from the root directory
+                artifact("${rootProject.projectDir}/aadhaar-ocr-release.aar")
 
-
-// 5. Publishing:
-publishing {
-    publications {
-        maven(MavenPublication) {
-            groupId = 'com.github.sayukth'
-            artifactId = 'panchayatseva-aadhaar-ocr'
-            version = "0.1"
-            pom {
-                description = 'DESCRIPTION'
+                pom {
+                    description = 'Aadhaar OCR Android Library'
+                }
             }
         }
-    }
-    repositories {               // << --- ADD This
-        mavenLocal()
+
+        repositories {
+            mavenLocal()
+        }
     }
 }
+
+
+
