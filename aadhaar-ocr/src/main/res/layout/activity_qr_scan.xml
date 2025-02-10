@@ -1,0 +1,85 @@
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!-- Camera Preview -->
+    <com.journeyapps.barcodescanner.DecoratedBarcodeView
+        android:id="@+id/barcode_scanner"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+
+    <!-- ImageView for Aadhaar GIF -->
+    <ImageView
+        android:id="@+id/gifAbove"
+        android:layout_width="wrap_content"
+        android:layout_height="100dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        android:scaleType="centerInside"
+        android:src="@drawable/aadhar_qr_scan_v1"
+        android:visibility="visible"
+        app:layout_constraintBottom_toTopOf="@+id/qr_code_text"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <!-- TextView for instructions -->
+    <TextView
+        android:id="@+id/qr_code_text"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:text="Please focus camera on the \n QR Code of the Aadhaar Card"
+        android:textAlignment="center"
+        android:textColor="@color/white"
+        android:textSize="21sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@+id/scanner_frame"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/gifAbove" />
+
+    <!-- Custom Scanner Frame centered in the layout -->
+    <ImageView
+        android:id="@+id/scanner_frame"
+        android:layout_width="310dp"
+        android:layout_height="310dp"
+        android:scaleType="centerInside"
+        android:src="@drawable/scanner_frame"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/timerTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="9"
+        android:textColor="@android:color/white"
+        android:textSize="50sp"
+        android:textStyle="bold"
+        android:visibility="visible"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/scanner_frame"
+        tools:ignore="MissingConstraints" />
+
+    <!-- Extra ImageView Below Scanner Frame -->
+    <ImageView
+        android:id="@+id/distanceImage"
+        android:layout_width="wrap_content"
+        android:layout_marginTop="@dimen/_4dp"
+        android:layout_height="200dp"
+        android:scaleType="centerInside"
+        android:src="@drawable/qr_scan_aadhar"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/scanner_frame" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

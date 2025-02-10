@@ -17,5 +17,7 @@
     <string name="big_qr_aadhaar_number">Step 2: Take Photo of Aadhaar Number</string>
     <string name="aadhaar_card_front_side_photo">Step 1: Take Aadhaar Card Front Side Photo</string>
     <string name="aadhaar_card_back_side_photo">Step 2: Take Aadhaar Card Back Side Photo</string>
+    <string name="ok_string">Ok</string>
+
 
 </resources>

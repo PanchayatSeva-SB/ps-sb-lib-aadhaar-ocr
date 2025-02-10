@@ -1,8 +1,33 @@
 package com.sayukth.aadhaar_ocr.ui;
 
+import static com.sayukth.aadhaar_ocr.constants.AadhaarOcrConstants.AADHAAR;
 import static com.sayukth.aadhaar_ocr.constants.AadhaarOcrConstants.AADHAAR_BIGQR_OCR;
 import static com.sayukth.aadhaar_ocr.constants.AadhaarOcrConstants.AADHAAR_OCR_BACK_SIDE;
 import static com.sayukth.aadhaar_ocr.constants.AadhaarOcrConstants.AADHAAR_OCR_FRONT_SIDE;
+import static com.sayukth.aadhaar_ocr.constants.AadhaarOcrConstants.ADDRESS;
+import static com.sayukth.aadhaar_ocr.constants.AadhaarOcrConstants.Address;
+import static com.sayukth.aadhaar_ocr.constants.AadhaarOcrConstants.BIRTH;
+import static com.sayukth.aadhaar_ocr.constants.AadhaarOcrConstants.Birth;
+import static com.sayukth.aadhaar_ocr.constants.AadhaarOcrConstants.DATE;
+import static com.sayukth.aadhaar_ocr.constants.AadhaarOcrConstants.DATE_OF_YEAR;
+import static com.sayukth.aadhaar_ocr.constants.AadhaarOcrConstants.DAUGHTER_OF;
+import static com.sayukth.aadhaar_ocr.constants.AadhaarOcrConstants.DOB;
+import static com.sayukth.aadhaar_ocr.constants.AadhaarOcrConstants.FATHER;
+import static com.sayukth.aadhaar_ocr.constants.AadhaarOcrConstants.FEMALE;
+import static com.sayukth.aadhaar_ocr.constants.AadhaarOcrConstants.GENDER;
+import static com.sayukth.aadhaar_ocr.constants.AadhaarOcrConstants.GOVERNMENT;
+import static com.sayukth.aadhaar_ocr.constants.AadhaarOcrConstants.INDIA;
+import static com.sayukth.aadhaar_ocr.constants.AadhaarOcrConstants.MALE;
+import static com.sayukth.aadhaar_ocr.constants.AadhaarOcrConstants.NAME;
+import static com.sayukth.aadhaar_ocr.constants.AadhaarOcrConstants.OF;
+import static com.sayukth.aadhaar_ocr.constants.AadhaarOcrConstants.OTHER;
+import static com.sayukth.aadhaar_ocr.constants.AadhaarOcrConstants.SON_OF;
+import static com.sayukth.aadhaar_ocr.constants.AadhaarOcrConstants.TRANS;
+import static com.sayukth.aadhaar_ocr.constants.AadhaarOcrConstants.WIFE_OF;
+import static com.sayukth.aadhaar_ocr.constants.AadhaarOcrConstants.YEAR;
+import static com.sayukth.aadhaar_ocr.constants.AadhaarOcrConstants.YEAR_OF;
+import static com.sayukth.aadhaar_ocr.constants.AadhaarOcrConstants.YOB;
+import static com.sayukth.aadhaar_ocr.constants.AadhaarOcrConstants.Year;
 import static com.sayukth.aadhaar_ocr.ocrpreferences.AadhaarOcrPreferences.Key.AADHAAR_OCR_SCAN_SIDE;
 
 import android.app.Activity;
@@ -13,9 +38,11 @@ import android.util.SparseArray;
 import com.google.android.gms.vision.Frame;
 import com.google.android.gms.vision.text.TextBlock;
 import com.google.android.gms.vision.text.TextRecognizer;
+import com.google.mlkit.vision.text.Text;
 import com.sayukth.aadhaar_ocr.error.ActivityException;
 import com.sayukth.aadhaar_ocr.ocrpreferences.AadhaarOcrPreferences;
 import com.sayukth.aadhaar_ocr.utils.DateUtils;
+import com.sayukth.aadhaar_ocr.utils.ParseQRUtil;
 import com.sayukth.aadhaar_ocr.utils.StringSplitUtils;
 
 import java.io.IOException;
@@ -29,6 +56,11 @@ public class DetectAadhaarPresenter implements DetectAadhaarContract.Presenter {
     private DetectAadhaarContract.View detectAadharView;
     private Activity activity;
     StringBuilder ocrImageText = new StringBuilder();
+    private static final String AADHAAR_REGEX = "^[2-9]{1}[0-9]{3}\\s[0-9]{4}\\s[0-9]{4}$";
+    private static final String NAME_REGEX = "^[a-zA-Z\\s]*$";
+    private static final String DATE_FORMAT = "01-01-";
+
+
 
     HashMap<String, String> backAadhaarMap = new HashMap<>();
 
@@ -38,9 +70,7 @@ public class DetectAadhaarPresenter implements DetectAadhaarContract.Presenter {
     }
 
     @Override
-    public void getImageDataAsText(Bitmap photo) {
-
-        String aadhaarOcrScanSide = AadhaarOcrPreferences.getInstance().getString(AADHAAR_OCR_SCAN_SIDE, "");
+    public String getImageDataAsText(Bitmap photo) {
 
         ocrImageText.setLength(0);
         TextRecognizer textRecognizer = new TextRecognizer.Builder(activity).build();
@@ -61,31 +91,33 @@ public class DetectAadhaarPresenter implements DetectAadhaarContract.Presenter {
             stringBuilder.append("#" + imageText + "#");
             stringBuilder.append("\n");
 
+            boolean isFrontMatch = imageText.contains(DOB) || imageText.contains(Year) || imageText.contains(OF) || imageText.contains(Birth);
+            boolean isBackMatch = imageText.contains(SON_OF) || imageText.contains(Address) || imageText.contains(WIFE_OF) || imageText.contains(DAUGHTER_OF);
 
-            if (aadhaarOcrScanSide.equals(AADHAAR_OCR_BACK_SIDE)) {
+            if(isFrontMatch){
+                getTextType(imageText);
+            }  else if(isBackMatch){
                 try {
                     setFatherOrSpouseMetaData(imageText.toString());
                 } catch (ActivityException e) {
                     throw new RuntimeException(e);
                 }
-            } else if (aadhaarOcrScanSide.equals(AADHAAR_OCR_FRONT_SIDE)) {
-                getTextType(imageText);
-            }
-            else if(aadhaarOcrScanSide.equals(AADHAAR_BIGQR_OCR)){
+            } else if(containsAadhaar(imageText)){
                 getTextTypeBigQR(imageText);
-
             }
+
         }
 
         detectAadharView.showAadhaarInfo(metadataMap);
 
+        // Return the extracted text from the image
+        return imageText;
     }
 
-    public void getTextType(String val) {
-        try {
-            String type = " ";
 
-//           Log.e("RAMESH","RAMSVALUE"+val);
+    public void getTextType(String val) {
+
+        try {
 
             if (val.contains("\n")) {
                 String valArr[] = val.split("\n");
@@ -101,6 +133,8 @@ public class DetectAadhaarPresenter implements DetectAadhaarContract.Presenter {
                 System.out.println(" else : " + val);
                 setMetaData(val);
             }
+
+
         } catch (ActivityException e) {
 
         }
@@ -109,17 +143,12 @@ public class DetectAadhaarPresenter implements DetectAadhaarContract.Presenter {
 
     public void getTextTypeBigQR(String val) {
         try {
-            String type = " ";
-
-//           Log.e("RAMESH","RAMSVALUE"+val);
-
             if (val.contains("\n")) {
                 String valArr[] = val.split("\n");
 
                 if (valArr.length > 0) {
                     for (int newlineIdx = 0; newlineIdx < valArr.length; newlineIdx++) {
                         System.out.println(" if : " + valArr[newlineIdx]);
-//                        setMetaData(valArr[newlineIdx]);
                         setAadhaarId(valArr[newlineIdx]);
                     }
                 }
@@ -134,19 +163,20 @@ public class DetectAadhaarPresenter implements DetectAadhaarContract.Presenter {
     }
 
     public void setFatherOrSpouseMetaData(String val) throws ActivityException {
-        Log.e("in setFatherOrSpouseMetaData","setFatherOrSpouseMetaData");
         detectAadharView.showImageText(String.valueOf(ocrImageText));
 
         String srcVal = val.toUpperCase();
-        if (srcVal.contains("ADDRESS")) {
-            String metaData = "FATHER";
+
+
+        if (srcVal.contains(ADDRESS)) {
+            String metaData = FATHER;
 
             String text = StringSplitUtils.getLastPartOfStringBySplitString(ocrImageText.toString(), ":");
-//           System.out.println("Text : "+ text);
+           System.out.println("Text : "+ text);
             String fsnameWithCareOf = StringSplitUtils.getFirstPartOfStringBySplitString(text.toString(), ",");
-//            System.out.println("FS : "+ fsnameWithCareOf);
+            System.out.println("FS : "+ fsnameWithCareOf);
             String fsname = StringSplitUtils.getLastPartOfStringBySplitString(fsnameWithCareOf.trim(), " ");
-//            System.out.println("FS : " + fsname);
+            System.out.println("FS : " + fsname);
 
             metadataMap.put(metaData, fsname.trim());
         }
@@ -154,14 +184,12 @@ public class DetectAadhaarPresenter implements DetectAadhaarContract.Presenter {
     }
 
     public void setAadhaarId(String val) throws ActivityException{
-//        Log.e("in setAadhaarId","setAadhaarId");
         detectAadharView.showImageText(String.valueOf(ocrImageText));
-        String aadharRegex = "^[2-9]{1}[0-9]{3}\\s[0-9]{4}\\s[0-9]{4}$";
+        String aadharRegex = AADHAAR_REGEX;
 
-//        String aadharRegex = "^[2-9]{1}[0-9]{3}\\s[0-9]{4}\\s[0-9]{4}$|\\d{12}";
-        Matcher aadharMatcher = getPatternMatcher(aadharRegex, val);
+        Matcher aadharMatcher = getPatternMatcher(AADHAAR_REGEX, val);
 
-        String metaData = "AADHAR";
+        String metaData = AADHAAR;
         String tgtVal = val;
 
 
@@ -175,20 +203,19 @@ public class DetectAadhaarPresenter implements DetectAadhaarContract.Presenter {
     public void setMetaData(String val) throws ActivityException {
 
         try {
-            detectAadharView.showImageText(String.valueOf(ocrImageText));
 
-            String aadharRegex = "^[2-9]{1}[0-9]{3}\\s[0-9]{4}\\s[0-9]{4}$";
-            String nameRegex = "^[a-zA-Z\\s]*$";
+            String aadharRegex = AADHAAR_REGEX;
+            String nameRegex = NAME_REGEX;
 
             Matcher aadharMatcher = getPatternMatcher(aadharRegex, val);
             Matcher nameMatcher = getPatternMatcher(nameRegex, val);
 
-            String metaData = "OTHER";
+            String metaData = OTHER;
             String srcVal = val.toUpperCase();
             String tgtVal = val;
 
-            if (srcVal.contains("MALE") || srcVal.contains("FEMALE") || srcVal.contains("TRANS")) {
-                metaData = "GENDER";
+            if (srcVal.contains(MALE) || srcVal.contains(FEMALE) || srcVal.contains(TRANS)) {
+                metaData = GENDER;
                 if (val.contains("/")) {
                     tgtVal = val.split("/")[1];
                 } else {
@@ -197,9 +224,9 @@ public class DetectAadhaarPresenter implements DetectAadhaarContract.Presenter {
                     }
                 }
 
-            } else if (srcVal.contains("YEAR") || srcVal.contains("BIRTH") || srcVal.contains("DATE") || srcVal.contains("DOB") ||
-                    srcVal.contains("YEAR OF") || srcVal.contains("YOB")) {
-                metaData = "DATE_OF_YEAR";
+            } else if (srcVal.contains(YEAR) || srcVal.contains(BIRTH) || srcVal.contains(DATE) || srcVal.contains(DOB) ||
+                    srcVal.contains(YEAR_OF) || srcVal.contains(YOB)) {
+                metaData = DATE_OF_YEAR;
 
                 if (val.contains(":")) {
                     tgtVal = val.split(":")[1];
@@ -212,32 +239,16 @@ public class DetectAadhaarPresenter implements DetectAadhaarContract.Presenter {
                 tgtVal = getFormatedDate(tgtVal);
 
             } else if (aadharMatcher.matches()) {
-                metaData = "AADHAR";
-            } else if (nameMatcher.matches() && !srcVal.contains("GOVERNMENT") && !srcVal.contains("INDIA") && !srcVal.contains("FATHER")) {
-                metaData = "NAME";
+                metaData = AADHAAR;
+            } else if (nameMatcher.matches() && !srcVal.contains(GOVERNMENT) && !srcVal.contains(INDIA) && !srcVal.contains(FATHER)) {
+                metaData = NAME;
 
-//            } else {
-//                if (srcVal != null && srcVal != "") {
-//                    if (srcVal.contains(".")) {
-//                        Log.i(". contains", srcVal);
-//
-//                        String dotRemovedString = StringSplitUtils.removeSymbolFromString(srcVal, '.');
-//
-//                        Log.i("dot removed ", dotRemovedString);
-//
-//                        Matcher nameOtherMatcher = getPatternMatcher(nameRegex, dotRemovedString);
-//
-//
-//                        if (nameOtherMatcher.matches() && !dotRemovedString.contains("GOVERNMENT") && !dotRemovedString.contains("INDIA") && !dotRemovedString.contains("FATHER")) {
-//                            metaData = "NAME";
-//                            tgtVal = StringSplitUtils.toTitleCase(dotRemovedString);
-//                        }
-//
-//                    }
-//                }
             }
 
+
             metadataMap.put(metaData, tgtVal.trim());
+
+
         } catch (ActivityException e) {
             Log.i(TAG, e.getMessage());
             Log.i(TAG, e.getMessage());
@@ -251,7 +262,7 @@ public class DetectAadhaarPresenter implements DetectAadhaarContract.Presenter {
 
             if (datevalue.matches("\\d{4}")) {
                 //This block will execute when we have only year in the aadhaar card
-                return "01-01-" + datevalue;
+                return DATE_FORMAT + datevalue;
             } else {
                 return DateUtils.aAdhaarDateFormated(datevalue);
             }
@@ -267,6 +278,33 @@ public class DetectAadhaarPresenter implements DetectAadhaarContract.Presenter {
 
         return patternMatcher;
     }
+
+    public void handleQrCodeScan(String scanContent) {
+
+        HashMap<String, String> parsedDataStr =  ParseQRUtil.parseScannedData(scanContent);
+        detectAadharView.showAadhaarInfo(parsedDataStr);
+    }
+
+    private boolean containsAadhaar(String text) {
+        String aadharRegex = AADHAAR_REGEX;
+        Pattern pattern = Pattern.compile(aadharRegex);
+
+        // Split the string into lines or words to simulate "text blocks"
+        String[] lines = text.split("\\r?\\n");
+
+        for (String line : lines) {
+            if (pattern.matcher(line).find()) {
+                Log.d("TAG", "Aadhaar detected: " + line);
+                return true;
+            }
+        }
+        return false;
+    }
+
+
+
+
+
 
 
 }

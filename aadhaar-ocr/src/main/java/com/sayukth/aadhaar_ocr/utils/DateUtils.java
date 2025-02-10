@@ -1,11 +1,19 @@
 package com.sayukth.aadhaar_ocr.utils;
 
+import static com.yalantis.ucrop.UCropFragment.TAG;
+
+import android.app.Dialog;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.net.ParseException;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.ProgressBar;
 
 //import com.sayukth.panchayatseva.survey.error.ActivityException;
 
+import com.sayukth.aadhaar_ocr.R;
 import com.sayukth.aadhaar_ocr.error.ActivityException;
 
 import java.text.SimpleDateFormat;
@@ -288,6 +296,22 @@ public class DateUtils {
         }
     }
 
+    public static String getFormatedDate(String datevalue) throws ActivityException {
+        try {
+            datevalue = (datevalue != null && !datevalue.isEmpty()) ? datevalue.trim() : "";
+
+            if (datevalue.matches("\\d{4}")) {
+                //This block will execute when we have only year in the aadhaar card
+                return "01-01-" + datevalue;
+            } else {
+                return DateUtils.aAdhaarDateFormated(datevalue);
+            }
+        } catch (ActivityException execption) {
+            Log.i(TAG, execption.getMessage());
+            throw new ActivityException(execption);
+        }
+    }
+
     public static boolean isValidAadhaarDateFormat(String dateString) {
         // Define the regular expression pattern for dd-MM-yyyy format
         String pattern = "\\d{2}-\\d{2}-\\d{4}";
@@ -300,6 +324,38 @@ public class DateUtils {
 
         // Return true if the date string matches the pattern, false otherwise
         return matcher.matches();
+    }
+
+    public static void showLoading(Context context) {
+         Dialog dialog = null;
+         ProgressBar progressBar;
+
+        dialog = new Dialog(context);
+        View view = LayoutInflater.from(context).inflate(R.layout.progress_bar, null); // Replace with your actual layout file name
+        dialog.setContentView(view);
+        dialog.setCancelable(false);
+        dialog.setCanceledOnTouchOutside(false);
+        dialog.show();
+
+        progressBar = view.findViewById(R.id.pbLoading); // Replace with your actual ProgressBar ID
+        progressBar.setIndeterminate(true);
+        progressBar.setVisibility(View.VISIBLE);
+    }
+
+    public static void hideLoading(Context context) {
+        Dialog dialog = null;
+        ProgressBar progressBar;
+
+        dialog = new Dialog(context);
+        View view = LayoutInflater.from(context).inflate(R.layout.progress_bar, null); // Replace with your actual layout file name
+        dialog.setContentView(view);
+        dialog.setCancelable(false);
+        dialog.setCanceledOnTouchOutside(false);
+        dialog.show();
+
+        progressBar = view.findViewById(R.id.pbLoading); // Replace with your actual ProgressBar ID
+        progressBar.setIndeterminate(true);
+        progressBar.setVisibility(View.GONE);
     }
 
 

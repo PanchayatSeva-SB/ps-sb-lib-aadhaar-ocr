@@ -6,9 +6,6 @@ import java.util.HashMap;
 
 public interface DetectAadhaarContract {
     interface View {
-        void showAadhaarDetectOptions();
-
-        void showCameraOptions();
 
         void showImageText(String imageText);
 
@@ -16,6 +13,8 @@ public interface DetectAadhaarContract {
     }
 
     interface Presenter {
-        void getImageDataAsText(Bitmap bitmap);
+        String getImageDataAsText(Bitmap bitmap);
+
+        void handleQrCodeScan(String scanContent);
     }
 }

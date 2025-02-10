@@ -19,6 +19,10 @@ public class AadhaarOcrPreferences {
         AADHAAR_OCR_SCAN_SIDE,
         AADHAAR_INPUT_TYPE,
         AADHAAR_SCAN_TYPE_KEY,
+        IS_FRONT_SIDE_CAPTURED,
+        IS_BACK_SIDE_CAPTURED,
+        IS_BIG_QR_OCR,
+        IS_FLIP_GIF_SHOW
     }
 
     private AadhaarOcrPreferences(Context context) {

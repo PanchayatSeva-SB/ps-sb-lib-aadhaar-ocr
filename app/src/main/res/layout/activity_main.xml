@@ -1,92 +1,97 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_centerInParent="true"
-    android:orientation="vertical">
+    android:fillViewport="true">
 
-
-    <!-- Scan New Card -->
     <LinearLayout
-        android:id="@+id/ll_scan_qr_wrapper"
         android:layout_width="match_parent"
-        android:layout_height="120dp"
-        android:layout_margin="10dp"
-        android:layout_marginLeft="10dp"
-        android:background="@drawable/square_blue_background"
-        android:onClick="scanAadhaar"
-        android:orientation="horizontal"
-        android:padding="5dp">
-        <!-- scanner -->
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="10dp">
+
+        <!-- Scan New Card -->
+
         <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:orientation="vertical"
+            android:id="@+id/btn_detect_input"
+            android:layout_width="match_parent"
+            android:layout_height="120dp"
+            android:layout_margin="10dp"
+            android:background="@drawable/square_blue_background"
+            android:onClick="scanAadhaar"
+            android:orientation="horizontal"
             android:padding="5dp">
 
-            <ImageView
-                android:layout_width="wrap_content"
+            <!-- Scanner -->
+            <LinearLayout
+                android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:src="@drawable/qr_scanner" />
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:padding="5dp">
 
-        </LinearLayout>
-        <!-- Text -->
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:visibility="visible">
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/qr_scanner" />
 
-            <TextView
-                android:layout_width="match_parent"
+            </LinearLayout>
+
+            <!-- Text -->
+            <LinearLayout
+                android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:gravity="center"
-                android:text="@string/scan_new_card"
-                android:textColor="@color/white"
-                android:textSize="18sp"
-                android:textStyle="bold" />
+                android:layout_weight="1">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:text="@string/scan_new_card"
+                    android:textColor="@color/white"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
         </LinearLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="16dp"
+            android:text="Aadhaar Data :"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tv_aadhaar_data"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginVertical="16dp"
+            android:text="" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="16dp"
+            android:text="Ocr Image Data :"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tv_ocr_image_data"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginVertical="16dp"
+            android:text="" />
+
+        <ImageView
+            android:id="@+id/iv_ocr"
+            android:layout_width="250dp"
+            android:layout_height="200dp"
+            android:layout_gravity="center"
+            android:layout_marginTop="32dp"
+            android:background="@drawable/square_blue_background"
+            android:scaleType="fitXY" />
+
     </LinearLayout>
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="16dp"
-        android:text="Aadhaar Data :"
-        android:textStyle="bold" />
-
-    <TextView
-        android:id="@+id/tv_aadhaar_data"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="16dp"
-        android:layout_marginVertical="16dp"
-        android:text="" />
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="16dp"
-        android:text="Ocr Image Data :"
-        android:textStyle="bold" />
-
-    <TextView
-        android:id="@+id/tv_ocr_image_data"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="16dp"
-        android:layout_marginVertical="16dp"
-        android:text="" />
-
-    <ImageView
-        android:id="@+id/iv_ocr"
-        android:layout_width="250dp"
-        android:layout_height="200dp"
-        android:layout_gravity="center"
-        android:layout_marginTop="32dp"
-        android:background="@drawable/square_blue_background"
-        android:scaleType="fitXY" />
-
-
-</LinearLayout>
+</ScrollView>

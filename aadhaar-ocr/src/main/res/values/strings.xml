@@ -18,5 +18,12 @@
     <string name="aadhaar_card_front_side_photo">Step 1: Take Aadhaar Card Front Side Photo</string>
     <string name="aadhaar_card_back_side_photo">Step 2: Take Aadhaar Card Back Side Photo</string>
     <string name="or">(OR)</string>
+    <string name="scan_type">scan type</string>
+    <string name="front_side">Front side</string>
+    <string name="back_side">Back side</string>
+    <string name="back_side_focus_request">Please focus camera on the \n Back side of the Aadhaar Card</string>
+    <string name="big_qr_ocr">Big QR OCR</string>
+    <string name="aadhaar_number_focus_request">Please focus camera on the Aadhaar card number only</string>
+    <string name="path">path</string>
 
 </resources>
