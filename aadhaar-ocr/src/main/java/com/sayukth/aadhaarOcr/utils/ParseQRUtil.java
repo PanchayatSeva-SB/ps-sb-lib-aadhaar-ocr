@@ -1,10 +1,10 @@
-package com.sayukth.aadhaar_ocr.utils;
+package com.sayukth.aadhaarOcr.utils;
 
 import static com.yalantis.ucrop.UCropFragment.TAG;
 
 import android.util.Log;
 
-import com.sayukth.aadhaar_ocr.error.ActivityException;
+import com.sayukth.aadhaarOcr.error.ActivityException;
 
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserFactory;

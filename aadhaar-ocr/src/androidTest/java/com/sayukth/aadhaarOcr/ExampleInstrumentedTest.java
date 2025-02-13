@@ -1,4 +1,4 @@
-package com.sayukth.aadhaar_ocr;
+package com.sayukth.aadhaarOcr;
 
 import android.content.Context;
 
@@ -21,6 +21,6 @@ public class ExampleInstrumentedTest {
     public void useAppContext() {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
-        assertEquals("com.sayukth.aadhaar_ocr.test", appContext.getPackageName());
+        assertEquals("com.sayukth.aadhaarOcr.test", appContext.getPackageName());
     }
 }

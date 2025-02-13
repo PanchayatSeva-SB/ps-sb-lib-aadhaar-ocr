@@ -1,4 +1,4 @@
-package com.sayukth.aadhaar_ocr.error;
+package com.sayukth.aadhaarOcr.error;
 
 public class ActivityException extends Exception {
 

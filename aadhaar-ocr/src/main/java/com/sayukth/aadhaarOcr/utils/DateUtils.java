@@ -1,33 +1,25 @@
-package com.sayukth.aadhaar_ocr.utils;
+package com.sayukth.aadhaarOcr.utils;
 
 import static com.yalantis.ucrop.UCropFragment.TAG;
 
 import android.app.Activity;
 import android.app.Dialog;
-import android.content.Context;
-import android.content.pm.ApplicationInfo;
-import android.net.ParseException;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.ProgressBar;
 
 //import com.sayukth.panchayatseva.survey.error.ActivityException;
 
-import com.sayukth.aadhaar_ocr.R;
-import com.sayukth.aadhaar_ocr.error.ActivityException;
+import com.sayukth.aadhaarOcr.R;
+import com.sayukth.aadhaarOcr.error.ActivityException;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 import java.util.StringTokenizer;
-import java.util.TimeZone;
-import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
 
 public class DateUtils {
 

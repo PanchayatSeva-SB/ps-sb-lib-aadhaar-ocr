@@ -1,9 +1,9 @@
-package com.sayukth.aadhaar_ocr.ocrpreferences;
+package com.sayukth.aadhaarOcr.ocrpreferences;
 
 import android.content.Context;
 import android.content.SharedPreferences;
 
-import com.sayukth.aadhaar_ocr.AadhaarOcrLibraryApplication;
+import com.sayukth.aadhaarOcr.AadhaarOcrLibraryApplication;
 
 
 public class AadhaarOcrPreferences {

@@ -21,7 +21,7 @@ plugins {
 }
 
 android {
-    namespace 'com.sayukth.aadhaar_ocr'
+    namespace 'com.sayukth.aadhaarOcr'
     compileSdk 33
 
 

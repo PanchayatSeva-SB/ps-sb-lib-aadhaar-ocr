@@ -1,4 +1,4 @@
-package com.sayukth.aadhaar_ocr.ui;
+package com.sayukth.aadhaarOcr.ui;
 
 import android.graphics.Bitmap;
 

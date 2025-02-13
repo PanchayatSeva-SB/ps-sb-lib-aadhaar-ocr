@@ -1,4 +1,4 @@
-package com.sayukth.aadhaar_ocr;
+package com.sayukth.aadhaarOcr;
 
 import org.junit.Test;
 

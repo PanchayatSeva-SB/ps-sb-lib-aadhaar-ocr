@@ -1,9 +1,8 @@
-package com.sayukth.aadhaar_ocr.ui;
+package com.sayukth.aadhaarOcr.ui;
 
-import static com.sayukth.aadhaar_ocr.constants.AadhaarOcrConstants.RESULT_TIMEOUT;
+import static com.sayukth.aadhaarOcr.constants.AadhaarOcrConstants.RESULT_TIMEOUT;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -19,13 +18,12 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.bumptech.glide.Glide;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.zxing.Result;
 import com.journeyapps.barcodescanner.BarcodeCallback;
 import com.journeyapps.barcodescanner.BarcodeResult;
 import com.journeyapps.barcodescanner.CaptureManager;
 import com.journeyapps.barcodescanner.DecoratedBarcodeView;
-import com.sayukth.aadhaar_ocr.R;
+import com.sayukth.aadhaarOcr.R;
 
 public class QRScanningActivity extends AppCompatActivity {
 
@@ -74,7 +72,6 @@ public class QRScanningActivity extends AppCompatActivity {
      * Initializes and launches the barcode scanner UI with a custom layout.
      * @param activity The current activity instance.
      */
-
     public void launchScannerCustomUi(Activity activity) {
 
 

@@ -1,10 +1,9 @@
-package com.sayukth.aadhaar_ocr.ui;
+package com.sayukth.aadhaarOcr.ui;
 
 
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -31,9 +30,9 @@ import androidx.core.content.ContextCompat;
 
 import com.bumptech.glide.Glide;
 import com.google.common.util.concurrent.ListenableFuture;
-import com.sayukth.aadhaar_ocr.R;
-import com.sayukth.aadhaar_ocr.ocrpreferences.AadhaarOcrPreferences;
-import com.sayukth.aadhaar_ocr.utils.DateUtils;
+import com.sayukth.aadhaarOcr.R;
+import com.sayukth.aadhaarOcr.ocrpreferences.AadhaarOcrPreferences;
+import com.sayukth.aadhaarOcr.utils.DateUtils;
 
 import java.io.File;
 import java.util.concurrent.ExecutorService;
@@ -70,8 +69,8 @@ public class CustomCameraLaunchActivity extends AppCompatActivity {
         // Initialize views
         cameraPreview = findViewById(R.id.camera_preview);
         capturePhotoButton = findViewById(R.id.capture_photo);
-        frontBackGif = findViewById(com.sayukth.aadhaar_ocr.R.id.front_back_gif);
-        ocrTextView = findViewById(com.sayukth.aadhaar_ocr.R.id.ocr_text);
+        frontBackGif = findViewById(com.sayukth.aadhaarOcr.R.id.front_back_gif);
+        ocrTextView = findViewById(com.sayukth.aadhaarOcr.R.id.ocr_text);
         progressBar = findViewById(R.id.progressBar);
         gifImageView = findViewById(R.id.gifImageView);
         overlay = findViewById(R.id.overlay);
@@ -203,7 +202,6 @@ public class CustomCameraLaunchActivity extends AppCompatActivity {
     /**
      * Captures a photo.
      */
-
     private void capturePhoto() {
         if (imageCapture == null) return;
 

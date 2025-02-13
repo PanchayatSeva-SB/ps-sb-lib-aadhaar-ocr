@@ -1,8 +1,4 @@
-package com.sayukth.aadhaar_ocr.constants;
-
-import com.sayukth.aadhaar_ocr.utils.ParseQRUtil;
-
-import java.security.PublicKey;
+package com.sayukth.aadhaarOcr.constants;
 
 public class AadhaarOcrConstants {
 
