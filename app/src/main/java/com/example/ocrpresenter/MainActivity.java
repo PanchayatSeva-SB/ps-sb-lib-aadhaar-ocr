@@ -1,8 +1,15 @@
 package com.example.ocrpresenter;
 
 import static com.sayukth.aadhaar_ocr.constants.AadhaarOcrConstants.AADHAAR_REQUEST_IMAGE;
+import static com.sayukth.aadhaar_ocr.constants.AadhaarOcrConstants.Address;
+import static com.sayukth.aadhaar_ocr.constants.AadhaarOcrConstants.Birth;
+import static com.sayukth.aadhaar_ocr.constants.AadhaarOcrConstants.DOB;
+import static com.sayukth.aadhaar_ocr.constants.AadhaarOcrConstants.ENROLLMENT_NUMBER;
+import static com.sayukth.aadhaar_ocr.constants.AadhaarOcrConstants.OF;
 import static com.sayukth.aadhaar_ocr.constants.AadhaarOcrConstants.RESULT_TIMEOUT;
 import static com.sayukth.aadhaar_ocr.constants.AadhaarOcrConstants.SCANNER_REQUEST_CODE;
+import static com.sayukth.aadhaar_ocr.constants.AadhaarOcrConstants.TO;
+import static com.sayukth.aadhaar_ocr.constants.AadhaarOcrConstants.Year;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -41,6 +48,10 @@ public class MainActivity extends AppCompatActivity implements DetectAadhaarCont
     private StringCharacterIterator fatherOrSpouseName;
     private boolean isFrontCaptured = false;
     private boolean isBackCaptured = false;
+
+    private static final String SCANNED_AADHAAR = "SCANNED_AADHAAR";
+    private static final String XML_FORMAT = "<?xml";
+    private static final String AADHAAR_REGEX = "^[2-9]{1}[0-9]{3}\\s[0-9]{4}\\s[0-9]{4}$";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,6 +96,7 @@ public class MainActivity extends AppCompatActivity implements DetectAadhaarCont
     public void onActivityResult(int requestCode, int resultCode, Intent intent) {
         super.onActivityResult(requestCode, resultCode, intent);
         boolean isBigQROCR = false;
+        boolean isPattern3 = false;
 
         try {
 
@@ -92,11 +104,11 @@ public class MainActivity extends AppCompatActivity implements DetectAadhaarCont
             if (requestCode == SCANNER_REQUEST_CODE) {
                 if (resultCode == RESULT_OK) {
                     // Get the scanned Aadhaar data from the intent
-                    String scannedAadhaar = intent.getStringExtra("SCANNED_AADHAAR");
+                    String scannedAadhaar = intent.getStringExtra(SCANNED_AADHAAR);
 
                     if (scannedAadhaar != null) {
                         // Display the scanned Aadhaar data (or use it as needed)
-                        if(scannedAadhaar.startsWith("<?xml")) {
+                        if(scannedAadhaar.startsWith(XML_FORMAT)) {
                             presenter.handleQrCodeScan(scannedAadhaar);
                         } else{
                             presenter.handleQrCodeScan(scannedAadhaar);
@@ -104,17 +116,17 @@ public class MainActivity extends AppCompatActivity implements DetectAadhaarCont
                         }
                     }
                 } else if (resultCode == RESULT_TIMEOUT) {
-                    Toast.makeText(MainActivity.this, "QR not Detected Switching to OCR", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this, getString(R.string.qr_to_ocr_switch), Toast.LENGTH_SHORT).show();
                     launchCameraForFrontSideCapture();
                 } else {
-                    Toast.makeText(MainActivity.this, "Scan Cancelled", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this, getString(R.string.scan_cancelled), Toast.LENGTH_SHORT).show();
                 }
             } else if (requestCode == AADHAAR_REQUEST_IMAGE) {
 
                 if (resultCode == Activity.RESULT_OK) {
 
 
-                    String imagePath = intent.getStringExtra("path");
+                    String imagePath = intent.getStringExtra(getString(R.string.path));
 
                     // Convert the image path to a Bitmap and display it
                     Bitmap bitmap = BitmapFactory.decodeFile(imagePath);
@@ -126,30 +138,36 @@ public class MainActivity extends AppCompatActivity implements DetectAadhaarCont
                     String imageText = presenter.getImageDataAsText(bitmap);
                     tvOcrImageText.setText(imageText);
 
-
-                    // Check if front or back side is captured
-                    if (!isFrontCaptured && isFrontMatch(imageText)) {
-                        isFrontCaptured = true; // Mark front as captured
-                        Toast.makeText(this, "Front side captured.", Toast.LENGTH_SHORT).show();
-                        AadhaarOcrPreferences.getInstance().put(AadhaarOcrPreferences.Key.IS_FRONT_SIDE_CAPTURED, true);
-
-                    } else if (!isBackCaptured && isBackMatch(imageText)) {
-                        isBackCaptured = true; // Mark back as captured
-                        AadhaarOcrPreferences.getInstance().put(AadhaarOcrPreferences.Key.IS_BACK_SIDE_CAPTURED, true);
-                        Toast.makeText(this, "Back side captured.", Toast.LENGTH_SHORT).show();
-                    } else if (containsAadhaar(imageText)) {
-                        isBigQROCR = true;
-                        Toast.makeText(this, "Capturing complete", Toast.LENGTH_SHORT).show();
+                    if(AadhaarOcrPreferences.getInstance().getBoolean(AadhaarOcrPreferences.Key.IS_BIG_QR_OCR)) {
+                        AadhaarOcrPreferences.getInstance().put(AadhaarOcrPreferences.Key.IS_BIG_QR_OCR, false);
+                        if (containsAadhaar(imageText)) {
+                            isBigQROCR = true;
+                            Toast.makeText(this, getString(R.string.capture_complete), Toast.LENGTH_SHORT).show();
+                        }
                     } else {
-                        Toast.makeText(this, "Unable to identify side. Please retry.", Toast.LENGTH_SHORT).show();
+                        // Check if front or back side is captured or pattern3 is matched
+                        if (isFrontSideFullScan(imageText)) {
+                            isPattern3 = true;
+                            Toast.makeText(this, getString(R.string.capture_complete), Toast.LENGTH_SHORT).show();
+                        } else if (!isFrontCaptured && isFrontMatch(imageText)) {
+                            isFrontCaptured = true; // Mark front as captured
+                            Toast.makeText(this, getString(R.string.front_side_captured), Toast.LENGTH_SHORT).show();
+                            AadhaarOcrPreferences.getInstance().put(AadhaarOcrPreferences.Key.IS_FRONT_SIDE_CAPTURED, true);
+
+                        } else if (!isBackCaptured && isBackMatch(imageText)) {
+                            isBackCaptured = true; // Mark back as captured
+                            AadhaarOcrPreferences.getInstance().put(AadhaarOcrPreferences.Key.IS_BACK_SIDE_CAPTURED, true);
+                            Toast.makeText(this, getString(R.string.back_side_captured), Toast.LENGTH_SHORT).show();
+                        }  else {
+                            Toast.makeText(this, getString(R.string.unable_to_identify_side), Toast.LENGTH_SHORT).show();
+                        }
                     }
 
-                    if(!isBigQROCR) {
+                    if(!isBigQROCR && !isPattern3) {
                         if (AadhaarOcrPreferences.getInstance().getBoolean(AadhaarOcrPreferences.Key.IS_FRONT_SIDE_CAPTURED) && AadhaarOcrPreferences.getInstance().getBoolean(AadhaarOcrPreferences.Key.IS_BACK_SIDE_CAPTURED)) {
-
                             AadhaarOcrPreferences.getInstance().put(AadhaarOcrPreferences.Key.IS_FRONT_SIDE_CAPTURED, false);
                             AadhaarOcrPreferences.getInstance().put(AadhaarOcrPreferences.Key.IS_BACK_SIDE_CAPTURED, false);
-                            Toast.makeText(this, "Capture Complete", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(this, getString(R.string.capture_complete), Toast.LENGTH_SHORT).show();
                         } else if (!AadhaarOcrPreferences.getInstance().getBoolean(AadhaarOcrPreferences.Key.IS_FRONT_SIDE_CAPTURED)) {
                             AadhaarOcrPreferences.getInstance().put(AadhaarOcrPreferences.Key.IS_FLIP_GIF_SHOW, true);
                             launchCameraForFrontSideCapture();
@@ -164,7 +182,7 @@ public class MainActivity extends AppCompatActivity implements DetectAadhaarCont
                 }
             }
             else {
-                Toast.makeText(MainActivity.this, "Scan cancelled", Toast.LENGTH_SHORT).show();
+                Toast.makeText(MainActivity.this, getString(R.string.capture_complete), Toast.LENGTH_SHORT).show();
             }
 
         } catch (Exception e) {
@@ -173,11 +191,15 @@ public class MainActivity extends AppCompatActivity implements DetectAadhaarCont
     }
 
     private boolean isFrontMatch(String imageText) {
-        return imageText.contains("DOB") || imageText.contains("Year") || imageText.contains("Of") || imageText.contains("Birth");
+        return imageText.contains(DOB) || imageText.contains(Year) || imageText.contains(OF) || imageText.contains(Birth);
     }
 
     private boolean isBackMatch(String imageText) {
-        return imageText.contains("S/O") || imageText.contains("Address") || imageText.contains("W/O") || imageText.contains("D/O");
+        return  imageText.contains(Address);
+    }
+
+    private boolean isFrontSideFullScan(String imageText){
+        return imageText.contains(TO) || imageText.contains(ENROLLMENT_NUMBER);
     }
 
 
@@ -186,7 +208,7 @@ public class MainActivity extends AppCompatActivity implements DetectAadhaarCont
         try {
             Log.i("Aadhaar : ", String.valueOf(map));
 
-            map.forEach((k, v) -> System.out.println(("K: " + k + ":" + "V: " + v)));
+            map.forEach((k, v) -> System.out.println(("Key: " + k + ":" + "Value: " + v)));
 
             StringBuilder aadhaarData = new StringBuilder();
 
@@ -212,7 +234,7 @@ public class MainActivity extends AppCompatActivity implements DetectAadhaarCont
             }
 
             String genderStr = map.get("GENDER");
-            if (genderStr != "" && genderStr != null) {
+            if (genderStr != null && genderStr != "") {
                 if (genderStr.equals("M") || genderStr.startsWith("M")) {
                     aadhaarData.append(" Gender : Male" + ", \n");
                 } else if (genderStr.equals("F") || genderStr.startsWith("F")) {
@@ -220,6 +242,18 @@ public class MainActivity extends AppCompatActivity implements DetectAadhaarCont
                 } else {
                     aadhaarData.append(" Gender : Other" + ", \n");
                 }
+            }
+
+            String mobileStr = map.get("MOBILE");
+
+            if(mobileStr != null && mobileStr != "" ){
+                aadhaarData.append("Mobile: "+ mobileStr + ",\n");
+            }
+
+            String addressStr = map.get("ADDRESS");
+
+            if(addressStr != null && addressStr != ""){
+                aadhaarData.append("Address: "+ addressStr + ",\n");
             }
 
             tvOcrData.setText(aadhaarData);
@@ -241,25 +275,26 @@ public class MainActivity extends AppCompatActivity implements DetectAadhaarCont
         isFrontCaptured = false;
         isBackCaptured = false;
         Intent intent = new Intent(MainActivity.this, CustomCameraLaunchActivity.class);
-        intent.putExtra("scan type","Front side");
+        intent.putExtra(getString(R.string.scan_type),getString(R.string.front_side));
         startActivityForResult(intent, AADHAAR_REQUEST_IMAGE);
 
     }
 
     public void launchCameraForBackSideCapture() {
         Intent intent = new Intent(MainActivity.this, CustomCameraLaunchActivity.class);
-        intent.putExtra("scan type","Back side");
+        intent.putExtra(getString(R.string.scan_type),getString(R.string.back_side));
         startActivityForResult(intent, AADHAAR_REQUEST_IMAGE);
     }
 
     public void launchCameraForBigQROCRCapture() {
+        AadhaarOcrPreferences.getInstance().put(AadhaarOcrPreferences.Key.IS_BIG_QR_OCR, true);
         Intent intent = new Intent(MainActivity.this, CustomCameraLaunchActivity.class);
-        intent.putExtra("scan type","Big QR OCR");
+        intent.putExtra(getString(R.string.scan_type),getString(R.string.big_qr_ocr));
         startActivityForResult(intent, AADHAAR_REQUEST_IMAGE);
     }
 
     private boolean containsAadhaar(String text) {
-        String aadharRegex = "^[2-9]{1}[0-9]{3}\\s[0-9]{4}\\s[0-9]{4}$";
+        String aadharRegex = AADHAAR_REGEX;
         Pattern pattern = Pattern.compile(aadharRegex);
 
         // Split the string into lines or words to simulate "text blocks"

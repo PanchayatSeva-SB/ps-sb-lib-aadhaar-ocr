@@ -44,7 +44,6 @@ import java.util.concurrent.Executors;
 public class CustomCameraLaunchActivity extends AppCompatActivity {
 
     private PreviewView cameraPreview;
-    private Button switchFlashlightButton;
     private Button capturePhotoButton;
 
     private ImageCapture imageCapture;
@@ -95,7 +94,6 @@ public class CustomCameraLaunchActivity extends AppCompatActivity {
         String scanType = getIntent().getStringExtra(getString(R.string.scan_type));
 
         if (getString(R.string.front_side).equals(scanType)) {
-//            frontBackGif.setImageDrawable(ContextCompat.getDrawable(this, com.sayukth.aadhaar_ocr.R.drawable.aadhar_scan_front));
 
             // Load GIF using Glide
             Glide.with(this)
@@ -104,7 +102,6 @@ public class CustomCameraLaunchActivity extends AppCompatActivity {
                     .into(frontBackGif);
 
         } else if (getString(R.string.back_side).equals(scanType)) {
-//            frontBackGif.setImageDrawable(ContextCompat.getDrawable(this, com.sayukth.aadhaar_ocr.R.drawable.aadhar_scan_back));
 
             // Load GIF using Glide
             Glide.with(this)
@@ -114,7 +111,6 @@ public class CustomCameraLaunchActivity extends AppCompatActivity {
 
             ocrTextView.setText(getString(R.string.back_side_focus_request));
         } else if (getString(R.string.big_qr_ocr).equals(scanType)) {
-//            frontBackGif.setImageDrawable(ContextCompat.getDrawable(this, com.sayukth.aadhaar_ocr.R.drawable.aadhar_scan_front));
             // Load GIF using Glide
             Glide.with(this)
                     .asGif()
@@ -138,7 +134,7 @@ public class CustomCameraLaunchActivity extends AppCompatActivity {
 
 
             // Load GIF using Glide
-            Glide.with(this).asGif().load(R.drawable.fip_aadhar).into(gifImageView);
+            Glide.with(this).asGif().load(R.drawable.fip_aadhar_1).into(gifImageView);
 
             // Delay for 2 seconds, then show camera preview
             new Handler(Looper.getMainLooper()).postDelayed(() -> {
@@ -146,7 +142,7 @@ public class CustomCameraLaunchActivity extends AppCompatActivity {
                 flipTextView.setVisibility(View.GONE);
 
                 // Re-initialize the camera view
-                startCamera();  // Rebind camera preview and other views
+                startCamera();
 
                 cameraPreview.setVisibility(View.VISIBLE);
                 capturePhotoButton.setVisibility(View.VISIBLE);
@@ -165,6 +161,8 @@ public class CustomCameraLaunchActivity extends AppCompatActivity {
 
     }
 
+
+//    Starts the Camera for capture
     private void startCamera() {
         ListenableFuture<ProcessCameraProvider> cameraProviderFuture =
                 ProcessCameraProvider.getInstance(this);
@@ -202,6 +200,10 @@ public class CustomCameraLaunchActivity extends AppCompatActivity {
         }, ContextCompat.getMainExecutor(this));
     }
 
+    /**
+     * Captures a photo.
+     */
+
     private void capturePhoto() {
         if (imageCapture == null) return;
 
@@ -214,7 +216,6 @@ public class CustomCameraLaunchActivity extends AppCompatActivity {
         // Get the cache directory and create the 'camera' subfolder if it doesn't exist
         File cacheDir = new File(getCacheDir(), "camera");
         if (!cacheDir.exists() && !cacheDir.mkdirs()) {
-            Log.e("CustomCameraActivity", "Failed to create 'camera' directory in cache");
             return;
         }
 
@@ -262,7 +263,7 @@ public class CustomCameraLaunchActivity extends AppCompatActivity {
         super.onDestroy();
         cameraExecutor.shutdown();
         // Dismiss dialog if activity is closing
-        DateUtils.hideLoading(CustomCameraLaunchActivity.this);
+        DateUtils.hideLoading();
     }
 
     @Override

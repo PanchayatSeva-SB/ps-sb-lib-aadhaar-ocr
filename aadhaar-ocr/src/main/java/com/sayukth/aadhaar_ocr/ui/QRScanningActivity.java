@@ -5,6 +5,7 @@ import static com.sayukth.aadhaar_ocr.constants.AadhaarOcrConstants.RESULT_TIMEO
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
@@ -18,6 +19,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.bumptech.glide.Glide;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.zxing.Result;
 import com.journeyapps.barcodescanner.BarcodeCallback;
 import com.journeyapps.barcodescanner.BarcodeResult;
@@ -36,32 +38,43 @@ public class QRScanningActivity extends AppCompatActivity {
     private static Runnable timeoutRunnable; // Runnable to execute timeout logic
     View promptView;
     CountDownTimer countDownTimer;
-    private static final int TIMER_DURATION = 10000;
+    private static final int TIMER_DURATION = 15000;
     TextView timerTextView;
     ImageView gifImage;
+    ImageView torchToggle;
     private static final String SCANNED_AADHAAR = "SCANNED_AADHAAR";
     private static final String CONST_ZERO = "0";
+    private boolean isTorchOn = false; // Track torch state
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         // Inflate the custom layout and set it as the content view
-       promptView = LayoutInflater.from(this).inflate(R.layout.activity_qr_scan, null);
+        promptView = LayoutInflater.from(this).inflate(R.layout.activity_qr_scan, null);
         setContentView(promptView);
 
+        // Initialize UI components
         timerTextView = promptView.findViewById(R.id.timerTextView);
+        torchToggle = promptView.findViewById(R.id.torchToggle);
 
-        // Call the method using the instance (non-static context)
+       // Launch the custom QR scanner UI
         launchScannerCustomUi(this);
 
+        // Load and display a GIF animation above the scanner
         gifImage = promptView.findViewById(R.id.gifAbove);
         Glide.with(this).asGif().load(R.drawable.aadhar_qr_scan_v1).into(gifImage);
 
         startCountDownTimer();
+
+        setupTorchToggle();
     }
 
-    // Modify the launchScannerCustomUi method to not be static
+    /**
+     * Initializes and launches the barcode scanner UI with a custom layout.
+     * @param activity The current activity instance.
+     */
+
     public void launchScannerCustomUi(Activity activity) {
 
 
@@ -108,12 +121,15 @@ public class QRScanningActivity extends AppCompatActivity {
                 Intent data = new Intent();
                 activity.setResult(RESULT_TIMEOUT, data);
 
-//                // Optionally, you can close the activity if timeout occurs
                 activity.finish();
             }
         };
     }
 
+    /**
+     * Handles the result of a successful QR scan.
+     * @param result The scanned QR code result.
+     */
     private void handleScanResult(Result result) {
 
         // Remove timeout if scanning is successful
@@ -123,7 +139,6 @@ public class QRScanningActivity extends AppCompatActivity {
             // Get the scanned data from the QR code
             String scannedData = result.getText();
 
-            // Log the scanned data
             Log.e("Scanned Data", "Data: " + scannedData);
 
             // Create an intent to return the scanned data
@@ -131,7 +146,7 @@ public class QRScanningActivity extends AppCompatActivity {
             data.putExtra(SCANNED_AADHAAR, scannedData);
 
             // Set the result and finish the activity
-            setResult(RESULT_OK, data); // Now this works as it's within an instance method
+            setResult(RESULT_OK, data);
             finish(); // Close the activity after scanning
         } else {
             Toast.makeText(this, "No data scanned", Toast.LENGTH_SHORT).show();
@@ -147,7 +162,7 @@ public class QRScanningActivity extends AppCompatActivity {
         }
 
         // Post the timeout runnable
-        timeoutHandler.postDelayed(timeoutRunnable, SCAN_TIMEOUT);
+        timeoutHandler.postDelayed(timeoutRunnable, TIMER_DURATION);
     }
 
     @Override
@@ -180,6 +195,10 @@ public class QRScanningActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Starts a countdown timer for the scanning process.
+     * Displays the remaining time on screen and resets when completed.
+     */
     private void startCountDownTimer() {
         countDownTimer = new CountDownTimer(TIMER_DURATION, 1000) { // Countdown interval of 1 second
             @Override
@@ -200,5 +219,32 @@ public class QRScanningActivity extends AppCompatActivity {
         // Start the countdown timer
         countDownTimer.start();
     }
+
+    /**
+     * Configures the flashlight toggle button.
+     * Checks if the device has a flash and toggles the flashlight on/off.
+     */
+    private void setupTorchToggle() {
+        boolean hasFlash = getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA_FLASH);
+
+        if (hasFlash) {
+            torchToggle.setVisibility(View.VISIBLE);
+        } else {
+            torchToggle.setVisibility(View.GONE);
+            return;
+        }
+
+        torchToggle.setOnClickListener(v -> {
+            if (isTorchOn) {
+                barcodeScannerView.setTorchOff();
+                torchToggle.setImageResource(R.drawable.ic_flashlight_off_24);
+            } else {
+                barcodeScannerView.setTorchOn();
+                torchToggle.setImageResource(R.drawable.ic_flashlight_on_24);
+            }
+            isTorchOn = !isTorchOn;
+        });
+    }
+
 }
 

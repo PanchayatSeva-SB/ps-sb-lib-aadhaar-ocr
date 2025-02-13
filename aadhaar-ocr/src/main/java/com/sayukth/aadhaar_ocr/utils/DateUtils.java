@@ -2,6 +2,7 @@ package com.sayukth.aadhaar_ocr.utils;
 
 import static com.yalantis.ucrop.UCropFragment.TAG;
 
+import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
@@ -45,6 +46,8 @@ public class DateUtils {
     private static String EDITABLE_FIELD_DATE_FORMAT = "dd-MM-yyyy";
 
     public static final String SURVEY_DISPLAY_DATE_PATTERN = "dd MMM yyyy hh:mm:ss";
+
+    private static Dialog loadingDialog;
 
     /**
      * To get the current datetime
@@ -326,37 +329,64 @@ public class DateUtils {
         return matcher.matches();
     }
 
-    public static void showLoading(Context context) {
-         Dialog dialog = null;
-         ProgressBar progressBar;
+//    public static void showLoading(Context context) {
+//         Dialog dialog = null;
+//         ProgressBar progressBar;
+//
+//        dialog = new Dialog(context);
+//        View view = LayoutInflater.from(context).inflate(R.layout.progress_bar, null); // Replace with your actual layout file name
+//        dialog.setContentView(view);
+//        dialog.setCancelable(false);
+//        dialog.setCanceledOnTouchOutside(false);
+//        dialog.show();
+//
+//        progressBar = view.findViewById(R.id.pbLoading); // Replace with your actual ProgressBar ID
+//        progressBar.setIndeterminate(true);
+//        progressBar.setVisibility(View.VISIBLE);
+//    }
+//
+//    public static void hideLoading(Context context) {
+//        Dialog dialog = null;
+//        ProgressBar progressBar;
+//
+//        dialog = new Dialog(context);
+//        View view = LayoutInflater.from(context).inflate(R.layout.progress_bar, null); // Replace with your actual layout file name
+//        dialog.setContentView(view);
+//        dialog.setCancelable(false);
+//        dialog.setCanceledOnTouchOutside(false);
+//        dialog.show();
+//
+//        progressBar = view.findViewById(R.id.pbLoading); // Replace with your actual ProgressBar ID
+//        progressBar.setIndeterminate(true);
+//        progressBar.setVisibility(View.GONE);
+//    }
 
-        dialog = new Dialog(context);
-        View view = LayoutInflater.from(context).inflate(R.layout.progress_bar, null); // Replace with your actual layout file name
-        dialog.setContentView(view);
-        dialog.setCancelable(false);
-        dialog.setCanceledOnTouchOutside(false);
-        dialog.show();
+    // Show loading dialog
+    public static void showLoading(Activity activity) {
+        if (activity == null || activity.isFinishing()) {
+            return; // Prevent leaks if activity is finishing
+        }
 
-        progressBar = view.findViewById(R.id.pbLoading); // Replace with your actual ProgressBar ID
-        progressBar.setIndeterminate(true);
-        progressBar.setVisibility(View.VISIBLE);
+        if (loadingDialog != null && loadingDialog.isShowing()) {
+            return; // Prevent multiple dialogs
+        }
+
+        loadingDialog = new Dialog(activity);
+        View view = LayoutInflater.from(activity).inflate(R.layout.progress_bar, null);
+        loadingDialog.setContentView(view);
+        loadingDialog.setCancelable(false);
+        loadingDialog.setCanceledOnTouchOutside(false);
+        loadingDialog.show();
     }
 
-    public static void hideLoading(Context context) {
-        Dialog dialog = null;
-        ProgressBar progressBar;
-
-        dialog = new Dialog(context);
-        View view = LayoutInflater.from(context).inflate(R.layout.progress_bar, null); // Replace with your actual layout file name
-        dialog.setContentView(view);
-        dialog.setCancelable(false);
-        dialog.setCanceledOnTouchOutside(false);
-        dialog.show();
-
-        progressBar = view.findViewById(R.id.pbLoading); // Replace with your actual ProgressBar ID
-        progressBar.setIndeterminate(true);
-        progressBar.setVisibility(View.GONE);
+    // Hide loading dialog
+    public static void hideLoading() {
+        if (loadingDialog != null && loadingDialog.isShowing()) {
+            loadingDialog.dismiss();
+            loadingDialog = null; // Prevent memory leaks
+        }
     }
-
-
 }
+
+
+

@@ -77,4 +77,10 @@ public class AadhaarOcrConstants {
 
     public static final String DAUGHTER_OF = "D/O";
 
+    public static final String MOBILE = "MOBILE";
+
+    public static final String TO = "To";
+
+    public static final String ENROLLMENT_NUMBER = "Enrollment No";
+
 }
