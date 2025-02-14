@@ -1,18 +1,14 @@
 buildscript {
-//    ext.kotlin_version = '1.7.20'
     repositories {
         google()
         mavenCentral()
-        mavenLocal()            // << --- ADD This
+        mavenLocal()
     }
 
     dependencies {
-//        classpath 'com.android.tools.build:gradle:7.1.3'
-//        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+
     }
 }
-
-
 
 
 plugins {
@@ -23,8 +19,6 @@ plugins {
 android {
     namespace 'com.sayukth.aadhaarOcr'
     compileSdk 33
-
-
 
     defaultConfig {
         minSdk 24
@@ -39,12 +33,12 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             consumerProguardFiles 'proguard-rules.pro'
-            consumerProguardFiles 'consumer-rules.pro'       // << --- ADD This
+            consumerProguardFiles 'consumer-rules.pro'
         }
     }
 
     java {
-        sourceCompatibility = JavaVersion.VERSION_1_8            // << --- ADD This
+        sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
     }
 
