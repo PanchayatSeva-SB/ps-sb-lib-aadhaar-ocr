@@ -52,7 +52,12 @@
             android:screenOrientation="portrait"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
 
-        <activity android:name="com.sayukth.aadhaar_ocr.ui.DetectAadhaarActivity"/>
+        <activity
+            android:name="com.journeyapps.barcodescanner.CaptureActivity"
+            android:exported="false"
+            android:screenOrientation="fullSensor"
+            tools:replace="screenOrientation" />
+
 
         <provider
             android:name="androidx.core.content.FileProvider"

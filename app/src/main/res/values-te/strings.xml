@@ -18,4 +18,18 @@
     <string name="aadhaar_card_front_side_photo">స్టెప్ 1: ఆధార్ కార్డ్ ముందు వైపు ఫోటో తీయండి</string>
     <string name="aadhaar_card_back_side_photo">స్టెప్ 2: ఆధార్ కార్డ్ వెనుక వైపు ఫోటో తీయండి</string>
 
+
+    <string name="ok_string">Ok</string>
+    <string name="qr_to_ocr_switch">QR not Detected Switching to OCR</string>
+    <string name="scan_cancelled">Scan Cancelled</string>
+    <string name="path">path</string>
+    <string name="capture_complete">Capturing complete</string>
+    <string name="front_side_captured">Front side Captured</string>
+    <string name="back_side_captured">Back Side Captured</string>
+    <string name="unable_to_identify_side">Unable to identify side. Please retry</string>
+    <string name="scan_type">scan type</string>
+    <string name="front_side">Front side</string>
+    <string name="back_side">Back side</string>
+    <string name="big_qr_ocr">Big QR OCR</string>
+
 </resources>

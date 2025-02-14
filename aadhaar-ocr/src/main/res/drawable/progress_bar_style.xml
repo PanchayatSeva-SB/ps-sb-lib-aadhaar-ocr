@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- res/drawable/progress_bar_color.xml -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@android:id/background">
+        <shape>
+            <solid android:color="@color/blue_800" /> <!-- Background color -->
+            <corners android:radius="25dp"/>
+        </shape>
+    </item>
+    <item android:id="@android:id/progress">
+        <shape>
+            <solid android:color="@color/blue_800" /> <!-- Progress bar color -->
+            <corners android:radius="25dp"/>
+        </shape>
+    </item>
+</layer-list>

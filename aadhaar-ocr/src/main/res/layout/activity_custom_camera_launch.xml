@@ -1,0 +1,129 @@
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!-- Aadhaar Scan GIF -->
+    <ImageView
+        android:id="@+id/front_back_gif"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:scaleType="centerInside"
+        android:src="@drawable/aadhar_front_scan"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHeight_percent="0.25" />
+
+    <!-- Instructions -->
+    <TextView
+        android:id="@+id/ocr_text"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Please focus camera on the \n Front side of the Aadhaar Card"
+        android:textSize="18sp"
+        android:textAlignment="center"
+        android:textStyle="bold"
+        android:gravity="center"
+        app:layout_constraintTop_toBottomOf="@id/front_back_gif"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginBottom="@dimen/_8dp"/>
+
+    <TextView
+        android:id="@+id/flip_text"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Please flip the Card to Capture another Side of the Aadhaar"
+        android:textSize="18sp"
+        android:textAlignment="center"
+        android:textStyle="bold"
+        android:gravity="center"
+        app:layout_constraintTop_toBottomOf="@id/front_back_gif"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_margin="8dp"
+        android:visibility="gone"/>
+
+    <!-- Camera Preview -->
+    <androidx.camera.view.PreviewView
+        android:id="@+id/camera_preview"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="#000"
+        app:layout_constraintTop_toBottomOf="@id/ocr_text"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHeight_percent="0.35"/>
+
+    <!-- Progress Bar -->
+    <ProgressBar
+        android:id="@+id/progressBar"
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:visibility="gone"
+        app:layout_constraintTop_toTopOf="@id/camera_preview"
+        app:layout_constraintBottom_toBottomOf="@id/camera_preview"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <!-- Overlay -->
+    <View
+        android:id="@+id/overlay"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="@drawable/viewport_overlay"
+        app:layout_constraintTop_toBottomOf="@id/ocr_text"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHeight_percent="0.35" />
+
+    <ImageView
+        android:id="@+id/gifImageView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:scaleType="centerInside"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+
+
+    <!-- Extra Image Between Camera Preview & Button -->
+    <ImageView
+        android:id="@+id/distance_image"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:src="@drawable/ocr_scan_aadhar"
+        android:scaleType="centerInside"
+        app:layout_constraintTop_toBottomOf="@id/camera_preview"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHeight_percent="0.25"/>
+
+    <!-- Capture Button -->
+    <LinearLayout
+        android:id="@+id/button_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:padding="16dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <Button
+            android:id="@+id/capture_photo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Capture"
+            android:textColor="@color/white"
+            android:background="@drawable/rounded_button"/>
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
