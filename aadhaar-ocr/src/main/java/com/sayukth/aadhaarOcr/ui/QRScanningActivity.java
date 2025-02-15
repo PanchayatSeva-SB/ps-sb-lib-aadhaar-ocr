@@ -43,6 +43,8 @@ public class QRScanningActivity extends AppCompatActivity {
     private static final String SCANNED_AADHAAR = "SCANNED_AADHAAR";
     private static final String CONST_ZERO = "0";
     private boolean isTorchOn = false; // Track torch state
+    boolean isScanProcessed = false;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,6 +77,7 @@ public class QRScanningActivity extends AppCompatActivity {
     public void launchScannerCustomUi(Activity activity) {
 
 
+
         // Initialize the barcode scanner view
         barcodeScannerView = promptView.findViewById(R.id.barcode_scanner);
 
@@ -89,19 +92,24 @@ public class QRScanningActivity extends AppCompatActivity {
         captureManager.decode();
 
         // Set up result handler for barcode scanning (decodeSingle)
-        barcodeScannerView.decodeSingle(new BarcodeCallback() {
-            public void barcodeResult(Result result) {
-                handleScanResult(result); // Handle the scanned result
-            }
-
+        barcodeScannerView.decodeContinuous(new BarcodeCallback() {
             @Override
             public void barcodeResult(BarcodeResult result) {
-                handleScanResult(result.getResult());
-            }
+                String scannedData = result.getText();
 
-            @Override
-            public void possibleResultPoints(java.util.List<com.google.zxing.ResultPoint> resultPoints) {
-                // Optional: Handle possible result points (for more advanced use cases)
+                // Ensure the scanned data is not null and has at least 64 characters
+                if (scannedData != null && scannedData.length() >= 64) {
+                    if (!isScanProcessed) {
+                        isScanProcessed = true;
+                        handleScanResult(result.getResult());
+
+                        // Stop scanning after a valid scan
+                        barcodeScannerView.pause();
+                    }
+                } else {
+                    // Keep scanning if the data is less than 64 characters
+                    Log.d("QRScanningActivity", "Scanned data is too short, continuing scan...");
+                }
             }
         });
 
