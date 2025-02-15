@@ -229,11 +229,6 @@ public class CustomCameraLaunchActivity extends AppCompatActivity {
                     @Override
                     public void onImageSaved(@NonNull ImageCapture.OutputFileResults outputFileResults) {
                         runOnUiThread(() -> {
-
-                            Toast.makeText(CustomCameraLaunchActivity.this,
-                                    "Photo saved: " + photoFile.getAbsolutePath(),
-                                    Toast.LENGTH_SHORT).show();
-
                             Intent resultIntent = new Intent();
                             resultIntent.putExtra(getString(R.string.path), photoFile.getAbsolutePath());
                             setResult(RESULT_OK, resultIntent);
