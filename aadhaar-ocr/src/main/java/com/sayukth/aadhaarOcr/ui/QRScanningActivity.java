@@ -9,12 +9,15 @@ import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.bumptech.glide.Glide;
@@ -53,6 +56,8 @@ public class QRScanningActivity extends AppCompatActivity {
         // Inflate the custom layout and set it as the content view
         promptView = LayoutInflater.from(this).inflate(R.layout.activity_qr_scan, null);
         setContentView(promptView);
+
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         // Initialize UI components
         timerTextView = promptView.findViewById(R.id.timerTextView);
@@ -249,6 +254,27 @@ public class QRScanningActivity extends AppCompatActivity {
             }
             isTorchOn = !isTorchOn;
         });
+    }
+
+
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            // Perform any necessary actions before exiting
+            onBackPressed(); // Close the activity
+            return true; // Indicate that the event has been handled
+        }
+        return super.onKeyDown(keyCode, event);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            onBackPressed();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
 }

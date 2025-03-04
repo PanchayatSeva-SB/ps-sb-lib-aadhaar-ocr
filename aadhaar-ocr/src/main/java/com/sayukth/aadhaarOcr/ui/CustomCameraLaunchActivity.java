@@ -8,7 +8,9 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -56,6 +58,7 @@ public class CustomCameraLaunchActivity extends AppCompatActivity {
     View overlay;
     TextView flipTextView;
     ImageView distanceImage;
+    TextView textViewBigQR;
 
     private static final String JPG = ".jpg";
 
@@ -65,6 +68,8 @@ public class CustomCameraLaunchActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         promptView = LayoutInflater.from(this).inflate(R.layout.activity_custom_camera_launch, null);
         setContentView(promptView);
+
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         // Initialize views
         cameraPreview = findViewById(R.id.camera_preview);
@@ -76,6 +81,7 @@ public class CustomCameraLaunchActivity extends AppCompatActivity {
         overlay = findViewById(R.id.overlay);
         flipTextView = findViewById(R.id.flip_text);
         distanceImage = findViewById(R.id.distance_image);
+        textViewBigQR = findViewById(R.id.textViewBigQR);
 
         // Initialize camera executor
         cameraExecutor = Executors.newSingleThreadExecutor();
@@ -153,6 +159,41 @@ public class CustomCameraLaunchActivity extends AppCompatActivity {
             }, 3000); // 2000ms = 2 seconds
         }
 
+        if(AadhaarOcrPreferences.getInstance().getBoolean(AadhaarOcrPreferences.Key.IS_BIG_QR_OCR)){
+            // Show the flip GIF
+//            textViewBigQR.setVisibility(View.VISIBLE);
+            gifImageView.setVisibility(View.VISIBLE);
+            flipTextView.setVisibility(View.VISIBLE);
+            cameraPreview.setVisibility(View.GONE);
+            capturePhotoButton.setVisibility(View.GONE);
+            frontBackGif.setVisibility(View.GONE);
+            overlay.setVisibility(View.GONE);
+            ocrTextView.setVisibility(View.GONE);
+            distanceImage.setVisibility(View.GONE);
+
+//            / Load GIF using Glide
+            Glide.with(this).asGif().load(R.drawable.aadhar_num_scan).into(gifImageView);
+            flipTextView.setText("Big QR Code Scanned. Please Capture the Photo of the Aadhaar Number");
+
+
+            // Delay for 2 seconds, then show camera preview
+            new Handler(Looper.getMainLooper()).postDelayed(() -> {
+                gifImageView.setVisibility(View.GONE);
+                flipTextView.setVisibility(View.GONE);
+
+                // Re-initialize the camera view
+                startCamera();
+
+                textViewBigQR.setVisibility(View.GONE);
+                cameraPreview.setVisibility(View.VISIBLE);
+                capturePhotoButton.setVisibility(View.VISIBLE);
+                frontBackGif.setVisibility(View.VISIBLE);
+                overlay.setVisibility(View.VISIBLE);
+                ocrTextView.setVisibility(View.VISIBLE);
+                distanceImage.setVisibility(View.VISIBLE);
+
+            }, 3000);
+        }
 
         // Set up photo capture
         capturePhotoButton.setOnClickListener(v -> capturePhoto());
@@ -270,6 +311,34 @@ public class CustomCameraLaunchActivity extends AppCompatActivity {
             Toast.makeText(this, "Camera permission denied", Toast.LENGTH_SHORT).show();
         }
     }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        finish();
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            // Perform any necessary actions before exiting
+            onBackPressed(); // Close the activity
+            return true; // Indicate that the event has been handled
+        }
+        return super.onKeyDown(keyCode, event);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            onBackPressed();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+
+
 
 }
 
