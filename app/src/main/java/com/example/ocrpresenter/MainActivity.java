@@ -51,6 +51,7 @@ public class MainActivity extends AppCompatActivity implements DetectAadhaarCont
 
     private static final String SCANNED_AADHAAR = "SCANNED_AADHAAR";
     private static final String XML_FORMAT = "<?xml";
+    private static final String XML_FORMAT_ALTERNATE = "<PrintLetterBarcodeData";
     private static final String AADHAAR_REGEX = "^[2-9]{1}[0-9]{3}\\s[0-9]{4}\\s[0-9]{4}$";
 
     boolean isBigQROCR = false;
@@ -244,7 +245,7 @@ public class MainActivity extends AppCompatActivity implements DetectAadhaarCont
             if (scannedAadhaar != null) {
                 // Display the scanned Aadhaar data (or use it as needed)
                 presenter.handleQrCodeScan(scannedAadhaar);
-                if (!scannedAadhaar.startsWith(XML_FORMAT)) {
+                if (!scannedAadhaar.startsWith(XML_FORMAT) && ! scannedAadhaar.contains(XML_FORMAT_ALTERNATE)) {
                     launchCameraForBigQROCRCapture();
                 }
             }
