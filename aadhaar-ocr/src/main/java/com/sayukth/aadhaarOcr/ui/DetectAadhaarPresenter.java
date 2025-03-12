@@ -160,25 +160,52 @@ public class DetectAadhaarPresenter implements DetectAadhaarContract.Presenter {
      * @throws ActivityException If an error occurs while processing.
      */
     public void setFatherOrSpouseMetaData(String val) throws ActivityException {
+        // Display the extracted OCR text on the UI
         detectAadharView.showImageText(String.valueOf(ocrImageText));
 
+        // Convert the input value to uppercase for case-insensitive comparison
         String srcVal = val.toUpperCase();
 
-
+        // Check if the extracted text contains the keyword "ADDRESS"
         if (srcVal.contains(ADDRESS)) {
+            // Define metadata key for storing extracted name
             String metaData = FATHER;
 
+            // Extract the last part of the string by splitting it at ":"
             String text = StringSplitUtils.getLastPartOfStringBySplitString(ocrImageText.toString(), ":");
-           System.out.println("Text : "+ text);
-            String fsnameWithCareOf = StringSplitUtils.getFirstPartOfStringBySplitString(text.toString(), ",");
-            System.out.println("FS : "+ fsnameWithCareOf);
-            String fsname = StringSplitUtils.getLastPartOfStringBySplitString(fsnameWithCareOf.trim(), " ");
-            System.out.println("FS : " + fsname);
+            System.out.println("Text : " + text);
 
-            metadataMap.put(metaData, fsname.trim());
+        /*
+        // Old approach: Split based on "," to get the first part
+        String fsnameWithCareOf = StringSplitUtils.getFirstPartOfStringBySplitString(text.toString(), ",");
+        System.out.println("FS : "+ fsnameWithCareOf);
+
+        // Extract the last word after trimming spaces
+        String fsname = StringSplitUtils.getLastPartOfStringBySplitString(fsnameWithCareOf.trim(), " ");
+        System.out.println("FS : " + fsname);
+        */
+
+            // Define a regex pattern to match S/O, D/O, W/O, or C/O and extract the name after it
+            Pattern pattern = Pattern.compile("(?i)\\b(?:S/O|D/O|W/O|C/O)(.*)"); // Case-insensitive match
+            Matcher matcher = pattern.matcher(text);
+
+            String formattedFatherName = "";
+            if (matcher.find()) {
+                // Extract the name after S/O, D/O, W/O, or C/O and remove newline characters
+                formattedFatherName = matcher.group(1).trim().replaceAll("\\n+", " ");
+
+                // Remove everything after the first comma to retain only the name
+                int commaIndex = formattedFatherName.indexOf(",");
+                if (commaIndex != -1) {
+                    formattedFatherName = formattedFatherName.substring(0, commaIndex).trim();
+                }
+            }
+
+            // Store the extracted and formatted name in the metadata map
+            metadataMap.put(metaData, formattedFatherName.trim());
         }
-
     }
+
 
     /**
      * Extracts father or spouse name using specific patterns.
