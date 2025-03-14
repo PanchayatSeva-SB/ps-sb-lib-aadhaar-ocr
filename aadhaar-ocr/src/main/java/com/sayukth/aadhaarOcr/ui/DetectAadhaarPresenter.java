@@ -329,17 +329,6 @@ public class DetectAadhaarPresenter implements DetectAadhaarContract.Presenter {
             String srcVal = val.toUpperCase();
             String tgtVal = val;
 
-//            if (srcVal.contains(MALE) || srcVal.contains(FEMALE) || srcVal.contains(TRANS)) {
-//                metaData = GENDER;
-//                if (val.contains("/")) {
-//                    tgtVal = val.split("/")[1];
-//                } else {
-//                    if (val.contains(" ")) {
-//                        tgtVal = val.split(" ")[1];
-//                    }
-//                }
-//
-//            }
             if (srcVal.contains(MALE) || srcVal.contains(FEMALE) || srcVal.contains(TRANS)) {
                 if (srcVal.contains(FEMALE)) {
                     metaData = GENDER;
@@ -355,13 +344,6 @@ public class DetectAadhaarPresenter implements DetectAadhaarContract.Presenter {
                     srcVal.contains(YEAR_OF) || srcVal.contains(YOB)) {
                 metaData = DATE_OF_YEAR;
 
-//                if (val.contains(":")) {
-//                    tgtVal = val.split(":")[1];
-//                } else {
-//                    String dobValArr[] = val.split(" ");
-//                    int dobValLen = dobValArr.length;
-//                    tgtVal = dobValArr[dobValLen - 1];
-//                }
                 Pattern pattern = Pattern.compile("(\\d{4}[-/]\\d{1,2}[-/]\\d{1,2})|((\\d{1,2})[-/](\\d{1,2})[-/](\\d{4}))");
                 Pattern onlyYear = Pattern.compile("\\d{4}");
                 Matcher matcher1 = pattern.matcher(val);
