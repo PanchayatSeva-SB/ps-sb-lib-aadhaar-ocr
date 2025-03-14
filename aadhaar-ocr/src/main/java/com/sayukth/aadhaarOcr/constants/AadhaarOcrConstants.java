@@ -51,6 +51,8 @@ public class AadhaarOcrConstants {
 
     public static final String GOVERNMENT = "GOVERNMENT";
 
+    public static final String AADHAAR_ = "AADHAAR";
+
     public static final String INDIA = "INDIA";
 
     public static final String FATHER = "FATHER";
