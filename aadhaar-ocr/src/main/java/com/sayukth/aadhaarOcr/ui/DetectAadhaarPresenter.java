@@ -3,25 +3,38 @@ package com.sayukth.aadhaarOcr.ui;
 import static com.sayukth.aadhaarOcr.constants.AadhaarOcrConstants.AADHAAR;
 import static com.sayukth.aadhaarOcr.constants.AadhaarOcrConstants.AADHAAR_;
 import static com.sayukth.aadhaarOcr.constants.AadhaarOcrConstants.ADDRESS;
+import static com.sayukth.aadhaarOcr.constants.AadhaarOcrConstants.AUTHENTICATION;
+import static com.sayukth.aadhaarOcr.constants.AadhaarOcrConstants.AUTHORITY;
 import static com.sayukth.aadhaarOcr.constants.AadhaarOcrConstants.Address;
 import static com.sayukth.aadhaarOcr.constants.AadhaarOcrConstants.BIRTH;
 import static com.sayukth.aadhaarOcr.constants.AadhaarOcrConstants.Birth;
+import static com.sayukth.aadhaarOcr.constants.AadhaarOcrConstants.CITIZENSHIP;
 import static com.sayukth.aadhaarOcr.constants.AadhaarOcrConstants.DATE;
 import static com.sayukth.aadhaarOcr.constants.AadhaarOcrConstants.DATE_OF_YEAR;
+import static com.sayukth.aadhaarOcr.constants.AadhaarOcrConstants.DIGITALLY;
 import static com.sayukth.aadhaarOcr.constants.AadhaarOcrConstants.DOB;
+import static com.sayukth.aadhaarOcr.constants.AadhaarOcrConstants.ENROLLMENT;
 import static com.sayukth.aadhaarOcr.constants.AadhaarOcrConstants.ENROLLMENT_NUMBER;
 import static com.sayukth.aadhaarOcr.constants.AadhaarOcrConstants.FATHER;
+import static com.sayukth.aadhaarOcr.constants.AadhaarOcrConstants.FEEMALE;
 import static com.sayukth.aadhaarOcr.constants.AadhaarOcrConstants.FEMALE;
 import static com.sayukth.aadhaarOcr.constants.AadhaarOcrConstants.GENDER;
 import static com.sayukth.aadhaarOcr.constants.AadhaarOcrConstants.GOVERNMENT;
+import static com.sayukth.aadhaarOcr.constants.AadhaarOcrConstants.HEMALE;
 import static com.sayukth.aadhaarOcr.constants.AadhaarOcrConstants.INDIA;
 import static com.sayukth.aadhaarOcr.constants.AadhaarOcrConstants.MALE;
 import static com.sayukth.aadhaarOcr.constants.AadhaarOcrConstants.MOBILE;
 import static com.sayukth.aadhaarOcr.constants.AadhaarOcrConstants.NAME;
 import static com.sayukth.aadhaarOcr.constants.AadhaarOcrConstants.OF;
+import static com.sayukth.aadhaarOcr.constants.AadhaarOcrConstants.OFFLINE;
 import static com.sayukth.aadhaarOcr.constants.AadhaarOcrConstants.OTHER;
+import static com.sayukth.aadhaarOcr.constants.AadhaarOcrConstants.SIGNED;
+import static com.sayukth.aadhaarOcr.constants.AadhaarOcrConstants.TEMALE;
 import static com.sayukth.aadhaarOcr.constants.AadhaarOcrConstants.TO;
 import static com.sayukth.aadhaarOcr.constants.AadhaarOcrConstants.TRANS;
+import static com.sayukth.aadhaarOcr.constants.AadhaarOcrConstants.UNIQUE;
+import static com.sayukth.aadhaarOcr.constants.AadhaarOcrConstants.VERIFICATION;
+import static com.sayukth.aadhaarOcr.constants.AadhaarOcrConstants.XML;
 import static com.sayukth.aadhaarOcr.constants.AadhaarOcrConstants.YEAR;
 import static com.sayukth.aadhaarOcr.constants.AadhaarOcrConstants.YEAR_OF;
 import static com.sayukth.aadhaarOcr.constants.AadhaarOcrConstants.YOB;
@@ -35,13 +48,18 @@ import android.util.SparseArray;
 import com.google.android.gms.vision.Frame;
 import com.google.android.gms.vision.text.TextBlock;
 import com.google.android.gms.vision.text.TextRecognizer;
+import com.sayukth.aadhaarOcr.constants.AadhaarOcrConstants;
 import com.sayukth.aadhaarOcr.error.ActivityException;
+import com.sayukth.aadhaarOcr.ocrpreferences.AadhaarOcrPreferences;
 import com.sayukth.aadhaarOcr.utils.DateUtils;
 import com.sayukth.aadhaarOcr.utils.ParseQRUtil;
 import com.sayukth.aadhaarOcr.utils.StringSplitUtils;
 
+import org.xmlpull.v1.XmlPullParserException;
+
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -95,6 +113,8 @@ public class DetectAadhaarPresenter implements DetectAadhaarContract.Presenter {
             Log.d("Language : ", imageText + " : " + textBlock.getLanguage());
             stringBuilder.append("#").append(textValue).append("#\n");
             stringBuilder.append("\n");
+
+            AadhaarOcrPreferences.getInstance().put(AadhaarOcrPreferences.Key.OCR_CAPTURED_TEXT, imageText);
 
             classifyTextBlock(imageText);
 
@@ -187,7 +207,7 @@ public class DetectAadhaarPresenter implements DetectAadhaarContract.Presenter {
         */
 
             // Define a regex pattern to match S/O, D/O, W/O, or C/O and extract the name after it
-            Pattern pattern = Pattern.compile("(?i)\\b(?:S/O|D/O|W/O|C/O)(.*)"); // Case-insensitive match
+            Pattern pattern = Pattern.compile("(?i)\\b(?:S/O|D/O|W/O|C/O|SIO|DIO|WIO|CIO)(.*)"); // Case-insensitive match
             Matcher matcher = pattern.matcher(text);
 
             String formattedFatherName = "";
@@ -362,13 +382,13 @@ public class DetectAadhaarPresenter implements DetectAadhaarContract.Presenter {
             }
             else if (aadharMatcher.matches()) {
                 metaData = AADHAAR;
-            } else if (!srcVal.contains(GOVERNMENT) && !srcVal.contains(INDIA) && !srcVal.contains(FATHER) && !srcVal.contains(AADHAAR_)) {
+            } else if (!srcVal.contains(DIGITALLY) && !srcVal.contains(SIGNED) && !srcVal.contains(UNIQUE) && !srcVal.contains(AUTHORITY)&& !srcVal.contains(GOVERNMENT) && !srcVal.contains(INDIA) && !srcVal.contains(FATHER) && !srcVal.contains(AADHAAR_) && !srcVal.contains(CITIZENSHIP) && !srcVal.contains(VERIFICATION) && !srcVal.contains(AUTHENTICATION) && !srcVal.contains(OFFLINE) && !srcVal.contains(XML) && !srcVal.contains(ENROLLMENT)) {
                 if(nameMatcher.matches()) {
                     metaData = NAME;
                 }
 
-            }
 
+            }
 
             metadataMap.put(metaData, tgtVal.trim());
 
@@ -410,8 +430,14 @@ public class DetectAadhaarPresenter implements DetectAadhaarContract.Presenter {
      */
     public void handleQrCodeScan(String scanContent) {
 
-        HashMap<String, String> parsedDataStr = ParseQRUtil.parseScannedData(scanContent);
-        detectAadharView.showAadhaarInfo(parsedDataStr);
+        HashMap<String, String> parsedDataStr = null;
+        try {
+            parsedDataStr = ParseQRUtil.parseScannedData(scanContent.trim());
+            detectAadharView.showAadhaarInfo(parsedDataStr);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
     }
 
     /**
