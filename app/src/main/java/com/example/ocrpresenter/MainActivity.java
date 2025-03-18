@@ -51,6 +51,7 @@ public class MainActivity extends AppCompatActivity implements DetectAadhaarCont
 
     private static final String SCANNED_AADHAAR = "SCANNED_AADHAAR";
     private static final String XML_FORMAT = "<?xml";
+    private static final String XML_FORMAT_ALTERNATE = "<PrintLetterBarcodeData";
     private static final String AADHAAR_REGEX = "^[2-9]{1}[0-9]{3}\\s[0-9]{4}\\s[0-9]{4}$";
 
     boolean isBigQROCR = false;
@@ -242,10 +243,19 @@ public class MainActivity extends AppCompatActivity implements DetectAadhaarCont
             String scannedAadhaar = intent.getStringExtra(SCANNED_AADHAAR);
 
             if (scannedAadhaar != null) {
-                // Display the scanned Aadhaar data (or use it as needed)
-                presenter.handleQrCodeScan(scannedAadhaar);
-                if (!scannedAadhaar.startsWith(XML_FORMAT)) {
-                    launchCameraForBigQROCRCapture();
+                try {
+                    // Attempt to process the scanned Aadhaar data
+                    presenter.handleQrCodeScan(scannedAadhaar);
+
+                    // Check the format and decide next action
+                    if (!scannedAadhaar.startsWith(XML_FORMAT) && !scannedAadhaar.contains(XML_FORMAT_ALTERNATE)) {
+                        launchCameraForBigQROCRCapture();
+                    }
+                } catch (Exception e) {
+                    // Handle the exception gracefully
+                    Log.e("in handle scanner result","handle scanner result");
+                    e.printStackTrace();
+                    Toast.makeText(this, "Error processing QR Code: " + e.getMessage(), Toast.LENGTH_LONG).show();
                 }
             }
         } else if (resultCode == RESULT_TIMEOUT) {
@@ -255,6 +265,7 @@ public class MainActivity extends AppCompatActivity implements DetectAadhaarCont
             Toast.makeText(this, getString(R.string.scan_cancelled), Toast.LENGTH_SHORT).show();
         }
     }
+
 
     private void handleAadhaarImageResult(int resultCode, Intent intent) {
         if (resultCode == Activity.RESULT_OK) {

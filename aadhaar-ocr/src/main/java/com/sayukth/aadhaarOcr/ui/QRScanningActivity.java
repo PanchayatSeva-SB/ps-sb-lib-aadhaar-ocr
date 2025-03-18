@@ -9,12 +9,15 @@ import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.bumptech.glide.Glide;
@@ -43,6 +46,8 @@ public class QRScanningActivity extends AppCompatActivity {
     private static final String SCANNED_AADHAAR = "SCANNED_AADHAAR";
     private static final String CONST_ZERO = "0";
     private boolean isTorchOn = false; // Track torch state
+    boolean isScanProcessed = false;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,6 +56,8 @@ public class QRScanningActivity extends AppCompatActivity {
         // Inflate the custom layout and set it as the content view
         promptView = LayoutInflater.from(this).inflate(R.layout.activity_qr_scan, null);
         setContentView(promptView);
+
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         // Initialize UI components
         timerTextView = promptView.findViewById(R.id.timerTextView);
@@ -75,6 +82,7 @@ public class QRScanningActivity extends AppCompatActivity {
     public void launchScannerCustomUi(Activity activity) {
 
 
+
         // Initialize the barcode scanner view
         barcodeScannerView = promptView.findViewById(R.id.barcode_scanner);
 
@@ -89,19 +97,24 @@ public class QRScanningActivity extends AppCompatActivity {
         captureManager.decode();
 
         // Set up result handler for barcode scanning (decodeSingle)
-        barcodeScannerView.decodeSingle(new BarcodeCallback() {
-            public void barcodeResult(Result result) {
-                handleScanResult(result); // Handle the scanned result
-            }
-
+        barcodeScannerView.decodeContinuous(new BarcodeCallback() {
             @Override
             public void barcodeResult(BarcodeResult result) {
-                handleScanResult(result.getResult());
-            }
+                String scannedData = result.getText();
 
-            @Override
-            public void possibleResultPoints(java.util.List<com.google.zxing.ResultPoint> resultPoints) {
-                // Optional: Handle possible result points (for more advanced use cases)
+                // Ensure the scanned data is not null and has at least 64 characters
+                if (scannedData != null && scannedData.length() >= 64) {
+                    if (!isScanProcessed) {
+                        isScanProcessed = true;
+                        handleScanResult(result.getResult());
+
+                        // Stop scanning after a valid scan
+                        barcodeScannerView.pause();
+                    }
+                } else {
+                    // Keep scanning if the data is less than 64 characters
+                    Log.d("QRScanningActivity", "Scanned data is too short, continuing scan...");
+                }
             }
         });
 
@@ -241,6 +254,27 @@ public class QRScanningActivity extends AppCompatActivity {
             }
             isTorchOn = !isTorchOn;
         });
+    }
+
+
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            // Perform any necessary actions before exiting
+            onBackPressed(); // Close the activity
+            return true; // Indicate that the event has been handled
+        }
+        return super.onKeyDown(keyCode, event);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            onBackPressed();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
 }

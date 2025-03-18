@@ -29,7 +29,7 @@ public class AadhaarOcrConstants {
 
     public static final String FEMALE = "FEMALE";
 
-    public static final String TRANS = "TRANS";
+    public static final String TRANS = "TRANSGENDER";
 
     public static final String GENDER = "GENDER";
 
@@ -50,6 +50,8 @@ public class AadhaarOcrConstants {
     public static final String AADHAAR = "AADHAR";
 
     public static final String GOVERNMENT = "GOVERNMENT";
+
+    public static final String AADHAAR_ = "AADHAAR";
 
     public static final String INDIA = "INDIA";
 
@@ -78,5 +80,37 @@ public class AadhaarOcrConstants {
     public static final String TO = "To";
 
     public static final String ENROLLMENT_NUMBER = "Enrollment No";
+
+    public static final String DIGITALLY = "DIGITALLY";
+
+    public static final String SIGNED = "SIGNED";
+
+    public  static final String UNIQUE = "UNIQUE";
+
+    public static final String AUTHORITY = "AUTHORITY";
+
+    public static final String CITIZENSHIP = "CITIZENSHIP";
+
+    public static final String VERIFICATION = "VERIFICATION";
+
+    public static final String AUTHENTICATION = "AUTHENTICATION";
+
+    public static final String OFFLINE = "OFFLINE";
+
+    public static final String XML = "XML";
+
+    public static final String ENROLLMENT = "ENROLLMENT";
+
+    public static final String TEMALE = "TEMALE";
+
+    public static final String HEMALE = "HEMALE";
+
+    public static final String FEEMALE = "FEEMALE";
+
+    public static final String FEMALE_STR = "Female";
+
+    public static final String MALE_STR = "Male";
+
+    public static final String TRANS_STR = "Transgender";
 
 }

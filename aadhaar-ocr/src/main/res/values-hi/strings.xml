@@ -21,4 +21,12 @@
     <string name="aadhaar_card_back_side_photo">స్టెప్ 2: ఆధార్ కార్డ్ వెనుక వైపు ఫోటో తీయండి</string>
 
     <string name="or">(या)</string>
+
+    <string name="scan_type">scan type</string>
+    <string name="front_side">Front side</string>
+    <string name="back_side">Back side</string>
+    <string name="back_side_focus_request">Please focus camera on the back side of the Aadhaar Card and click Capture</string>
+    <string name="big_qr_ocr">Big QR OCR</string>
+    <string name="aadhaar_number_focus_request">Please focus camera on the Aadhaar card number only and click Capture</string>
+    <string name="path">path</string>
 </resources>

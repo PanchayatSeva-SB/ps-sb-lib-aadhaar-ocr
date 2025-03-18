@@ -7,6 +7,7 @@ import android.util.Log;
 import com.sayukth.aadhaarOcr.error.ActivityException;
 
 import org.xmlpull.v1.XmlPullParser;
+import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlPullParserFactory;
 
 import java.io.ByteArrayInputStream;
@@ -23,10 +24,11 @@ public class ParseQRUtil {
     public static final String V2 = "V2";
     public static final String V3 = "V3";
     public static final String V_2 = "2";
+    public static final String V4 = "V4";
     private static final int TERMINATOR = 255;
 
     // Base function to parse different formats of scanned data
-    public static HashMap<String, String> parseScannedData(String scannedResult) {
+    public static HashMap<String, String> parseScannedData(String scannedResult) throws XmlPullParserException, IOException, ActivityException {
         if (isXmlFormat(scannedResult)) {
             // If the result is XML, parse it as XML
             return parseXml(scannedResult);
@@ -38,14 +40,17 @@ public class ParseQRUtil {
 
     // To check if the scanned data is in XML format
     private static boolean isXmlFormat(String scannedResult) {
-        return scannedResult.trim().startsWith("<?xml");
+        try {
+            return scannedResult.trim().startsWith("<?xml") || scannedResult.trim().contains("<PrintLetterBarcodeData");
+        } catch (Exception e){
+            throw e;
+        }
     }
 
+
     // To parse XML and return as HashMap
-    private static HashMap<String, String> parseXml(String scannedResult) {
+    private static HashMap<String, String> parseXml(String scannedResult) throws XmlPullParserException, IOException, ActivityException {
         HashMap<String, String> resultData = new HashMap<>();
-
-
 
         // Define a mapping of attribute names to desired keys
         HashMap<String, String> attributeKeyMapping = new HashMap<>();
@@ -62,8 +67,17 @@ public class ParseQRUtil {
         attributeKeyMapping.put("dist", "District");
         attributeKeyMapping.put("state", "State");
         attributeKeyMapping.put("pc", "PostalCode");
+        attributeKeyMapping.put("dob", "DATE_OF_BIRTH"); // Added DOB mapping
 
         try {
+            // Clean the input XML
+            scannedResult = scannedResult.trim();
+
+            // Ensure proper XML declaration
+            if (scannedResult.startsWith("</?xml")) {
+                scannedResult = scannedResult.replace("</?xml", "<?xml");
+            }
+
             XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
             XmlPullParser parser = factory.newPullParser();
             parser.setInput(new java.io.StringReader(scannedResult));
@@ -87,23 +101,34 @@ public class ParseQRUtil {
             }
         } catch (Exception e) {
             Log.e("QR Parsing Error", "Error parsing QR code: " + e.getMessage());
+            throw e;
         }
 
         try {
-            resultData.put("DATE_OF_YEAR", DateUtils.getFormatedDate(resultData.get("DATE_OF_YEAR")));
+            if (resultData.containsKey("DATE_OF_YEAR")) {
+                resultData.put("DATE_OF_YEAR", DateUtils.getFormatedDate(resultData.get("DATE_OF_YEAR")));
+            }
         } catch (ActivityException e) {
-            Log.i(TAG, "date format exception"+e );
+            Log.i("QR Parsing", "Date format exception: " + e);
+            throw e;
         }
 
         return resultData;
     }
 
 
+
     // To parse byte-encoded data and return as HashMap
-    private static HashMap<String, String> parseByteEncodeData(String scanData) {
+    private static HashMap<String, String> parseByteEncodeData(String scanData) throws ActivityException {
         HashMap<String, String> resultData = new HashMap<>();
 
         try {
+
+            if(scanData == null || scanData.trim().isEmpty()){
+                Log.e("scan data is null","scan data is null");
+                return resultData;
+            }
+
             BigInteger bInt = new BigInteger(scanData);
             byte[] bIntByteArray = bInt.toByteArray();
             System.out.println("scan data: " + scanData);
@@ -117,15 +142,21 @@ public class ParseQRUtil {
 
             int count = getNextValue(bin, result);
             String emailMobilePresentBitIndicatorStr = new String(result, 0, count, java.nio.charset.StandardCharsets.ISO_8859_1).trim();
+
+           //emailMobileBitIndicator to check for the version of Aadhaar
+            String emailMobileBitIndicator = emailMobilePresentBitIndicatorStr;
+
             System.out.println("emailMobilePresentBitIndicatorStr: " + emailMobilePresentBitIndicatorStr);
 
-            if (List.of(V2, V3, V_2).contains(emailMobilePresentBitIndicatorStr)) {
+            if (List.of(V2, V3, V_2, V4).contains(emailMobilePresentBitIndicatorStr)) {
                 if (V_2.equals(emailMobilePresentBitIndicatorStr)) {
+                    Log.e("v2", "v2");
                     count = getNextValue(bin, result);
                     emailMobilePresentBitIndicatorStr = new String(result, 0, count, java.nio.charset.StandardCharsets.ISO_8859_1).trim();
                 }
 
-                if (!V_2.equals(emailMobilePresentBitIndicatorStr)) {
+                if (!V_2.equals(emailMobileBitIndicator)) {
+                    Log.e("not v2", "not v2");
                     count = getNextValue(bin, result);
                     String referenceId = new String(result, 0, count, java.nio.charset.StandardCharsets.ISO_8859_1).trim();
                     resultData.put("Reference ID", referenceId);
@@ -145,12 +176,14 @@ public class ParseQRUtil {
         } catch (Exception e) {
             e.printStackTrace();
             resultData.put("Error", "Error processing scan data: " + e.getMessage());
+            throw new RuntimeException(e);
         }
 
         try {
             resultData.put("DATE_OF_YEAR", DateUtils.getFormatedDate(resultData.get("DATE_OF_YEAR")));
         } catch (ActivityException e) {
-            Log.i(TAG, "date format exception"+e );
+            Log.i(TAG, "date format exception" + e);
+            throw e;
         }
 
         return resultData;
@@ -201,6 +234,7 @@ public class ParseQRUtil {
             resultData.put("VTC", new String(result, 0, count, java.nio.charset.StandardCharsets.ISO_8859_1).trim());
         } catch (Exception e) {
             e.printStackTrace();
+            throw new RuntimeException(e);
         }
     }
 
@@ -222,6 +256,9 @@ public class ParseQRUtil {
                 byteArrayOutputStream.write(buffer, 0, bytesRead);
             }
             return byteArrayOutputStream.toByteArray();
+        }
+        catch (Exception e){
+            throw e;
         }
     }
 
