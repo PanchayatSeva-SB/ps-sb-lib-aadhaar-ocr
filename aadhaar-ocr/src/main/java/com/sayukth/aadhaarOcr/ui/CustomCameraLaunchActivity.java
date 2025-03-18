@@ -161,7 +161,6 @@ public class CustomCameraLaunchActivity extends AppCompatActivity {
 
         if(AadhaarOcrPreferences.getInstance().getBoolean(AadhaarOcrPreferences.Key.IS_BIG_QR_OCR)){
             // Show the flip GIF
-//            textViewBigQR.setVisibility(View.VISIBLE);
             gifImageView.setVisibility(View.VISIBLE);
             flipTextView.setVisibility(View.VISIBLE);
             cameraPreview.setVisibility(View.GONE);
@@ -171,7 +170,7 @@ public class CustomCameraLaunchActivity extends AppCompatActivity {
             ocrTextView.setVisibility(View.GONE);
             distanceImage.setVisibility(View.GONE);
 
-//            / Load GIF using Glide
+            //             Load GIF using Glide
             Glide.with(this).asGif().load(R.drawable.aadhar_num_scan).into(gifImageView);
             flipTextView.setText("Big QR Code Scanned. Please Capture the Photo of the Aadhaar Number");
 
