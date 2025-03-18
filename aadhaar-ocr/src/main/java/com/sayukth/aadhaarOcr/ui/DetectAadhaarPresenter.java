@@ -58,6 +58,8 @@ import com.sayukth.aadhaarOcr.utils.StringSplitUtils;
 import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -72,6 +74,34 @@ public class DetectAadhaarPresenter implements DetectAadhaarContract.Presenter {
     private static final String AADHAAR_REGEX = "^[2-9]{1}[0-9]{3}\\s*[0-9]{4}\\s*[0-9]{4}$";
     private static final String NAME_REGEX = "^[a-zA-Z\\s]*$";
     private static final String DATE_FORMAT = "01-01-";
+    private static final String PINCODE_REGEX = ".*\\b\\d{6}\\b.*";
+    private static final String VID_PATTERN = ".*\\bVID:\\s*\\d{16}\\b.*";
+    private static final String MOBILE_REGEX ="\\b[6789]\\d{9}\\b";
+
+    Pattern datePattern = Pattern.compile("(\\d{4}[-/]\\d{1,2}[-/]\\d{1,2})|((\\d{1,2})[-/](\\d{1,2})[-/](\\d{4}))");
+    // Regex pattern
+    Pattern datePatternWithAnyCharacter = Pattern.compile(
+            "(\\d{4})\\D(\\d{1,2})\\D(\\d{1,2})" +  // YYYY-anything-MM-anything-DD
+                    "|(\\d{1,2})\\D(\\d{1,2})\\D(\\d{4})"   // DD-anything-MM-anything-YYYY
+    );
+    Pattern onlyYear = Pattern.compile("\\d{4}");
+
+    Pattern namePattern = Pattern.compile("(?:D/O|S/O|W/O|C/O|DIO|SIO|WIO|CIO)[:\\s]+([^,]+)", Pattern.CASE_INSENSITIVE);
+
+    Pattern mobilePattern = Pattern.compile(MOBILE_REGEX);
+
+    Pattern addressPattern = Pattern.compile("(C/O|S/O|D/O|W/O)\\s+[A-Z\\s]+,\\s*(.*?)(?=\\n(?:Mobile:|PIN Code:|$))", Pattern.DOTALL);
+
+
+    List<String> genderListFemale = List.of("FEMALE", "TEMALE", "HEMALE", "FEEMALE");
+    List<String> genderListMale = List.of("MALE");
+    List<String> genderListTrans = List.of("TRANS");
+
+    // Combine all gender lists into a single list
+    List<String> genderKeywords = new ArrayList<>();
+
+
+
 
 
     /**
@@ -174,6 +204,27 @@ public class DetectAadhaarPresenter implements DetectAadhaarContract.Presenter {
 
     }
 
+    public void getTextTypeMobileNumber(String val) {
+        try {
+            if (val.contains("\n")) {
+                String valArr[] = val.split("\n");
+
+                if (valArr.length > 0) {
+                    for (int newlineIdx = 0; newlineIdx < valArr.length; newlineIdx++) {
+                        System.out.println(" if : " + valArr[newlineIdx]);
+                        setMobileNumber(valArr[newlineIdx]);
+                    }
+                }
+            } else {
+                System.out.println(" else : " + val);
+                setMetaData(val);
+            }
+        } catch (ActivityException e) {
+
+        }
+
+    }
+
     /**
      * Extracts father or spouse name from text.
      *
@@ -181,50 +232,83 @@ public class DetectAadhaarPresenter implements DetectAadhaarContract.Presenter {
      * @throws ActivityException If an error occurs while processing.
      */
     public void setFatherOrSpouseMetaData(String val) throws ActivityException {
-        // Display the extracted OCR text on the UI
         detectAadharView.showImageText(String.valueOf(ocrImageText));
 
-        // Convert the input value to uppercase for case-insensitive comparison
         String srcVal = val.toUpperCase();
-
-        // Check if the extracted text contains the keyword "ADDRESS"
         if (srcVal.contains(ADDRESS)) {
-            // Define metadata key for storing extracted name
             String metaData = FATHER;
-
-            // Extract the last part of the string by splitting it at ":"
-            String text = StringSplitUtils.getLastPartOfStringBySplitString(ocrImageText.toString(), ":");
-            System.out.println("Text : " + text);
-
-        /*
-        // Old approach: Split based on "," to get the first part
-        String fsnameWithCareOf = StringSplitUtils.getFirstPartOfStringBySplitString(text.toString(), ",");
-        System.out.println("FS : "+ fsnameWithCareOf);
-
-        // Extract the last word after trimming spaces
-        String fsname = StringSplitUtils.getLastPartOfStringBySplitString(fsnameWithCareOf.trim(), " ");
-        System.out.println("FS : " + fsname);
-        */
-
-            // Define a regex pattern to match S/O, D/O, W/O, or C/O and extract the name after it
-            Pattern pattern = Pattern.compile("(?i)\\b(?:S/O|D/O|W/O|C/O|SIO|DIO|WIO|CIO)(.*)"); // Case-insensitive match
-            Matcher matcher = pattern.matcher(text);
-
             String formattedFatherName = "";
-            if (matcher.find()) {
-                // Extract the name after S/O, D/O, W/O, or C/O and remove newline characters
-                formattedFatherName = matcher.group(1).trim().replaceAll("\\n+", " ");
+            List<String> possibleNames = new ArrayList<>();
 
-                // Remove everything after the first comma to retain only the name
-                int commaIndex = formattedFatherName.indexOf(",");
-                if (commaIndex != -1) {
-                    formattedFatherName = formattedFatherName.substring(0, commaIndex).trim();
+            String text = StringSplitUtils.getLastPartOfStringBySplitString(ocrImageText.toString(), ":");
+            Matcher matcher = namePattern.matcher(text);
+
+            while (matcher.find()) {  // Collect all matches
+                possibleNames.add(matcher.group(1).trim().replaceAll("\\n+", " "));
+            }
+
+            // Get most probable name
+            if (!possibleNames.isEmpty()) {
+                formattedFatherName = getMostProbableName(possibleNames);
+            }
+
+            // ✅ If valid, store and exit
+            if (isValidName(formattedFatherName)) {
+                metadataMap.put(metaData, formattedFatherName.trim());
+                return;
+            }
+
+            possibleNames.clear();
+            List<String> validLines = new ArrayList<>();
+            String[] lines = val.split("\n");
+
+            for (String line : lines) {
+                if (line.matches(PINCODE_REGEX) || line.matches(AADHAAR_REGEX) || line.matches(VID_PATTERN)) continue;
+                if (line.contains("@") || line.contains("1947")) continue;
+                if (line.matches(".*\\b(lock|unlock|aadhaar|security|obligated|entities|unique|Authority)\\b.*")) continue;
+
+                validLines.add(line.trim());
+            }
+
+            for (String validLine : validLines) {
+                Matcher lineMatcher = namePattern.matcher(validLine);
+                while (lineMatcher.find()) {
+                    possibleNames.add(lineMatcher.group(1).trim());
                 }
             }
 
-            // Store the extracted and formatted name in the metadata map
+            // Get most probable name
+            if (!possibleNames.isEmpty()) {
+                formattedFatherName = getMostProbableName(possibleNames);
+            }
+
+            // ✅ If valid, store and exit
+            if (isValidName(formattedFatherName)) {
+                metadataMap.put(metaData, formattedFatherName.trim());
+                return;
+            }
+
+            for (String line : lines) {
+                Matcher manualMatcher = namePattern.matcher(line);
+                if (manualMatcher.find()) {
+                    formattedFatherName = manualMatcher.group(1).trim();
+                    break; // Take first match
+                }
+            }
+
+            // ✅ Store final extracted name
             metadataMap.put(metaData, formattedFatherName.trim());
         }
+    }
+
+
+    /**
+     * Validates if extracted name is meaningful.
+     * - Should have more than 2 characters
+     * - Should contain only alphabets and spaces
+     */
+    private boolean isValidName(String name) {
+        return name.length() > 2 && name.matches("^[a-zA-Z\\s]*$");
     }
 
 
@@ -260,7 +344,7 @@ public class DetectAadhaarPresenter implements DetectAadhaarContract.Presenter {
      * @param text Extracted text.
      */
     public void setMobileNumber(String text) {
-        Pattern pattern = Pattern.compile("\\b[6789]\\d{9}\\b"); // Indian mobile numbers start with 6,7,8, or 9
+        Pattern pattern = Pattern.compile(MOBILE_REGEX); // Indian mobile numbers start with 6,7,8, or 9
         Matcher matcher = pattern.matcher(text);
 
         String metaData = MOBILE;
@@ -285,8 +369,7 @@ public class DetectAadhaarPresenter implements DetectAadhaarContract.Presenter {
         String metaData = ADDRESS;
 
         // Regex to match address starting after Father/Spouse Name and stopping at "Mobile" or "PIN Code"
-        Pattern pattern = Pattern.compile("(C/O|S/O|D/O|W/O)\\s+[A-Z\\s]+,\\s*(.*?)(?=\\n(?:Mobile:|PIN Code:|$))", Pattern.DOTALL);
-        Matcher matcher = pattern.matcher(text);
+        Matcher matcher = addressPattern.matcher(text);
 
         if (matcher.find()) {
             Log.e("address", "" + matcher.group(2).trim());
@@ -349,41 +432,57 @@ public class DetectAadhaarPresenter implements DetectAadhaarContract.Presenter {
             String srcVal = val.toUpperCase();
             String tgtVal = val;
 
-            if (srcVal.contains(MALE) || srcVal.contains(FEMALE) || srcVal.contains(TRANS)) {
-                if (srcVal.contains(FEMALE)) {
+            genderKeywords.addAll(genderListTrans);
+            genderKeywords.addAll(genderListFemale);
+            genderKeywords.addAll(genderListMale);
+
+            for (String gender : genderKeywords) {
+                if (srcVal.contains(gender)) {
                     metaData = GENDER;
-                    tgtVal = "Female";
-                } else if (srcVal.contains(MALE)) {
-                    metaData = GENDER;
-                    tgtVal = "Male";
-                } else if (srcVal.contains(TRANS)) {
-                    tgtVal = "Transgender";
+                    if (genderListFemale.contains(gender)) {
+                        tgtVal = AadhaarOcrConstants.FEMALE_STR;
+                    } else if (genderListMale.contains(gender)) {
+                        tgtVal = AadhaarOcrConstants.MALE_STR;
+                    } else if (genderListTrans.contains(gender)) {
+                        tgtVal = AadhaarOcrConstants.TRANS_STR;
+                    }
+                    break; // Exit the loop once a match is found
                 }
             }
-            else if (srcVal.contains(YEAR) || srcVal.contains(BIRTH) || srcVal.contains(DATE) || srcVal.contains(DOB) ||
+            if (srcVal.contains(YEAR) || srcVal.contains(BIRTH) || srcVal.contains(DATE) || srcVal.contains(DOB) ||
                     srcVal.contains(YEAR_OF) || srcVal.contains(YOB)) {
                 metaData = DATE_OF_YEAR;
 
-                Pattern pattern = Pattern.compile("(\\d{4}[-/]\\d{1,2}[-/]\\d{1,2})|((\\d{1,2})[-/](\\d{1,2})[-/](\\d{4}))");
-                Pattern onlyYear = Pattern.compile("\\d{4}");
-                Matcher matcher1 = pattern.matcher(val);
-                Matcher matcher2 = onlyYear.matcher(val);
+                Matcher matcher1 = datePattern.matcher(val);
+                Matcher matcher2 = datePatternWithAnyCharacter.matcher(val);
+                Matcher matcher3 = onlyYear.matcher(val);
 
 
                 if (matcher1.find()) {
                     tgtVal = matcher1.group();
-                }else if(matcher2.find()){
-                    tgtVal = matcher2.group();
+                } else if (matcher2.find()) {
+                    StringBuilder formattedDate = new StringBuilder();
+                    if (matcher2.group(1) != null) {  // YYYY-any-MM-any-DD format
+                        formattedDate.append(matcher2.group(1)).append("/")
+                                .append(matcher2.group(2)).append("/")
+                                .append(matcher2.group(3));
+                    } else {  // DD-any-MM-any-YYYY format
+                        formattedDate.append(matcher2.group(4)).append("/")
+                                .append(matcher2.group(5)).append("/")
+                                .append(matcher2.group(6));
+                    }
+                    tgtVal = formattedDate.toString();
+                } else if (matcher3.find()) {
+                    tgtVal = matcher3.group();
 
                 }
 
                 tgtVal = getFormatedDate(tgtVal);
 
-            }
-            else if (aadharMatcher.matches()) {
+            } else if (aadharMatcher.matches()) {
                 metaData = AADHAAR;
-            } else if (!srcVal.contains(DIGITALLY) && !srcVal.contains(SIGNED) && !srcVal.contains(UNIQUE) && !srcVal.contains(AUTHORITY)&& !srcVal.contains(GOVERNMENT) && !srcVal.contains(INDIA) && !srcVal.contains(FATHER) && !srcVal.contains(AADHAAR_) && !srcVal.contains(CITIZENSHIP) && !srcVal.contains(VERIFICATION) && !srcVal.contains(AUTHENTICATION) && !srcVal.contains(OFFLINE) && !srcVal.contains(XML) && !srcVal.contains(ENROLLMENT)) {
-                if(nameMatcher.matches()) {
+            } else if (!srcVal.contains(DIGITALLY) && !srcVal.contains(SIGNED) && !srcVal.contains(UNIQUE) && !srcVal.contains(AUTHORITY) && !srcVal.contains(GOVERNMENT) && !srcVal.contains(INDIA) && !srcVal.contains(FATHER) && !srcVal.contains(AADHAAR_) && !srcVal.contains(CITIZENSHIP) && !srcVal.contains(VERIFICATION) && !srcVal.contains(AUTHENTICATION) && !srcVal.contains(OFFLINE) && !srcVal.contains(XML) && !srcVal.contains(ENROLLMENT)) {
+                if (nameMatcher.matches()) {
                     metaData = NAME;
                 }
 
@@ -462,6 +561,22 @@ public class DetectAadhaarPresenter implements DetectAadhaarContract.Presenter {
         return false;
     }
 
+    private boolean containsMobileNumber(String text) {
+        // Mobile number regex pattern (10-digit numbers starting with 6-9)
+
+        // Split the string into lines or words to simulate "text blocks"
+        String[] lines = text.split("\\r?\\n");
+
+        for (String line : lines) {
+            if (mobilePattern.matcher(line).find()) {
+                Log.d("TAG", "Mobile number detected: " + line);
+                return true;
+            }
+        }
+        return false;
+    }
+
+
     /**
      * Checks if the given image text matches the front side of an Aadhaar card.
      * The front side typically contains the date of birth or year of birth.
@@ -520,6 +635,8 @@ public class DetectAadhaarPresenter implements DetectAadhaarContract.Presenter {
         } else if (containsAadhaar(textValue)) {
             // If Aadhaar number is detected, process it separately
             getTextTypeBigQR(textValue);
+        } else if (containsMobileNumber(textValue)) {
+            getTextTypeMobileNumber(textValue);
         }
     }
 
@@ -538,12 +655,18 @@ public class DetectAadhaarPresenter implements DetectAadhaarContract.Presenter {
             // Extract father/spouse details if present in the text
             setFatherOrSpouseMetaDataForPattern(textValue);
         } catch (ActivityException e) {
-            Log.e("Exception", "Error processing pattern match", e);
+             throw new RuntimeException(e);
         }
 
         // Extract and set mobile number and address from the scanned text
         setMobileNumber(textValue);
         setAddress(textValue);
+    }
+
+    // Function to select the most probable name
+    private String getMostProbableName(List<String> names) {
+        names.sort(Comparator.comparingInt(String::length).reversed()); // Prefer longer name
+        return names.get(0); // Return the first one (longest valid name)
     }
 
 

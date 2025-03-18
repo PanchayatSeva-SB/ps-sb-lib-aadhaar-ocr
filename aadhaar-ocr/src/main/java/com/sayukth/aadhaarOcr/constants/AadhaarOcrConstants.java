@@ -107,4 +107,10 @@ public class AadhaarOcrConstants {
 
     public static final String FEEMALE = "FEEMALE";
 
+    public static final String FEMALE_STR = "Female";
+
+    public static final String MALE_STR = "Male";
+
+    public static final String TRANS_STR = "Transgender";
+
 }
