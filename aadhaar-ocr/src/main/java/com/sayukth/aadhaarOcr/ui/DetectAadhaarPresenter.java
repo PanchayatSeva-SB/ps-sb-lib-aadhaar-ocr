@@ -100,7 +100,7 @@ public class DetectAadhaarPresenter implements DetectAadhaarContract.Presenter {
     // Combine all gender lists into a single list
     List<String> genderKeywords = new ArrayList<>();
 
-
+    private String lastExtractedDate = null;
 
 
 
@@ -239,7 +239,7 @@ public class DetectAadhaarPresenter implements DetectAadhaarContract.Presenter {
             String metaData = FATHER;
             String formattedFatherName = "";
             List<String> possibleNames = new ArrayList<>();
-
+            
             String text = StringSplitUtils.getLastPartOfStringBySplitString(ocrImageText.toString(), ":");
             Matcher matcher = namePattern.matcher(text);
 
@@ -419,85 +419,117 @@ public class DetectAadhaarPresenter implements DetectAadhaarContract.Presenter {
      * @throws ActivityException If an error occurs while processing.
      */
     public void setMetaData(String val) throws ActivityException {
-
         try {
-
-            String aadharRegex = AADHAAR_REGEX;
-            String nameRegex = NAME_REGEX;
-
-            Matcher aadharMatcher = getPatternMatcher(aadharRegex, val);
-            Matcher nameMatcher = getPatternMatcher(nameRegex, val);
-
-            String metaData = OTHER;
             String srcVal = val.toUpperCase();
             String tgtVal = val;
+            String metaData = OTHER;
 
-            genderKeywords.addAll(genderListTrans);
-            genderKeywords.addAll(genderListFemale);
-            genderKeywords.addAll(genderListMale);
+            initializeGenderKeywords();
 
-            for (String gender : genderKeywords) {
-                if (srcVal.contains(gender)) {
-                    metaData = GENDER;
-                    if (genderListFemale.contains(gender)) {
-                        tgtVal = AadhaarOcrConstants.FEMALE_STR;
-                    } else if (genderListMale.contains(gender)) {
-                        tgtVal = AadhaarOcrConstants.MALE_STR;
-                    } else if (genderListTrans.contains(gender)) {
-                        tgtVal = AadhaarOcrConstants.TRANS_STR;
-                    }
-                    break; // Exit the loop once a match is found
-                }
-            }
-            if (srcVal.contains(YEAR) || srcVal.contains(BIRTH) || srcVal.contains(DATE) || srcVal.contains(DOB) ||
-                    srcVal.contains(YEAR_OF) || srcVal.contains(YOB)) {
+            metaData = detectGender(srcVal);
+            if (GENDER.equals(metaData)) {
+                tgtVal = getGenderValue(srcVal);
+            } else if (isDateOfBirth(srcVal)) {
                 metaData = DATE_OF_YEAR;
-
-                Matcher matcher1 = datePattern.matcher(val);
-                Matcher matcher2 = datePatternWithAnyCharacter.matcher(val);
-                Matcher matcher3 = onlyYear.matcher(val);
-
-
-                if (matcher1.find()) {
-                    tgtVal = matcher1.group();
-                } else if (matcher2.find()) {
-                    StringBuilder formattedDate = new StringBuilder();
-                    if (matcher2.group(1) != null) {  // YYYY-any-MM-any-DD format
-                        formattedDate.append(matcher2.group(1)).append("/")
-                                .append(matcher2.group(2)).append("/")
-                                .append(matcher2.group(3));
-                    } else {  // DD-any-MM-any-YYYY format
-                        formattedDate.append(matcher2.group(4)).append("/")
-                                .append(matcher2.group(5)).append("/")
-                                .append(matcher2.group(6));
-                    }
-                    tgtVal = formattedDate.toString();
-                } else if (matcher3.find()) {
-                    tgtVal = matcher3.group();
-
+                String extractedDate = extractAndFormatDate(val);
+                if (extractedDate != null && !extractedDate.isEmpty()) {
+                    lastExtractedDate = extractedDate; // Store valid extracted date
+                    tgtVal = lastExtractedDate;
+                } else if (lastExtractedDate != null) {
+                    tgtVal = lastExtractedDate; // Retain last extracted date if no new date is found
                 }
-
-                tgtVal = getFormatedDate(tgtVal);
-
-            } else if (aadharMatcher.matches()) {
+            } else if (isAadhaarNumber(val)) {
                 metaData = AADHAAR;
-            } else if (!srcVal.contains(DIGITALLY) && !srcVal.contains(SIGNED) && !srcVal.contains(UNIQUE) && !srcVal.contains(AUTHORITY) && !srcVal.contains(GOVERNMENT) && !srcVal.contains(INDIA) && !srcVal.contains(FATHER) && !srcVal.contains(AADHAAR_) && !srcVal.contains(CITIZENSHIP) && !srcVal.contains(VERIFICATION) && !srcVal.contains(AUTHENTICATION) && !srcVal.contains(OFFLINE) && !srcVal.contains(XML) && !srcVal.contains(ENROLLMENT)) {
-                if (nameMatcher.matches()) {
-                    metaData = NAME;
-                }
-
-
+            } else if (isValidName(srcVal, val)) {
+                metaData = NAME;
             }
 
             metadataMap.put(metaData, tgtVal.trim());
-
-
         } catch (ActivityException e) {
-            Log.i(TAG, e.getMessage());
             Log.i(TAG, e.getMessage());
             throw new ActivityException(e);
         }
     }
+
+    // Initialize gender keywords to avoid redundant additions
+    private void initializeGenderKeywords() {
+        genderKeywords.addAll(genderListTrans);
+        genderKeywords.addAll(genderListFemale);
+        genderKeywords.addAll(genderListMale);
+    }
+
+    // Detect gender based on keywords
+    private String detectGender(String srcVal) {
+        for (String gender : genderKeywords) {
+            if (srcVal.contains(gender)) {
+                return GENDER;
+            }
+        }
+        return OTHER;
+    }
+
+    // Get standardized gender value
+    private String getGenderValue(String srcVal) {
+        for (String gender : genderKeywords) {
+            if (srcVal.contains(gender)) {
+                if (genderListFemale.contains(gender)) return AadhaarOcrConstants.FEMALE_STR;
+                if (genderListMale.contains(gender)) return AadhaarOcrConstants.MALE_STR;
+                if (genderListTrans.contains(gender)) return AadhaarOcrConstants.TRANS_STR;
+            }
+        }
+        return srcVal;
+    }
+
+    // Check if the value is a date of birth
+    private boolean isDateOfBirth(String srcVal) {
+        return containsAny(srcVal, YEAR, BIRTH, DATE, DOB, YEAR_OF, YOB);
+    }
+
+    // Extract and format date
+    private String extractAndFormatDate(String val) throws ActivityException {
+        Matcher matcher1 = datePattern.matcher(val);
+        Matcher matcher2 = datePatternWithAnyCharacter.matcher(val);
+        Matcher matcher3 = onlyYear.matcher(val);
+
+        if (matcher1.find()) {
+            return getFormatedDate(matcher1.group());
+        } else if (matcher2.find()) {
+            return getFormatedDate(formatDateFromMatcher(matcher2));
+        } else if (matcher3.find()) {
+            return getFormatedDate(matcher3.group());
+        }
+        return null;
+    }
+
+    // Format date based on matcher results
+    private String formatDateFromMatcher(Matcher matcher) {
+        return (matcher.group(1) != null)
+                ? matcher.group(1) + "/" + matcher.group(2) + "/" + matcher.group(3)  // YYYY-any-MM-any-DD
+                : matcher.group(4) + "/" + matcher.group(5) + "/" + matcher.group(6); // DD-any-MM-any-YYYY
+    }
+
+    // Check if value matches Aadhaar number
+    private boolean isAadhaarNumber(String val) {
+        return getPatternMatcher(AADHAAR_REGEX, val).matches();
+    }
+
+    // Check if name is valid (not containing restricted words)
+    private boolean isValidName(String srcVal, String val) {
+        return !containsAny(srcVal, DIGITALLY, SIGNED, UNIQUE, AUTHORITY, GOVERNMENT, INDIA,
+                FATHER, AADHAAR_, CITIZENSHIP, VERIFICATION, AUTHENTICATION, OFFLINE, XML, ENROLLMENT)
+                && getPatternMatcher(NAME_REGEX, val).matches();
+    }
+
+    // Utility method to check if text contains any keyword
+    private boolean containsAny(String text, String... keywords) {
+        for (String keyword : keywords) {
+            if (text.contains(keyword)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 
     private String getFormatedDate(String datevalue) throws ActivityException {
         try {

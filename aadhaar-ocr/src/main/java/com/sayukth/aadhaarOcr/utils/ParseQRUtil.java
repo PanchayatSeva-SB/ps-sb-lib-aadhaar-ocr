@@ -126,6 +126,7 @@ public class ParseQRUtil {
 
             if(scanData == null || scanData.trim().isEmpty()){
                 Log.e("scan data is null","scan data is null");
+                return resultData;
             }
 
             BigInteger bInt = new BigInteger(scanData);
