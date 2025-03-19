@@ -16,22 +16,16 @@ import static com.sayukth.aadhaarOcr.constants.AadhaarOcrConstants.DOB;
 import static com.sayukth.aadhaarOcr.constants.AadhaarOcrConstants.ENROLLMENT;
 import static com.sayukth.aadhaarOcr.constants.AadhaarOcrConstants.ENROLLMENT_NUMBER;
 import static com.sayukth.aadhaarOcr.constants.AadhaarOcrConstants.FATHER;
-import static com.sayukth.aadhaarOcr.constants.AadhaarOcrConstants.FEEMALE;
-import static com.sayukth.aadhaarOcr.constants.AadhaarOcrConstants.FEMALE;
 import static com.sayukth.aadhaarOcr.constants.AadhaarOcrConstants.GENDER;
 import static com.sayukth.aadhaarOcr.constants.AadhaarOcrConstants.GOVERNMENT;
-import static com.sayukth.aadhaarOcr.constants.AadhaarOcrConstants.HEMALE;
 import static com.sayukth.aadhaarOcr.constants.AadhaarOcrConstants.INDIA;
-import static com.sayukth.aadhaarOcr.constants.AadhaarOcrConstants.MALE;
 import static com.sayukth.aadhaarOcr.constants.AadhaarOcrConstants.MOBILE;
 import static com.sayukth.aadhaarOcr.constants.AadhaarOcrConstants.NAME;
 import static com.sayukth.aadhaarOcr.constants.AadhaarOcrConstants.OF;
 import static com.sayukth.aadhaarOcr.constants.AadhaarOcrConstants.OFFLINE;
 import static com.sayukth.aadhaarOcr.constants.AadhaarOcrConstants.OTHER;
 import static com.sayukth.aadhaarOcr.constants.AadhaarOcrConstants.SIGNED;
-import static com.sayukth.aadhaarOcr.constants.AadhaarOcrConstants.TEMALE;
 import static com.sayukth.aadhaarOcr.constants.AadhaarOcrConstants.TO;
-import static com.sayukth.aadhaarOcr.constants.AadhaarOcrConstants.TRANS;
 import static com.sayukth.aadhaarOcr.constants.AadhaarOcrConstants.UNIQUE;
 import static com.sayukth.aadhaarOcr.constants.AadhaarOcrConstants.VERIFICATION;
 import static com.sayukth.aadhaarOcr.constants.AadhaarOcrConstants.XML;
@@ -54,8 +48,6 @@ import com.sayukth.aadhaarOcr.ocrpreferences.AadhaarOcrPreferences;
 import com.sayukth.aadhaarOcr.utils.DateUtils;
 import com.sayukth.aadhaarOcr.utils.ParseQRUtil;
 import com.sayukth.aadhaarOcr.utils.StringSplitUtils;
-
-import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -100,6 +92,7 @@ public class DetectAadhaarPresenter implements DetectAadhaarContract.Presenter {
     // Combine all gender lists into a single list
     List<String> genderKeywords = new ArrayList<>();
 
+    // To store the last extracted date of birth
     private String lastExtractedDate = null;
 
 
