@@ -11,22 +11,34 @@ import static com.sayukth.aadhaarOcr.constants.AadhaarOcrConstants.Birth;
 import static com.sayukth.aadhaarOcr.constants.AadhaarOcrConstants.CITIZENSHIP;
 import static com.sayukth.aadhaarOcr.constants.AadhaarOcrConstants.DATE;
 import static com.sayukth.aadhaarOcr.constants.AadhaarOcrConstants.DATE_OF_YEAR;
+import static com.sayukth.aadhaarOcr.constants.AadhaarOcrConstants.DIGILALLY;
 import static com.sayukth.aadhaarOcr.constants.AadhaarOcrConstants.DIGITALLY;
+import static com.sayukth.aadhaarOcr.constants.AadhaarOcrConstants.DIGITALTY;
+import static com.sayukth.aadhaarOcr.constants.AadhaarOcrConstants.DIGTALLY;
 import static com.sayukth.aadhaarOcr.constants.AadhaarOcrConstants.DOB;
 import static com.sayukth.aadhaarOcr.constants.AadhaarOcrConstants.ENROLLMENT;
 import static com.sayukth.aadhaarOcr.constants.AadhaarOcrConstants.ENROLLMENT_NUMBER;
 import static com.sayukth.aadhaarOcr.constants.AadhaarOcrConstants.FATHER;
 import static com.sayukth.aadhaarOcr.constants.AadhaarOcrConstants.GENDER;
 import static com.sayukth.aadhaarOcr.constants.AadhaarOcrConstants.GOVERNMENT;
+import static com.sayukth.aadhaarOcr.constants.AadhaarOcrConstants.IDENTIFICATION;
 import static com.sayukth.aadhaarOcr.constants.AadhaarOcrConstants.INDIA;
+import static com.sayukth.aadhaarOcr.constants.AadhaarOcrConstants.IST;
+import static com.sayukth.aadhaarOcr.constants.AadhaarOcrConstants.LNDIA;
 import static com.sayukth.aadhaarOcr.constants.AadhaarOcrConstants.MOBILE;
 import static com.sayukth.aadhaarOcr.constants.AadhaarOcrConstants.NAME;
+import static com.sayukth.aadhaarOcr.constants.AadhaarOcrConstants.NOT_VERIFIED;
+import static com.sayukth.aadhaarOcr.constants.AadhaarOcrConstants.NOT_VERIFIED_ANOTHER;
 import static com.sayukth.aadhaarOcr.constants.AadhaarOcrConstants.OF;
 import static com.sayukth.aadhaarOcr.constants.AadhaarOcrConstants.OFFLINE;
 import static com.sayukth.aadhaarOcr.constants.AadhaarOcrConstants.OTHER;
+import static com.sayukth.aadhaarOcr.constants.AadhaarOcrConstants.SIGNATURE;
 import static com.sayukth.aadhaarOcr.constants.AadhaarOcrConstants.SIGNED;
 import static com.sayukth.aadhaarOcr.constants.AadhaarOcrConstants.TO;
+import static com.sayukth.aadhaarOcr.constants.AadhaarOcrConstants.UNIOUE;
+import static com.sayukth.aadhaarOcr.constants.AadhaarOcrConstants.UNIQLE;
 import static com.sayukth.aadhaarOcr.constants.AadhaarOcrConstants.UNIQUE;
+import static com.sayukth.aadhaarOcr.constants.AadhaarOcrConstants.UTC;
 import static com.sayukth.aadhaarOcr.constants.AadhaarOcrConstants.VERIFICATION;
 import static com.sayukth.aadhaarOcr.constants.AadhaarOcrConstants.XML;
 import static com.sayukth.aadhaarOcr.constants.AadhaarOcrConstants.YEAR;
@@ -68,7 +80,10 @@ public class DetectAadhaarPresenter implements DetectAadhaarContract.Presenter {
     private static final String DATE_FORMAT = "01-01-";
     private static final String PINCODE_REGEX = ".*\\b\\d{6}\\b.*";
     private static final String VID_PATTERN = ".*\\bVID:\\s*\\d{16}\\b.*";
-    private static final String MOBILE_REGEX ="\\b[6789]\\d{9}\\b";
+    private static final String MOBILE_REGEX = "\\b[6789]\\d{9}\\b";
+
+    private static final String EXCLUSION_KEYWORD_REGEX_FOR_FATHER_OR_SPOUSE_NAME_EXTRACTION = ".*\\b(lock|unlock|aadhaar|security|obligated|entities|unique|Authority)\\b.*";
+
 
     Pattern datePattern = Pattern.compile("(\\d{4}[-/]\\d{1,2}[-/]\\d{1,2})|((\\d{1,2})[-/](\\d{1,2})[-/](\\d{4}))");
     // Regex pattern
@@ -82,7 +97,20 @@ public class DetectAadhaarPresenter implements DetectAadhaarContract.Presenter {
 
     Pattern mobilePattern = Pattern.compile(MOBILE_REGEX);
 
-    Pattern addressPattern = Pattern.compile("(C/O|S/O|D/O|W/O)\\s+[A-Z\\s]+,\\s*(.*?)(?=\\n(?:Mobile:|PIN Code:|$))", Pattern.DOTALL);
+    Pattern addressPattern = Pattern.compile(
+            "(C/O|S/O|D/O|W/O)\\s+[A-Z\\s]+,?\\s*(.*?)\\s*(?=\\n(?:VTC:|PO:|Sub District:|District:|State:|PIN Code:|Mobile:|$))",
+            Pattern.DOTALL
+    );
+
+    Pattern fatherOrSpouseNamePattern = Pattern.compile("(CIO|C/O|S/O|D/O|W/O|SIO|DIO|WIO):?\\s*(.*)");
+
+    Pattern pincodePattern = Pattern.compile("\\b\\d{6}\\b");
+
+    String relationshipPattern = "(?i)\\b(C/O|S/O|W/O|D/O|CIO|SIO|WIO|DIO)\\b";
+
+    Pattern exclusionPattern = Pattern.compile("(?i)\\b(To|Enrolment No|Government|India|Unique|Identification)\\b");
+
+
 
 
     List<String> genderListFemale = List.of("FEMALE", "TEMALE", "HEMALE", "FEEMALE");
@@ -92,9 +120,7 @@ public class DetectAadhaarPresenter implements DetectAadhaarContract.Presenter {
     // Combine all gender lists into a single list
     List<String> genderKeywords = new ArrayList<>();
 
-    // To store the last extracted date of birth
     private String lastExtractedDate = null;
-
 
 
     /**
@@ -232,7 +258,7 @@ public class DetectAadhaarPresenter implements DetectAadhaarContract.Presenter {
             String metaData = FATHER;
             String formattedFatherName = "";
             List<String> possibleNames = new ArrayList<>();
-            
+
             String text = StringSplitUtils.getLastPartOfStringBySplitString(ocrImageText.toString(), ":");
             Matcher matcher = namePattern.matcher(text);
 
@@ -256,9 +282,11 @@ public class DetectAadhaarPresenter implements DetectAadhaarContract.Presenter {
             String[] lines = val.split("\n");
 
             for (String line : lines) {
-                if (line.matches(PINCODE_REGEX) || line.matches(AADHAAR_REGEX) || line.matches(VID_PATTERN)) continue;
+                if (line.matches(PINCODE_REGEX) || line.matches(AADHAAR_REGEX) || line.matches(VID_PATTERN))
+                    continue;
                 if (line.contains("@") || line.contains("1947")) continue;
-                if (line.matches(".*\\b(lock|unlock|aadhaar|security|obligated|entities|unique|Authority)\\b.*")) continue;
+                if (line.matches(EXCLUSION_KEYWORD_REGEX_FOR_FATHER_OR_SPOUSE_NAME_EXTRACTION))
+                    continue;
 
                 validLines.add(line.trim());
             }
@@ -317,14 +345,15 @@ public class DetectAadhaarPresenter implements DetectAadhaarContract.Presenter {
         String metaData = FATHER;
         String srcVal = val.toUpperCase();
 
-        Pattern pattern = Pattern.compile("(CIO|C/O|S/O|D/O|W/O|C/O:|S/O:|D/O:|W/O:|CO|WO|SO|DO|SIO|DIO|WIO)\\s+([A-Z\\s]+),");
-        Matcher matcher = pattern.matcher(srcVal);
+        Matcher matcher = fatherOrSpouseNamePattern.matcher(srcVal);
 
         if (matcher.find()) {
             String fsName = matcher.group(2).trim(); // Extract the name
 
             // Remove any 6-digit PIN code from fsName
             fsName = fsName.replaceAll("\\b\\d{6}\\b", "").trim();
+
+            fsName = fsName.replaceAll(",", "");
 
             metadataMap.put(metaData, fsName);
         }
@@ -343,7 +372,6 @@ public class DetectAadhaarPresenter implements DetectAadhaarContract.Presenter {
         String metaData = MOBILE;
 
         if (matcher.find()) {
-            Log.e("mobile", "" + matcher.group());// Return the found mobile number
             String mobileNumber = matcher.group();
             metadataMap.put(metaData, mobileNumber);
         }
@@ -356,32 +384,30 @@ public class DetectAadhaarPresenter implements DetectAadhaarContract.Presenter {
      * @param text Extracted text.
      */
     public void setAddress(String text) {
-        String address = " ";  // Initialize with a default value
-        String pincode = " "; // Initialize with a default value
+        String address = " ";
+        String pincode = " ";
 
         String metaData = ADDRESS;
 
-        // Regex to match address starting after Father/Spouse Name and stopping at "Mobile" or "PIN Code"
         Matcher matcher = addressPattern.matcher(text);
 
         if (matcher.find()) {
-            Log.e("address", "" + matcher.group(2).trim());
             address = matcher.group(2).trim();
         }
 
         // Extract the last 6-digit PIN Code
-        Pattern pincodePattern = Pattern.compile("\\b\\d{6}\\b");
         Matcher pincodeMatcher = pincodePattern.matcher(text);
 
         while (pincodeMatcher.find()) {
-            pincode = pincodeMatcher.group(); // Get the last occurrence of 6-digit number
+            pincode = pincodeMatcher.group(); // Get the last occurrence of a 6-digit number
         }
 
         // Combine address and PIN Code safely
-        String finalAddress = address + pincode;
+        String finalAddress = address + " " + pincode;
 
         metadataMap.put(metaData, finalAddress);
     }
+
 
     /**
      * Extracts Aadhaar ID from text.
@@ -436,7 +462,6 @@ public class DetectAadhaarPresenter implements DetectAadhaarContract.Presenter {
             } else if (isValidName(srcVal, val)) {
                 metaData = NAME;
             }
-
             metadataMap.put(metaData, tgtVal.trim());
         } catch (ActivityException e) {
             Log.i(TAG, e.getMessage());
@@ -509,7 +534,7 @@ public class DetectAadhaarPresenter implements DetectAadhaarContract.Presenter {
     // Check if name is valid (not containing restricted words)
     private boolean isValidName(String srcVal, String val) {
         return !containsAny(srcVal, DIGITALLY, SIGNED, UNIQUE, AUTHORITY, GOVERNMENT, INDIA,
-                FATHER, AADHAAR_, CITIZENSHIP, VERIFICATION, AUTHENTICATION, OFFLINE, XML, ENROLLMENT)
+                FATHER, AADHAAR_, CITIZENSHIP, VERIFICATION, AUTHENTICATION, OFFLINE, XML, ENROLLMENT, NOT_VERIFIED, DIGITALTY, SIGNATURE, NOT_VERIFIED_ANOTHER, UNIOUE, DIGTALLY, DIGILALLY, UNIQLE, LNDIA, IDENTIFICATION, IST, UTC)
                 && getPatternMatcher(NAME_REGEX, val).matches();
     }
 
@@ -644,26 +669,37 @@ public class DetectAadhaarPresenter implements DetectAadhaarContract.Presenter {
      * @param textValue The extracted text from the Aadhaar card image.
      */
     private void classifyTextBlock(String textValue) {
-        if (isFrontMatch(textValue)) {
-            // If the text matches front side patterns, process it as front side data
-            getTextType(textValue);
-        } else if (isBackMatch(textValue)) {
-            try {
-                // If the text matches back side patterns, process father/spouse metadata
-                setFatherOrSpouseMetaData(textValue);
-            } catch (ActivityException e) {
-                Log.e("Exception", "Error processing back match", e);
+        try {
+            if (isFrontMatch(textValue)) {
+                getTextType(textValue); // Process front side data
+                return;
             }
-        } else if (isFrontSideFullScan(textValue)) {
-            // If the text indicates a full front side scan, process relevant details
-            processFullFrontScan(textValue);
-        } else if (containsAadhaar(textValue)) {
-            // If Aadhaar number is detected, process it separately
-            getTextTypeBigQR(textValue);
-        } else if (containsMobileNumber(textValue)) {
-            getTextTypeMobileNumber(textValue);
+
+            if (isBackMatch(textValue)) {
+                setFatherOrSpouseMetaData(textValue); // Process father/spouse metadata
+                return;
+            }
+
+            if (isFrontSideFullScan(textValue)) {
+                processFullFrontScan(textValue); // Process full front scan
+                return;
+            }
+
+            if (containsAadhaar(textValue)) {
+                getTextTypeBigQR(textValue); // Process Aadhaar number
+                return;
+            }
+
+            if (containsMobileNumber(textValue)) {
+                getTextTypeMobileNumber(textValue); // Process mobile number
+            }
+        } catch (ActivityException e) {
+            throw new RuntimeException(e); // Handle any ActivityException
+        } catch (Exception e) {
+            throw new RuntimeException(e); // Catch any other unexpected exceptions
         }
     }
+
 
     /**
      * Processes a full front-side scan of the Aadhaar card.
@@ -672,20 +708,23 @@ public class DetectAadhaarPresenter implements DetectAadhaarContract.Presenter {
      *
      * @param textValue The extracted text from the Aadhaar card image.
      */
-    private void processFullFrontScan(String textValue) {
-        metadataMap.clear(); // Clear previous metadata before processing new data
-        getTextType(textValue); // Extract general text type information
+    private void processFullFrontScan(String textValue) throws ActivityException {
 
         try {
+            metadataMap.clear(); // Clear previous metadata before processing new data
+
+            getTextTypeForPatternThree(textValue);
+
+
             // Extract father/spouse details if present in the text
             setFatherOrSpouseMetaDataForPattern(textValue);
-        } catch (ActivityException e) {
-             throw new RuntimeException(e);
-        }
 
-        // Extract and set mobile number and address from the scanned text
-        setMobileNumber(textValue);
-        setAddress(textValue);
+            // Extract and set mobile number and address from the scanned text
+            setMobileNumber(textValue);
+            setAddress(textValue);
+        } catch (Exception e) {
+            throw e;
+        }
     }
 
     // Function to select the most probable name
@@ -693,6 +732,160 @@ public class DetectAadhaarPresenter implements DetectAadhaarContract.Presenter {
         names.sort(Comparator.comparingInt(String::length).reversed()); // Prefer longer name
         return names.get(0); // Return the first one (longest valid name)
     }
+
+
+    /**
+     * Processes the given text input to extract and set metadata based on predefined patterns.
+     * This method follows a multi-step approach to determine the correct metadata.
+     *
+     * @param val The input text that needs to be processed.
+     */
+    public void getTextTypeForPatternThree(String val) {
+        try {
+            if (val.contains("\n")) {
+                for (String line : val.split("\n")) {
+                    String extractedName = setMetaDataForPatternThreeApproachOne(line);
+
+                    if (!isExtractedNameValid(extractedName)) {
+                        metadataMap.remove(NAME);
+                        extractedName = setMetaDataForPatternThreeApproachTwo(val);
+                    }
+
+                    if (!isExtractedNameValid(extractedName)) {
+                        metadataMap.remove(NAME);
+                        setMetaDataForPatternThreeApproachThree(val);
+                    }
+
+                    setAadhaarId(line);
+                }
+            } else {
+                System.out.println("else : " + val);
+                setMetaData(val);
+            }
+        } catch (ActivityException e) {
+            e.printStackTrace(); // Log the exception for debugging
+        }
+    }
+
+
+    /**
+     * Validates the extracted name based on specific criteria.
+     * A valid name must be:
+     * - Non-null
+     * - Non-empty
+     * - Contain more than two words (determined by splitting on whitespace)
+     *
+     * @param name The extracted name to be validated.
+     * @return {@code true} if the name meets all criteria, otherwise {@code false}.
+     */
+    private boolean isExtractedNameValid(String name) {
+        return name != null && !name.isEmpty() && name.split("\\s+").length > 2;
+    }
+
+
+    /**
+     * Processes the given input string to determine and set metadata using the first approach for pattern three.
+     * This method attempts to extract a valid name and store it in the metadata map.
+     *
+     * @param val The input string to be analyzed.
+     * @return The extracted name if valid, otherwise {@code null}.
+     * @throws ActivityException If an unexpected error occurs during processing.
+     */
+    public String setMetaDataForPatternThreeApproachOne(String val) throws ActivityException {
+        try {
+            String srcVal = val.toUpperCase();
+            String tgtVal = val;
+            String metaData = OTHER;
+
+            if (isValidName(srcVal, val)) {
+                metaData = NAME;
+                metadataMap.put(metaData, tgtVal.trim());
+                return tgtVal.trim(); // Return extracted name
+            }
+
+            metadataMap.put(metaData, tgtVal.trim());
+            return null; // Return null if no valid name is found
+
+        } catch (Exception e) {
+            Log.i(TAG, e.getMessage());
+            throw new ActivityException(e);
+        }
+    }
+
+    /**
+     * Attempts to extract a valid name from the given input string using the second approach for pattern three.
+     * This method processes the input line by line, checking for a relationship pattern and using the previous line as a potential name.
+     *
+     * @param val The input string to be analyzed, which may contain multiple lines.
+     * @return The extracted name if a valid name is found, otherwise {@code null}.
+     * @throws ActivityException If an unexpected error occurs during processing.
+     */
+    public String setMetaDataForPatternThreeApproachTwo(String val) throws ActivityException {
+        try {
+            String[] lines = val.split("\n"); // Split text into lines
+            String extractedName = null;
+            String previousLine = "";
+
+            for (String line : lines) {
+                String currentLine = line.trim();
+
+                if (currentLine.matches(".*" + relationshipPattern + ".*")) {
+                    if (!previousLine.isEmpty() && isValidName(previousLine)) {
+                        extractedName = previousLine;
+                        metadataMap.put(NAME, extractedName);
+                        return extractedName; // Exit early if found
+                    }
+                }
+                previousLine = currentLine; // Update for next iteration
+            }
+
+            return null; // No valid name found
+
+        } catch (Exception e) {
+            throw new ActivityException(e);
+        }
+    }
+
+
+    /**
+     * Attempts to extract a valid name from the given input string using the third approach for pattern three.
+     * This method searches for a relationship keyword in the input and then looks at previous lines to find a valid name,
+     * ensuring that it does not match certain exclusion patterns.
+     *
+     * @param val The input string to be analyzed, which may contain multiple lines.
+     * @return The extracted name if a valid name is found, otherwise {@code null}.
+     * @throws ActivityException If an unexpected error occurs during processing.
+     */
+    public String setMetaDataForPatternThreeApproachThree(String val) throws ActivityException {
+        try {
+            String[] lines = val.split("\n");
+            String extractedName = null;
+
+            // Iterate over lines to find a relationship keyword
+            for (int i = 0; i < lines.length; i++) {
+                String currentLine = lines[i].trim();
+
+                if (currentLine.matches(".*" + relationshipPattern + ".*")) {
+                    // Iterate backward to find a valid name
+                    for (int j = i - 1; j >= 0; j--) {
+                        String previousLine = lines[j].trim();
+
+                        if (isValidName(previousLine) && !exclusionPattern.matcher(previousLine).find()) {
+                            extractedName = previousLine;
+                            metadataMap.put(NAME, extractedName);
+                            return extractedName; // Exit early when found
+                        }
+                    }
+                    break; // Stop processing once a relationship keyword is found
+                }
+            }
+            return null; // No valid name found
+
+        } catch (Exception e) {
+            throw new ActivityException(e);
+        }
+    }
+
 
 
 }
