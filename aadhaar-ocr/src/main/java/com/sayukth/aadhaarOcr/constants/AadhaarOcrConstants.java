@@ -1,5 +1,9 @@
 package com.sayukth.aadhaarOcr.constants;
 
+import com.sayukth.aadhaarOcr.utils.ParseQRUtil;
+
+import java.security.PublicKey;
+
 public class AadhaarOcrConstants {
 
     public static final int AADHAAR_REQUEST_IMAGE = 100;
@@ -112,5 +116,29 @@ public class AadhaarOcrConstants {
     public static final String MALE_STR = "Male";
 
     public static final String TRANS_STR = "Transgender";
+
+    public static final String NOT_VERIFIED = "NOT VERIFIED";
+
+    public static final String DIGITALTY = "DIGITALTY";
+
+    public static final String SIGNATURE = "SIGNATURE";
+
+    public static final String NOT_VERIFIED_ANOTHER = "NOT VERIFI ED";
+
+    public static final String UNIOUE = "UNIOUE";
+
+    public static final String DIGTALLY = "DIGTALLY";
+
+    public static final String DIGILALLY = "DIGILALLY";
+
+    public static final String UNIQLE = "UNIQLE";
+
+    public static final String LNDIA = "LNDIA";
+
+    public static final String IDENTIFICATION = "IDENTIFICATION";
+
+    public static final String IST = "IST";
+
+    public static final String UTC = "UTC";
 
 }
