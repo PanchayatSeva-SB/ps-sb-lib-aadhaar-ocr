@@ -82,6 +82,9 @@ public class DetectAadhaarPresenter implements DetectAadhaarContract.Presenter {
     private static final String VID_PATTERN = ".*\\bVID:\\s*\\d{16}\\b.*";
     private static final String MOBILE_REGEX = "\\b[6789]\\d{9}\\b";
 
+    private static final String EXCLUSION_KEYWORD_REGEX_FOR_FATHER_OR_SPOUSE_NAME_EXTRACTION = ".*\\b(lock|unlock|aadhaar|security|obligated|entities|unique|Authority)\\b.*";
+
+
     Pattern datePattern = Pattern.compile("(\\d{4}[-/]\\d{1,2}[-/]\\d{1,2})|((\\d{1,2})[-/](\\d{1,2})[-/](\\d{4}))");
     // Regex pattern
     Pattern datePatternWithAnyCharacter = Pattern.compile(
@@ -104,6 +107,9 @@ public class DetectAadhaarPresenter implements DetectAadhaarContract.Presenter {
     Pattern pincodePattern = Pattern.compile("\\b\\d{6}\\b");
 
     String relationshipPattern = "(?i)\\b(C/O|S/O|W/O|D/O|CIO|SIO|WIO|DIO)\\b";
+
+    Pattern exclusionPattern = Pattern.compile("(?i)\\b(To|Enrolment No|Government|India|Unique|Identification)\\b");
+
 
 
 
@@ -279,7 +285,7 @@ public class DetectAadhaarPresenter implements DetectAadhaarContract.Presenter {
                 if (line.matches(PINCODE_REGEX) || line.matches(AADHAAR_REGEX) || line.matches(VID_PATTERN))
                     continue;
                 if (line.contains("@") || line.contains("1947")) continue;
-                if (line.matches(".*\\b(lock|unlock|aadhaar|security|obligated|entities|unique|Authority)\\b.*"))
+                if (line.matches(EXCLUSION_KEYWORD_REGEX_FOR_FATHER_OR_SPOUSE_NAME_EXTRACTION))
                     continue;
 
                 validLines.add(line.trim());
@@ -663,31 +669,37 @@ public class DetectAadhaarPresenter implements DetectAadhaarContract.Presenter {
      * @param textValue The extracted text from the Aadhaar card image.
      */
     private void classifyTextBlock(String textValue) {
-        if (isFrontMatch(textValue)) {
-            // If the text matches front side patterns, process it as front side data
-            getTextType(textValue);
+        try {
+            if (isFrontMatch(textValue)) {
+                getTextType(textValue); // Process front side data
+                return;
+            }
 
-        } else if (isBackMatch(textValue)) {
-            try {
-                // If the text matches back side patterns, process father/spouse metadata
-                setFatherOrSpouseMetaData(textValue);
-            } catch (ActivityException e) {
-                throw new RuntimeException(e);
+            if (isBackMatch(textValue)) {
+                setFatherOrSpouseMetaData(textValue); // Process father/spouse metadata
+                return;
             }
-        } else if (isFrontSideFullScan(textValue)) {
-            // If the text indicates a full front side scan, process relevant details
-            try {
-                processFullFrontScan(textValue);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
+
+            if (isFrontSideFullScan(textValue)) {
+                processFullFrontScan(textValue); // Process full front scan
+                return;
             }
-        } else if (containsAadhaar(textValue)) {
-            // If Aadhaar number is detected, process it separately
-            getTextTypeBigQR(textValue);
-        } else if (containsMobileNumber(textValue)) {
-            getTextTypeMobileNumber(textValue);
+
+            if (containsAadhaar(textValue)) {
+                getTextTypeBigQR(textValue); // Process Aadhaar number
+                return;
+            }
+
+            if (containsMobileNumber(textValue)) {
+                getTextTypeMobileNumber(textValue); // Process mobile number
+            }
+        } catch (ActivityException e) {
+            throw new RuntimeException(e); // Handle any ActivityException
+        } catch (Exception e) {
+            throw new RuntimeException(e); // Catch any other unexpected exceptions
         }
     }
+
 
     /**
      * Processes a full front-side scan of the Aadhaar card.
@@ -734,12 +746,12 @@ public class DetectAadhaarPresenter implements DetectAadhaarContract.Presenter {
                 for (String line : val.split("\n")) {
                     String extractedName = setMetaDataForPatternThreeApproachOne(line);
 
-                    if (!isValidExtractedName(extractedName)) {
+                    if (!isExtractedNameValid(extractedName)) {
                         metadataMap.remove(NAME);
                         extractedName = setMetaDataForPatternThreeApproachTwo(val);
                     }
 
-                    if (!isValidExtractedName(extractedName)) {
+                    if (!isExtractedNameValid(extractedName)) {
                         metadataMap.remove(NAME);
                         setMetaDataForPatternThreeApproachThree(val);
                     }
@@ -766,7 +778,7 @@ public class DetectAadhaarPresenter implements DetectAadhaarContract.Presenter {
      * @param name The extracted name to be validated.
      * @return {@code true} if the name meets all criteria, otherwise {@code false}.
      */
-    private boolean isValidExtractedName(String name) {
+    private boolean isExtractedNameValid(String name) {
         return name != null && !name.isEmpty() && name.split("\\s+").length > 2;
     }
 
@@ -848,9 +860,6 @@ public class DetectAadhaarPresenter implements DetectAadhaarContract.Presenter {
         try {
             String[] lines = val.split("\n");
             String extractedName = null;
-
-            // Define exclusion pattern
-            Pattern exclusionPattern = Pattern.compile("(?i)\\b(To|Enrolment No|Government|India|Unique|Identification)\\b");
 
             // Iterate over lines to find a relationship keyword
             for (int i = 0; i < lines.length; i++) {
