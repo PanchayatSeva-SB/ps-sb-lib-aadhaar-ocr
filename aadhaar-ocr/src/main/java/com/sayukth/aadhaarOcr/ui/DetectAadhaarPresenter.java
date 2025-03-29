@@ -54,6 +54,7 @@ import android.util.SparseArray;
 import com.google.android.gms.vision.Frame;
 import com.google.android.gms.vision.text.TextBlock;
 import com.google.android.gms.vision.text.TextRecognizer;
+import com.sayukth.aadhaarOcr.Exceptions.PresenterException;
 import com.sayukth.aadhaarOcr.constants.AadhaarOcrConstants;
 import com.sayukth.aadhaarOcr.error.ActivityException;
 import com.sayukth.aadhaarOcr.ocrpreferences.AadhaarOcrPreferences;
@@ -81,6 +82,9 @@ public class DetectAadhaarPresenter implements DetectAadhaarContract.Presenter {
     private static final String PINCODE_REGEX = ".*\\b\\d{6}\\b.*";
     private static final String VID_PATTERN = ".*\\bVID:\\s*\\d{16}\\b.*";
     private static final String MOBILE_REGEX = "\\b[6789]\\d{9}\\b";
+    private static final String YEAR_1947 = "1947";
+    private static final String PINCODE_FORMAT = "\\b\\d{6}\\b";
+    private static final String IMAGE_TEXT = "IMAGETEXT";
 
     private static final String EXCLUSION_KEYWORD_REGEX_FOR_FATHER_OR_SPOUSE_NAME_EXTRACTION = ".*\\b(lock|unlock|aadhaar|security|obligated|entities|unique|Authority)\\b.*";
 
@@ -130,7 +134,7 @@ public class DetectAadhaarPresenter implements DetectAadhaarContract.Presenter {
      * @param activity         The activity context.
      * @throws IOException If an input/output exception occurs.
      */
-    public DetectAadhaarPresenter(DetectAadhaarContract.View detectAadharView, Activity activity) throws IOException {
+    public DetectAadhaarPresenter(DetectAadhaarContract.View detectAadharView, Activity activity) throws PresenterException {
         this.detectAadharView = detectAadharView;
         this.activity = activity;
     }
@@ -142,41 +146,44 @@ public class DetectAadhaarPresenter implements DetectAadhaarContract.Presenter {
      * @return The extracted text from the image.
      */
     @Override
-    public String getImageDataAsText(Bitmap photo) {
+    public String getImageDataAsText(Bitmap photo) throws PresenterException{
+        try {
+            ocrImageText.setLength(0);
+            TextRecognizer textRecognizer = new TextRecognizer.Builder(activity).build();
+            Frame imageFrame = new Frame.Builder()
+                    .setBitmap(photo)
+                    .build();
+            String imageText = "";
+            StringBuilder stringBuilder = new StringBuilder();
+            SparseArray<TextBlock> textBlockSparseArray = textRecognizer.detect(imageFrame);
 
-        ocrImageText.setLength(0);
-        TextRecognizer textRecognizer = new TextRecognizer.Builder(activity).build();
-        Frame imageFrame = new Frame.Builder()
-                .setBitmap(photo)
-                .build();
-        String imageText = "";
-        StringBuilder stringBuilder = new StringBuilder();
-        SparseArray<TextBlock> textBlockSparseArray = textRecognizer.detect(imageFrame);
+            for (int i = 0; i < textBlockSparseArray.size(); i++) {
+                TextBlock textBlock = textBlockSparseArray.get(textBlockSparseArray.keyAt(i));
+                String textValue = textBlock.getValue();
+                imageText = textValue;
+                Log.d(IMAGE_TEXT, "Text Block: " + imageText);
+                ocrImageText.append(textValue).append("\n");
+                Log.d("Language : ", imageText + " : " + textBlock.getLanguage());
+                stringBuilder.append("#").append(textValue).append("#\n");
+                stringBuilder.append("\n");
 
-        for (int i = 0; i < textBlockSparseArray.size(); i++) {
-            TextBlock textBlock = textBlockSparseArray.get(textBlockSparseArray.keyAt(i));
-            String textValue = textBlock.getValue();
-            imageText = textValue;
-            Log.d("IMAGEtEXT", "Text Block: " + imageText);
-            ocrImageText.append(textValue).append("\n");
-            Log.d("Language : ", imageText + " : " + textBlock.getLanguage());
-            stringBuilder.append("#").append(textValue).append("#\n");
-            stringBuilder.append("\n");
+                AadhaarOcrPreferences.getInstance().put(AadhaarOcrPreferences.Key.OCR_CAPTURED_TEXT, imageText);
 
-            AadhaarOcrPreferences.getInstance().put(AadhaarOcrPreferences.Key.OCR_CAPTURED_TEXT, imageText);
+                classifyTextBlock(imageText);
 
-            classifyTextBlock(imageText);
+            }
 
+            detectAadharView.showAadhaarInfo(metadataMap);
+
+            // Return the extracted text from the image
+            return imageText;
+        } catch (Exception e){
+            throw new PresenterException(e);
         }
-
-        detectAadharView.showAadhaarInfo(metadataMap);
-
-        // Return the extracted text from the image
-        return imageText;
     }
 
 
-    public void getTextType(String val) {
+    public void getTextType(String val) throws PresenterException {
 
         try {
 
@@ -196,13 +203,13 @@ public class DetectAadhaarPresenter implements DetectAadhaarContract.Presenter {
             }
 
 
-        } catch (ActivityException e) {
-
+        } catch (Exception e) {
+            throw new PresenterException(e);
         }
 
     }
 
-    public void getTextTypeBigQR(String val) {
+    public void getTextTypeBigQR(String val) throws PresenterException{
         try {
             if (val.contains("\n")) {
                 String valArr[] = val.split("\n");
@@ -217,13 +224,13 @@ public class DetectAadhaarPresenter implements DetectAadhaarContract.Presenter {
                 System.out.println(" else : " + val);
                 setMetaData(val);
             }
-        } catch (ActivityException e) {
-
+        } catch (Exception e) {
+            throw new PresenterException(e);
         }
 
     }
 
-    public void getTextTypeMobileNumber(String val) {
+    public void getTextTypeMobileNumber(String val) throws PresenterException{
         try {
             if (val.contains("\n")) {
                 String valArr[] = val.split("\n");
@@ -238,8 +245,8 @@ public class DetectAadhaarPresenter implements DetectAadhaarContract.Presenter {
                 System.out.println(" else : " + val);
                 setMetaData(val);
             }
-        } catch (ActivityException e) {
-
+        } catch (Exception e) {
+            throw new PresenterException(e);
         }
 
     }
@@ -248,77 +255,82 @@ public class DetectAadhaarPresenter implements DetectAadhaarContract.Presenter {
      * Extracts father or spouse name from text.
      *
      * @param val Extracted text.
-     * @throws ActivityException If an error occurs while processing.
+     * @throws PresenterException If an error occurs while processing.
      */
-    public void setFatherOrSpouseMetaData(String val) throws ActivityException {
-        detectAadharView.showImageText(String.valueOf(ocrImageText));
+    public void setFatherOrSpouseMetaData(String val) throws PresenterException{
 
-        String srcVal = val.toUpperCase();
-        if (srcVal.contains(ADDRESS)) {
-            String metaData = FATHER;
-            String formattedFatherName = "";
-            List<String> possibleNames = new ArrayList<>();
+        try {
+            detectAadharView.showImageText(String.valueOf(ocrImageText));
 
-            String text = StringSplitUtils.getLastPartOfStringBySplitString(ocrImageText.toString(), ":");
-            Matcher matcher = namePattern.matcher(text);
+            String srcVal = val.toUpperCase();
+            if (srcVal.contains(ADDRESS)) {
+                String metaData = FATHER;
+                String formattedFatherName = "";
+                List<String> possibleNames = new ArrayList<>();
 
-            while (matcher.find()) {  // Collect all matches
-                possibleNames.add(matcher.group(1).trim().replaceAll("\\n+", " "));
-            }
+                String text = StringSplitUtils.getLastPartOfStringBySplitString(ocrImageText.toString(), ":");
+                Matcher matcher = namePattern.matcher(text);
 
-            // Get most probable name
-            if (!possibleNames.isEmpty()) {
-                formattedFatherName = getMostProbableName(possibleNames);
-            }
-
-            // ✅ If valid, store and exit
-            if (isValidName(formattedFatherName)) {
-                metadataMap.put(metaData, formattedFatherName.trim());
-                return;
-            }
-
-            possibleNames.clear();
-            List<String> validLines = new ArrayList<>();
-            String[] lines = val.split("\n");
-
-            for (String line : lines) {
-                if (line.matches(PINCODE_REGEX) || line.matches(AADHAAR_REGEX) || line.matches(VID_PATTERN))
-                    continue;
-                if (line.contains("@") || line.contains("1947")) continue;
-                if (line.matches(EXCLUSION_KEYWORD_REGEX_FOR_FATHER_OR_SPOUSE_NAME_EXTRACTION))
-                    continue;
-
-                validLines.add(line.trim());
-            }
-
-            for (String validLine : validLines) {
-                Matcher lineMatcher = namePattern.matcher(validLine);
-                while (lineMatcher.find()) {
-                    possibleNames.add(lineMatcher.group(1).trim());
+                while (matcher.find()) {  // Collect all matches
+                    possibleNames.add(matcher.group(1).trim().replaceAll("\\n+", " "));
                 }
-            }
 
-            // Get most probable name
-            if (!possibleNames.isEmpty()) {
-                formattedFatherName = getMostProbableName(possibleNames);
-            }
-
-            // ✅ If valid, store and exit
-            if (isValidName(formattedFatherName)) {
-                metadataMap.put(metaData, formattedFatherName.trim());
-                return;
-            }
-
-            for (String line : lines) {
-                Matcher manualMatcher = namePattern.matcher(line);
-                if (manualMatcher.find()) {
-                    formattedFatherName = manualMatcher.group(1).trim();
-                    break; // Take first match
+                // Get most probable name
+                if (!possibleNames.isEmpty()) {
+                    formattedFatherName = getMostProbableName(possibleNames);
                 }
-            }
 
-            // ✅ Store final extracted name
-            metadataMap.put(metaData, formattedFatherName.trim());
+                // ✅ If valid, store and exit
+                if (isValidName(formattedFatherName)) {
+                    metadataMap.put(metaData, formattedFatherName.trim());
+                    return;
+                }
+
+                possibleNames.clear();
+                List<String> validLines = new ArrayList<>();
+                String[] lines = val.split("\n");
+
+                for (String line : lines) {
+                    if (line.matches(PINCODE_REGEX) || line.matches(AADHAAR_REGEX) || line.matches(VID_PATTERN))
+                        continue;
+                    if (line.contains("@") || line.contains(YEAR_1947)) continue;
+                    if (line.matches(EXCLUSION_KEYWORD_REGEX_FOR_FATHER_OR_SPOUSE_NAME_EXTRACTION))
+                        continue;
+
+                    validLines.add(line.trim());
+                }
+
+                for (String validLine : validLines) {
+                    Matcher lineMatcher = namePattern.matcher(validLine);
+                    while (lineMatcher.find()) {
+                        possibleNames.add(lineMatcher.group(1).trim());
+                    }
+                }
+
+                // Get most probable name
+                if (!possibleNames.isEmpty()) {
+                    formattedFatherName = getMostProbableName(possibleNames);
+                }
+
+                // ✅ If valid, store and exit
+                if (isValidName(formattedFatherName)) {
+                    metadataMap.put(metaData, formattedFatherName.trim());
+                    return;
+                }
+
+                for (String line : lines) {
+                    Matcher manualMatcher = namePattern.matcher(line);
+                    if (manualMatcher.find()) {
+                        formattedFatherName = manualMatcher.group(1).trim();
+                        break; // Take first match
+                    }
+                }
+
+                // ✅ Store final extracted name
+                metadataMap.put(metaData, formattedFatherName.trim());
+            }
+        } catch (Exception e){
+            throw new PresenterException(e);
         }
     }
 
@@ -337,25 +349,29 @@ public class DetectAadhaarPresenter implements DetectAadhaarContract.Presenter {
      * Extracts father or spouse name using specific patterns.
      *
      * @param val Extracted text.
-     * @throws ActivityException If an error occurs while processing.
+     * @throws PresenterException If an error occurs while processing.
      */
-    public void setFatherOrSpouseMetaDataForPattern(String val) throws ActivityException {
-        detectAadharView.showImageText(String.valueOf(ocrImageText));
+    public void setFatherOrSpouseMetaDataForPattern(String val) throws PresenterException {
+        try {
+            detectAadharView.showImageText(String.valueOf(ocrImageText));
 
-        String metaData = FATHER;
-        String srcVal = val.toUpperCase();
+            String metaData = FATHER;
+            String srcVal = val.toUpperCase();
 
-        Matcher matcher = fatherOrSpouseNamePattern.matcher(srcVal);
+            Matcher matcher = fatherOrSpouseNamePattern.matcher(srcVal);
 
-        if (matcher.find()) {
-            String fsName = matcher.group(2).trim(); // Extract the name
+            if (matcher.find()) {
+                String fsName = matcher.group(2).trim(); // Extract the name
 
-            // Remove any 6-digit PIN code from fsName
-            fsName = fsName.replaceAll("\\b\\d{6}\\b", "").trim();
+                // Remove any 6-digit PIN code from fsName
+                fsName = fsName.replaceAll(PINCODE_FORMAT, "").trim();
 
-            fsName = fsName.replaceAll(",", "");
+                fsName = fsName.replaceAll(",", "");
 
-            metadataMap.put(metaData, fsName);
+                metadataMap.put(metaData, fsName);
+            }
+        } catch (Exception e){
+            throw new PresenterException(e);
         }
     }
 
@@ -415,19 +431,23 @@ public class DetectAadhaarPresenter implements DetectAadhaarContract.Presenter {
      * @param val Extracted text.
      * @throws ActivityException If an error occurs while processing.
      */
-    public void setAadhaarId(String val) throws ActivityException {
-        detectAadharView.showImageText(String.valueOf(ocrImageText));
-        String aadharRegex = AADHAAR_REGEX;
 
-        Matcher aadharMatcher = getPatternMatcher(AADHAAR_REGEX, val);
+    public void setAadhaarId(String val) throws PresenterException{
+        try {
+            detectAadharView.showImageText(String.valueOf(ocrImageText));
 
-        String metaData = AADHAAR;
-        String tgtVal = val;
+            Matcher aadharMatcher = getPatternMatcher(AADHAAR_REGEX, val);
+
+            String metaData = AADHAAR;
+            String tgtVal = val;
 
 
-        if (aadharMatcher.matches()) {
+            if (aadharMatcher.matches()) {
 
-            metadataMap.put(metaData, tgtVal.trim());
+                metadataMap.put(metaData, tgtVal.trim());
+            }
+        }catch (Exception e){
+            throw new PresenterException(e);
         }
     }
 
@@ -435,9 +455,9 @@ public class DetectAadhaarPresenter implements DetectAadhaarContract.Presenter {
      * Categorizes extracted metadata.
      *
      * @param val Extracted text.
-     * @throws ActivityException If an error occurs while processing.
+     * @throws PresenterException If an error occurs while processing.
      */
-    public void setMetaData(String val) throws ActivityException {
+    public void setMetaData(String val) throws PresenterException {
         try {
             String srcVal = val.toUpperCase();
             String tgtVal = val;
@@ -463,9 +483,8 @@ public class DetectAadhaarPresenter implements DetectAadhaarContract.Presenter {
                 metaData = NAME;
             }
             metadataMap.put(metaData, tgtVal.trim());
-        } catch (ActivityException e) {
-            Log.i(TAG, e.getMessage());
-            throw new ActivityException(e);
+        } catch (Exception e) {
+            throw new PresenterException(e);
         }
     }
 
@@ -504,19 +523,24 @@ public class DetectAadhaarPresenter implements DetectAadhaarContract.Presenter {
     }
 
     // Extract and format date
-    private String extractAndFormatDate(String val) throws ActivityException {
-        Matcher matcher1 = datePattern.matcher(val);
-        Matcher matcher2 = datePatternWithAnyCharacter.matcher(val);
-        Matcher matcher3 = onlyYear.matcher(val);
+    private String extractAndFormatDate(String val) throws PresenterException{
 
-        if (matcher1.find()) {
-            return getFormatedDate(matcher1.group());
-        } else if (matcher2.find()) {
-            return getFormatedDate(formatDateFromMatcher(matcher2));
-        } else if (matcher3.find()) {
-            return getFormatedDate(matcher3.group());
+        try {
+            Matcher matcher1 = datePattern.matcher(val);
+            Matcher matcher2 = datePatternWithAnyCharacter.matcher(val);
+            Matcher matcher3 = onlyYear.matcher(val);
+
+            if (matcher1.find()) {
+                return getFormatedDate(matcher1.group());
+            } else if (matcher2.find()) {
+                return getFormatedDate(formatDateFromMatcher(matcher2));
+            } else if (matcher3.find()) {
+                return getFormatedDate(matcher3.group());
+            }
+            return null;
+        }catch (Exception e){
+            throw new PresenterException(e);
         }
-        return null;
     }
 
     // Format date based on matcher results
@@ -549,7 +573,7 @@ public class DetectAadhaarPresenter implements DetectAadhaarContract.Presenter {
     }
 
 
-    private String getFormatedDate(String datevalue) throws ActivityException {
+    private String getFormatedDate(String datevalue) throws PresenterException {
         try {
             datevalue = (datevalue != null && !datevalue.isEmpty()) ? datevalue.trim() : "";
 
@@ -559,9 +583,8 @@ public class DetectAadhaarPresenter implements DetectAadhaarContract.Presenter {
             } else {
                 return DateUtils.aAdhaarDateFormated(datevalue);
             }
-        } catch (ActivityException execption) {
-            Log.i(TAG, execption.getMessage());
-            throw new ActivityException(execption);
+        } catch (Exception e) {
+            throw new PresenterException(e);
         }
     }
 
@@ -577,17 +600,20 @@ public class DetectAadhaarPresenter implements DetectAadhaarContract.Presenter {
      *
      * @param scanContent The scanned QR code content.
      */
-    public void handleQrCodeScan(String scanContent) {
-
-        HashMap<String, String> parsedDataStr = null;
+    public HashMap<String, String> handleQrCodeScan(String scanContent) throws PresenterException{
         try {
+
+            HashMap<String, String> parsedDataStr = null;
+
             parsedDataStr = ParseQRUtil.parseScannedData(scanContent.trim());
             detectAadharView.showAadhaarInfo(parsedDataStr);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
 
+            return parsedDataStr;
+        } catch (Exception e){
+            throw new PresenterException(e);
+        }
     }
+
 
     /**
      * Checks if text contains Aadhaar number.
@@ -612,8 +638,6 @@ public class DetectAadhaarPresenter implements DetectAadhaarContract.Presenter {
     }
 
     private boolean containsMobileNumber(String text) {
-        // Mobile number regex pattern (10-digit numbers starting with 6-9)
-
         // Split the string into lines or words to simulate "text blocks"
         String[] lines = text.split("\\r?\\n");
 
@@ -668,19 +692,23 @@ public class DetectAadhaarPresenter implements DetectAadhaarContract.Presenter {
      *
      * @param textValue The extracted text from the Aadhaar card image.
      */
-    private void classifyTextBlock(String textValue) {
+    private void classifyTextBlock(String textValue) throws PresenterException {
         try {
-            if (isFrontMatch(textValue)) {
+
+            if(AadhaarOcrPreferences.getInstance().getBoolean(AadhaarOcrPreferences.Key.IS_SIGNATURE_DATA_BIG_QR_OCR)){
+                getTextTypeBigQR(textValue);
+                setFatherOrSpouseMetaData(textValue);
+                return;
+            }
+             if (isFrontMatch(textValue)) {
                 getTextType(textValue); // Process front side data
                 return;
             }
-
-            if (isBackMatch(textValue)) {
+             if (isBackMatch(textValue)) {
                 setFatherOrSpouseMetaData(textValue); // Process father/spouse metadata
                 return;
             }
-
-            if (isFrontSideFullScan(textValue)) {
+             if (isFrontSideFullScan(textValue)) {
                 processFullFrontScan(textValue); // Process full front scan
                 return;
             }
@@ -693,10 +721,8 @@ public class DetectAadhaarPresenter implements DetectAadhaarContract.Presenter {
             if (containsMobileNumber(textValue)) {
                 getTextTypeMobileNumber(textValue); // Process mobile number
             }
-        } catch (ActivityException e) {
-            throw new RuntimeException(e); // Handle any ActivityException
-        } catch (Exception e) {
-            throw new RuntimeException(e); // Catch any other unexpected exceptions
+        }  catch (Exception e) {
+            throw new PresenterException(e); // Catch any other unexpected exceptions
         }
     }
 
@@ -708,7 +734,7 @@ public class DetectAadhaarPresenter implements DetectAadhaarContract.Presenter {
      *
      * @param textValue The extracted text from the Aadhaar card image.
      */
-    private void processFullFrontScan(String textValue) throws ActivityException {
+    private void processFullFrontScan(String textValue) throws PresenterException {
 
         try {
             metadataMap.clear(); // Clear previous metadata before processing new data
@@ -723,7 +749,8 @@ public class DetectAadhaarPresenter implements DetectAadhaarContract.Presenter {
             setMobileNumber(textValue);
             setAddress(textValue);
         } catch (Exception e) {
-            throw e;
+            throw new PresenterException(e);
+
         }
     }
 
@@ -740,7 +767,7 @@ public class DetectAadhaarPresenter implements DetectAadhaarContract.Presenter {
      *
      * @param val The input text that needs to be processed.
      */
-    public void getTextTypeForPatternThree(String val) {
+    public void getTextTypeForPatternThree(String val) throws PresenterException{
         try {
             if (val.contains("\n")) {
                 for (String line : val.split("\n")) {
@@ -762,8 +789,8 @@ public class DetectAadhaarPresenter implements DetectAadhaarContract.Presenter {
                 System.out.println("else : " + val);
                 setMetaData(val);
             }
-        } catch (ActivityException e) {
-            e.printStackTrace(); // Log the exception for debugging
+        } catch (Exception e) {
+            throw new PresenterException(e);
         }
     }
 
@@ -791,7 +818,7 @@ public class DetectAadhaarPresenter implements DetectAadhaarContract.Presenter {
      * @return The extracted name if valid, otherwise {@code null}.
      * @throws ActivityException If an unexpected error occurs during processing.
      */
-    public String setMetaDataForPatternThreeApproachOne(String val) throws ActivityException {
+    public String setMetaDataForPatternThreeApproachOne(String val) throws PresenterException {
         try {
             String srcVal = val.toUpperCase();
             String tgtVal = val;
@@ -807,8 +834,7 @@ public class DetectAadhaarPresenter implements DetectAadhaarContract.Presenter {
             return null; // Return null if no valid name is found
 
         } catch (Exception e) {
-            Log.i(TAG, e.getMessage());
-            throw new ActivityException(e);
+            throw new PresenterException(e);
         }
     }
 
@@ -820,7 +846,7 @@ public class DetectAadhaarPresenter implements DetectAadhaarContract.Presenter {
      * @return The extracted name if a valid name is found, otherwise {@code null}.
      * @throws ActivityException If an unexpected error occurs during processing.
      */
-    public String setMetaDataForPatternThreeApproachTwo(String val) throws ActivityException {
+    public String setMetaDataForPatternThreeApproachTwo(String val) throws PresenterException {
         try {
             String[] lines = val.split("\n"); // Split text into lines
             String extractedName = null;
@@ -833,16 +859,16 @@ public class DetectAadhaarPresenter implements DetectAadhaarContract.Presenter {
                     if (!previousLine.isEmpty() && isValidName(previousLine)) {
                         extractedName = previousLine;
                         metadataMap.put(NAME, extractedName);
-                        return extractedName; // Exit early if found
+                        return extractedName;
                     }
                 }
-                previousLine = currentLine; // Update for next iteration
+                previousLine = currentLine;
             }
 
-            return null; // No valid name found
+            return null;
 
         } catch (Exception e) {
-            throw new ActivityException(e);
+            throw new PresenterException("Error in Presenter:",e);
         }
     }
 
@@ -854,9 +880,9 @@ public class DetectAadhaarPresenter implements DetectAadhaarContract.Presenter {
      *
      * @param val The input string to be analyzed, which may contain multiple lines.
      * @return The extracted name if a valid name is found, otherwise {@code null}.
-     * @throws ActivityException If an unexpected error occurs during processing.
+     * @throws PresenterException If an unexpected error occurs during processing.
      */
-    public String setMetaDataForPatternThreeApproachThree(String val) throws ActivityException {
+    public String setMetaDataForPatternThreeApproachThree(String val) throws PresenterException {
         try {
             String[] lines = val.split("\n");
             String extractedName = null;
@@ -882,10 +908,7 @@ public class DetectAadhaarPresenter implements DetectAadhaarContract.Presenter {
             return null; // No valid name found
 
         } catch (Exception e) {
-            throw new ActivityException(e);
+            throw new PresenterException(e);
         }
     }
-
-
-
 }

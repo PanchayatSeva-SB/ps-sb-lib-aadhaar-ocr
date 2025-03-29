@@ -2,6 +2,8 @@ package com.sayukth.aadhaarOcr.ui;
 
 import android.graphics.Bitmap;
 
+import com.sayukth.aadhaarOcr.Exceptions.PresenterException;
+
 import java.util.HashMap;
 
 public interface DetectAadhaarContract {
@@ -13,8 +15,8 @@ public interface DetectAadhaarContract {
     }
 
     interface Presenter {
-        String getImageDataAsText(Bitmap bitmap);
+        String getImageDataAsText(Bitmap bitmap) throws PresenterException;
 
-        void handleQrCodeScan(String scanContent);
+        HashMap<String, String> handleQrCodeScan(String scanContent) throws PresenterException;
     }
 }

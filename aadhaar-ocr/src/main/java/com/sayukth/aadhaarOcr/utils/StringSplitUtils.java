@@ -1,10 +1,11 @@
 package com.sayukth.aadhaarOcr.utils;
 
+import com.sayukth.aadhaarOcr.Exceptions.StringSplitUtilsException;
 import com.sayukth.aadhaarOcr.error.ActivityException;
 
 public class StringSplitUtils {
 
-    public static String getFirstPartOfStringBySplitString(String string, String delimiter) throws ActivityException {
+    public static String getFirstPartOfStringBySplitString(String string, String delimiter) throws StringSplitUtilsException {
         try {
             String mystring = string;
             String firstWord = " ";
@@ -15,11 +16,11 @@ public class StringSplitUtils {
             return firstWord;
 
         } catch (Exception e) {
-            throw new ActivityException(e);
+            throw new StringSplitUtilsException(e);
         }
     }
 
-    public static String getLastPartOfStringBySplitString(String string, String delimiter) throws ActivityException {
+    public static String getLastPartOfStringBySplitString(String string, String delimiter) throws StringSplitUtilsException {
         try {
             String mystring = string;
             String theRest = "";
@@ -31,7 +32,7 @@ public class StringSplitUtils {
             return theRest;
 
         } catch (Exception e) {
-            throw new ActivityException(e);
+            throw new StringSplitUtilsException(e);
         }
     }
 

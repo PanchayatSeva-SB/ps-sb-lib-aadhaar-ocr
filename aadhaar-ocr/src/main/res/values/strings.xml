@@ -25,5 +25,11 @@
     <string name="big_qr_ocr">Big QR OCR</string>
     <string name="aadhaar_number_focus_request">Please focus camera on the Aadhaar card number only and click Capture</string>
     <string name="path">path</string>
+    <string name="female">Female</string>
+    <string name="male">Male</string>
+    <string name="transgender">Transgender</string>
+    <string name="failed_to_start_camera">Failed to start camera: </string>
+    <string name="photo_catured_failed">Photo capture failed: </string>
+
 
 </resources>
