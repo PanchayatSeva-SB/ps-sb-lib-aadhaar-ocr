@@ -230,8 +230,7 @@ public class CustomCameraLaunchActivity extends AppCompatActivity {
 
     //    Starts the Camera for capture
     private void startCamera() {
-        ListenableFuture<ProcessCameraProvider> cameraProviderFuture =
-                ProcessCameraProvider.getInstance(this);
+        ListenableFuture<ProcessCameraProvider> cameraProviderFuture = ProcessCameraProvider.getInstance(this);
 
         try {
 
@@ -253,16 +252,14 @@ public class CustomCameraLaunchActivity extends AppCompatActivity {
                     CameraSelector cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA;
 
                     // Bind to lifecycle
-                    camera = cameraProvider.bindToLifecycle(
-                            this, cameraSelector, preview, imageCapture);
+                    camera = cameraProvider.bindToLifecycle(this, cameraSelector, preview, imageCapture);
 
                     // Set initial zoom level (e.g., 2x zoom)
                     float zoomRatio = 2.0f; // Adjust as needed
                     camera.getCameraControl().setZoomRatio(zoomRatio);
 
                 } catch (Exception e) {
-                    Toast.makeText(this, getString(R.string.failed_to_start_camera) + e.getMessage(),
-                            Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, getString(R.string.failed_to_start_camera) + e.getMessage(), Toast.LENGTH_SHORT).show();
                 }
             }, ContextCompat.getMainExecutor(this));
         } catch (Exception e) {
@@ -293,29 +290,25 @@ public class CustomCameraLaunchActivity extends AppCompatActivity {
             // Create a unique file name for the photo
             File photoFile = new File(cacheDir, PHOTO + System.currentTimeMillis() + JPG);
 
-            ImageCapture.OutputFileOptions outputFileOptions =
-                    new ImageCapture.OutputFileOptions.Builder(photoFile).build();
+            ImageCapture.OutputFileOptions outputFileOptions = new ImageCapture.OutputFileOptions.Builder(photoFile).build();
 
             // Capture the photo and save it in the 'camera' folder
-            imageCapture.takePicture(outputFileOptions, cameraExecutor,
-                    new ImageCapture.OnImageSavedCallback() {
-                        @Override
-                        public void onImageSaved(@NonNull ImageCapture.OutputFileResults outputFileResults) {
-                            runOnUiThread(() -> {
-                                Intent resultIntent = new Intent();
-                                resultIntent.putExtra(getString(R.string.path), photoFile.getAbsolutePath());
-                                setResult(RESULT_OK, resultIntent);
-                                finish();
-                            });
-                        }
-
-                        @Override
-                        public void onError(@NonNull ImageCaptureException exception) {
-                            runOnUiThread(() -> Toast.makeText(CustomCameraLaunchActivity.this,
-                                    getString(R.string.photo_catured_failed) + exception.getMessage(),
-                                    Toast.LENGTH_SHORT).show());
-                        }
+            imageCapture.takePicture(outputFileOptions, cameraExecutor, new ImageCapture.OnImageSavedCallback() {
+                @Override
+                public void onImageSaved(@NonNull ImageCapture.OutputFileResults outputFileResults) {
+                    runOnUiThread(() -> {
+                        Intent resultIntent = new Intent();
+                        resultIntent.putExtra(getString(R.string.path), photoFile.getAbsolutePath());
+                        setResult(RESULT_OK, resultIntent);
+                        finish();
                     });
+                }
+
+                @Override
+                public void onError(@NonNull ImageCaptureException exception) {
+                    runOnUiThread(() -> Toast.makeText(CustomCameraLaunchActivity.this, getString(R.string.photo_catured_failed) + exception.getMessage(), Toast.LENGTH_SHORT).show());
+                }
+            });
         } catch (Exception e) {
             Log.e(TAG, e.getMessage() != null ? e.getMessage() : GENERIC_EXCEPTION_MSSG, e);
 
@@ -324,8 +317,7 @@ public class CustomCameraLaunchActivity extends AppCompatActivity {
 
 
     private boolean allPermissionsGranted() {
-        return ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
-                == PackageManager.PERMISSION_GRANTED;
+        return ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED;
     }
 
     @Override
@@ -337,11 +329,9 @@ public class CustomCameraLaunchActivity extends AppCompatActivity {
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
-                                           @NonNull int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == 101 && grantResults.length > 0 &&
-                grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+        if (requestCode == 101 && grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             startCamera();
         } else {
             Toast.makeText(this, "Camera permission denied", Toast.LENGTH_SHORT).show();
