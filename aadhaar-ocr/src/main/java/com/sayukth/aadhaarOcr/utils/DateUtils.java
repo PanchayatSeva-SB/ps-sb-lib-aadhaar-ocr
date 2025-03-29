@@ -10,6 +10,8 @@ import android.view.View;
 
 //import com.sayukth.panchayatseva.survey.error.ActivityException;
 
+import com.sayukth.aadhaarOcr.Exceptions.DateParsingException;
+import com.sayukth.aadhaarOcr.Exceptions.PresenterException;
 import com.sayukth.aadhaarOcr.R;
 import com.sayukth.aadhaarOcr.error.ActivityException;
 
@@ -44,7 +46,7 @@ public class DateUtils {
     /**
      * To get the current datetime
      */
-    public static String getDateTimeNow() throws ActivityException {
+    public static String getDateTimeNow() throws DateParsingException {
         try {
             SimpleDateFormat dateFormat = new SimpleDateFormat(
                     timePattern, Locale.getDefault());
@@ -52,7 +54,7 @@ public class DateUtils {
 
             return dateFormat.format(date);
         } catch (Exception e) {
-            throw new ActivityException(e);
+            throw new DateParsingException(e);
         }
     }
 
@@ -63,7 +65,7 @@ public class DateUtils {
         return date.getTime();
     }
 
-    public static long dateToMilliSeconds(String myDate) throws ActivityException {
+    public static long dateToMilliSeconds(String myDate) throws DateParsingException {
         try {
             SimpleDateFormat sdf = new SimpleDateFormat(timePattern);
             Date date = null;
@@ -75,7 +77,7 @@ public class DateUtils {
             long millis = date.getTime();
             return millis;
         } catch (Exception e) {
-            throw new ActivityException(e);
+            throw new DateParsingException(e);
         }
     }
 
@@ -86,7 +88,7 @@ public class DateUtils {
      * @param surveyStartDateTime,surveyEndDateTime
      * @return
      */
-    public static long surveyDateToMilliSeconds(String surveyStartDateTime, String surveyEndDateTime) throws ActivityException {
+    public static long surveyDateToMilliSeconds(String surveyStartDateTime, String surveyEndDateTime) throws DateParsingException {
 
         try {
             SimpleDateFormat sdf = new SimpleDateFormat(SURVEY_DISPLAY_DATE_PATTERN, Locale.ENGLISH);
@@ -100,7 +102,7 @@ public class DateUtils {
             }
             return diff;
         } catch (Exception e) {
-            throw new ActivityException(e);
+            throw new DateParsingException(e);
         }
     }
 
@@ -110,7 +112,7 @@ public class DateUtils {
      * @param millis
      * @return
      */
-    public static String milliSecondsToHoursMinutes(long millis) throws ActivityException {
+    public static String milliSecondsToHoursMinutes(long millis) throws DateParsingException {
         try {
             long totalSecs = millis / 1000;
             long hours = (totalSecs / 3600);
@@ -146,7 +148,7 @@ public class DateUtils {
             }
 
         } catch (Exception e) {
-            throw new ActivityException(e);
+            throw new DateParsingException("Error in Date Parsing:",e);
         }
         return "";
     }
@@ -158,7 +160,7 @@ public class DateUtils {
      * @param theTime the current time
      * @return the current date/time
      */
-    public static String getTimeNow(Date theTime) throws ActivityException {
+    public static String getTimeNow(Date theTime) throws DateParsingException {
         return getDateTime(timePattern, theTime);
     }
 
@@ -170,7 +172,7 @@ public class DateUtils {
      * @param aDate a date object
      * @return a formatted string representation of the date
      */
-    public static final String getDateTime(String aMask, Date aDate) throws ActivityException {
+    public static final String getDateTime(String aMask, Date aDate) throws DateParsingException {
         try {
             SimpleDateFormat df = null;
             String returnValue = "";
@@ -184,13 +186,13 @@ public class DateUtils {
 
             return (returnValue);
         } catch (Exception e) {
-            throw new ActivityException(e);
+            throw new DateParsingException(e);
         }
     }
 
 
     /* This method take a String of date format and returns today date */
-    public static final String getCurrentDate(String aMask) throws ActivityException {
+    public static final String getCurrentDate(String aMask) throws DateParsingException {
         try {
             Date date = new Date();
             String returnValue = "";
@@ -203,7 +205,7 @@ public class DateUtils {
             }
             return returnValue;
         } catch (Exception e) {
-            throw new ActivityException(e);
+            throw new DateParsingException(e);
         }
     }
 
@@ -218,7 +220,7 @@ public class DateUtils {
     }
 
 
-    public static String aAdhaarDateFormated(String dateString) throws ActivityException {
+    public static String aAdhaarDateFormated(String dateString) throws DateParsingException {
         try {
             String delimeter = "/-";
             String year, month, day, finalDate;
@@ -267,14 +269,12 @@ public class DateUtils {
                 month = str2;
                 day = str3;
                 finalDate = String.format("%2s-%2s-%4s", day, month, year);
-//                return String.format("%2s-%2s-%4s", day, month, year);
 
             } else {
                 day = str1;
                 month = str2;
                 year = str3;
                 finalDate = String.format("%2s-%2s-%4s", day, month, year);
-//                return String.format("%2s-%2s-%4s", day, month, year);
 
             }
 
@@ -284,14 +284,12 @@ public class DateUtils {
                 return "";
             }
 
-
-//            return "";
         } catch (Exception e) {
-            throw new ActivityException(e);
+            throw new DateParsingException(e);
         }
     }
 
-    public static String getFormatedDate(String datevalue) throws ActivityException {
+    public static String getFormatedDate(String datevalue) throws DateParsingException {
         try {
             datevalue = (datevalue != null && !datevalue.isEmpty()) ? datevalue.trim() : "";
 
@@ -301,9 +299,8 @@ public class DateUtils {
             } else {
                 return DateUtils.aAdhaarDateFormated(datevalue);
             }
-        } catch (ActivityException execption) {
-            Log.i(TAG, execption.getMessage());
-            throw new ActivityException(execption);
+        } catch (Exception e) {
+            throw new DateParsingException(e);
         }
     }
 
@@ -320,38 +317,6 @@ public class DateUtils {
         // Return true if the date string matches the pattern, false otherwise
         return matcher.matches();
     }
-
-//    public static void showLoading(Context context) {
-//         Dialog dialog = null;
-//         ProgressBar progressBar;
-//
-//        dialog = new Dialog(context);
-//        View view = LayoutInflater.from(context).inflate(R.layout.progress_bar, null); // Replace with your actual layout file name
-//        dialog.setContentView(view);
-//        dialog.setCancelable(false);
-//        dialog.setCanceledOnTouchOutside(false);
-//        dialog.show();
-//
-//        progressBar = view.findViewById(R.id.pbLoading); // Replace with your actual ProgressBar ID
-//        progressBar.setIndeterminate(true);
-//        progressBar.setVisibility(View.VISIBLE);
-//    }
-//
-//    public static void hideLoading(Context context) {
-//        Dialog dialog = null;
-//        ProgressBar progressBar;
-//
-//        dialog = new Dialog(context);
-//        View view = LayoutInflater.from(context).inflate(R.layout.progress_bar, null); // Replace with your actual layout file name
-//        dialog.setContentView(view);
-//        dialog.setCancelable(false);
-//        dialog.setCanceledOnTouchOutside(false);
-//        dialog.show();
-//
-//        progressBar = view.findViewById(R.id.pbLoading); // Replace with your actual ProgressBar ID
-//        progressBar.setIndeterminate(true);
-//        progressBar.setVisibility(View.GONE);
-//    }
 
     // Show loading dialog
     public static void showLoading(Activity activity) {

@@ -23,7 +23,9 @@ public class AadhaarOcrPreferences {
         IS_BACK_SIDE_CAPTURED,
         IS_BIG_QR_OCR,
         IS_FLIP_GIF_SHOW,
-        OCR_CAPTURED_TEXT
+        OCR_CAPTURED_TEXT,
+        IS_MOBILE_NUMBER_CAPTURE,
+        IS_SIGNATURE_DATA_BIG_QR_OCR
     }
 
     private AadhaarOcrPreferences(Context context) {

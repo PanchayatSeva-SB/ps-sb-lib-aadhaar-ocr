@@ -1,5 +1,7 @@
 package com.sayukth.aadhaarOcr.ui;
 
+import static android.content.ContentValues.TAG;
+import static com.sayukth.aadhaarOcr.constants.AadhaarOcrConstants.GENERIC_EXCEPTION_MSSG;
 import static com.sayukth.aadhaarOcr.constants.AadhaarOcrConstants.RESULT_TIMEOUT;
 
 import android.app.Activity;
@@ -26,9 +28,12 @@ import com.journeyapps.barcodescanner.BarcodeCallback;
 import com.journeyapps.barcodescanner.BarcodeResult;
 import com.journeyapps.barcodescanner.CaptureManager;
 import com.journeyapps.barcodescanner.DecoratedBarcodeView;
+import com.sayukth.aadhaarOcr.Exceptions.ActivityException;
 import com.sayukth.aadhaarOcr.R;
 
 public class QRScanningActivity extends AppCompatActivity {
+
+    private static final String TAG = "QR Scanning Activity";
 
     private static CaptureManager captureManager; // Manages scanning functionality
     private static DecoratedBarcodeView barcodeScannerView;
@@ -53,26 +58,31 @@ public class QRScanningActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // Inflate the custom layout and set it as the content view
-        promptView = LayoutInflater.from(this).inflate(R.layout.activity_qr_scan, null);
-        setContentView(promptView);
+        try {
 
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            // Inflate the custom layout and set it as the content view
+            promptView = LayoutInflater.from(this).inflate(R.layout.activity_qr_scan, null);
+            setContentView(promptView);
 
-        // Initialize UI components
-        timerTextView = promptView.findViewById(R.id.timerTextView);
-        torchToggle = promptView.findViewById(R.id.torchToggle);
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-       // Launch the custom QR scanner UI
-        launchScannerCustomUi(this);
+            // Initialize UI components
+            timerTextView = promptView.findViewById(R.id.timerTextView);
+            torchToggle = promptView.findViewById(R.id.torchToggle);
 
-        // Load and display a GIF animation above the scanner
-        gifImage = promptView.findViewById(R.id.gifAbove);
-        Glide.with(this).asGif().load(R.drawable.aadhar_qr_scan_v1).into(gifImage);
+            // Launch the custom QR scanner UI
+            launchScannerCustomUi(this);
 
-        startCountDownTimer();
+            // Load and display a GIF animation above the scanner
+            gifImage = promptView.findViewById(R.id.gifAbove);
+            Glide.with(this).asGif().load(R.drawable.aadhar_qr_scan_v1).into(gifImage);
 
-        setupTorchToggle();
+            startCountDownTimer();
+
+            setupTorchToggle();
+        } catch (Exception e){
+            Log.e(TAG, e.getMessage() != null ? e.getMessage() : GENERIC_EXCEPTION_MSSG, e);
+        }
     }
 
     /**
@@ -81,59 +91,62 @@ public class QRScanningActivity extends AppCompatActivity {
      */
     public void launchScannerCustomUi(Activity activity) {
 
+        try {
 
+            // Initialize the barcode scanner view
+            barcodeScannerView = promptView.findViewById(R.id.barcode_scanner);
 
-        // Initialize the barcode scanner view
-        barcodeScannerView = promptView.findViewById(R.id.barcode_scanner);
+            // Initialize CaptureManager to handle scanning functionality
+            captureManager = new CaptureManager(activity, barcodeScannerView);
 
-        // Initialize CaptureManager to handle scanning functionality
-        captureManager = new CaptureManager(activity, barcodeScannerView);
+            // Initialize CaptureManager with the Bundle extracted from the Intent
+            Bundle bundle = activity.getIntent().getExtras(); // Extract Bundle from Intent
+            captureManager.initializeFromIntent(activity.getIntent(), bundle);
 
-        // Initialize CaptureManager with the Bundle extracted from the Intent
-        Bundle bundle = activity.getIntent().getExtras(); // Extract Bundle from Intent
-        captureManager.initializeFromIntent(activity.getIntent(), bundle);
+            // Start decoding the barcode
+            captureManager.decode();
 
-        // Start decoding the barcode
-        captureManager.decode();
+            // Set up result handler for barcode scanning (decodeSingle)
+            barcodeScannerView.decodeContinuous(new BarcodeCallback() {
+                @Override
+                public void barcodeResult(BarcodeResult result) {
+                    String scannedData = result.getText();
 
-        // Set up result handler for barcode scanning (decodeSingle)
-        barcodeScannerView.decodeContinuous(new BarcodeCallback() {
-            @Override
-            public void barcodeResult(BarcodeResult result) {
-                String scannedData = result.getText();
+                    // Ensure the scanned data is not null and has at least 64 characters
+                    if (scannedData != null && scannedData.length() >= 64) {
+                        if (!isScanProcessed) {
+                            isScanProcessed = true;
+                            handleScanResult(result.getResult());
 
-                // Ensure the scanned data is not null and has at least 64 characters
-                if (scannedData != null && scannedData.length() >= 64) {
-                    if (!isScanProcessed) {
-                        isScanProcessed = true;
-                        handleScanResult(result.getResult());
-
-                        // Stop scanning after a valid scan
-                        barcodeScannerView.pause();
+                            // Stop scanning after a valid scan
+                            barcodeScannerView.pause();
+                        }
+                    } else {
+                        // Keep scanning if the data is less than 64 characters
+                        Log.d("QRScanningActivity", "Scanned data is too short, continuing scan...");
                     }
-                } else {
-                    // Keep scanning if the data is less than 64 characters
-                    Log.d("QRScanningActivity", "Scanned data is too short, continuing scan...");
                 }
-            }
-        });
+            });
 
 
-        // Initialize timeout handler
-        timeoutHandler = new Handler();
-        timeoutRunnable = new Runnable() {
-            @Override
-            public void run() {
-                // Timeout occurred, stop the scanner and notify the user
-                Toast.makeText(activity, "Scanner Timeout", Toast.LENGTH_SHORT).show();
+            // Initialize timeout handler
+            timeoutHandler = new Handler();
+            timeoutRunnable = new Runnable() {
+                @Override
+                public void run() {
+                    // Timeout occurred, stop the scanner and notify the user
+                    Toast.makeText(activity, "Scanner Timeout", Toast.LENGTH_SHORT).show();
 
-                // Create an intent to return the timeout result code
-                Intent data = new Intent();
-                activity.setResult(RESULT_TIMEOUT, data);
+                    // Create an intent to return the timeout result code
+                    Intent data = new Intent();
+                    activity.setResult(RESULT_TIMEOUT, data);
 
-                activity.finish();
-            }
-        };
+                    activity.finish();
+                }
+            };
+        }catch (Exception e){
+            Log.e(TAG, e.getMessage() != null ? e.getMessage() : GENERIC_EXCEPTION_MSSG, e);
+        }
     }
 
     /**
@@ -142,24 +155,29 @@ public class QRScanningActivity extends AppCompatActivity {
      */
     private void handleScanResult(Result result) {
 
-        // Remove timeout if scanning is successful
-        timeoutHandler.removeCallbacks(timeoutRunnable);
+        try {
 
-        if (result != null) {
-            // Get the scanned data from the QR code
-            String scannedData = result.getText();
+            // Remove timeout if scanning is successful
+            timeoutHandler.removeCallbacks(timeoutRunnable);
 
-            Log.e("Scanned Data", "Data: " + scannedData);
+            if (result != null) {
+                // Get the scanned data from the QR code
+                String scannedData = result.getText();
 
-            // Create an intent to return the scanned data
-            Intent data = new Intent();
-            data.putExtra(SCANNED_AADHAAR, scannedData);
+                Log.e("Scanned Data", "Data: " + scannedData);
 
-            // Set the result and finish the activity
-            setResult(RESULT_OK, data);
-            finish(); // Close the activity after scanning
-        } else {
-            Toast.makeText(this, "No data scanned", Toast.LENGTH_SHORT).show();
+                // Create an intent to return the scanned data
+                Intent data = new Intent();
+                data.putExtra(SCANNED_AADHAAR, scannedData);
+
+                // Set the result and finish the activity
+                setResult(RESULT_OK, data);
+                finish(); // Close the activity after scanning
+            } else {
+                Toast.makeText(this, "No data scanned", Toast.LENGTH_SHORT).show();
+            }
+        } catch (Exception e){
+            Log.e(TAG, e.getMessage() != null ? e.getMessage() : GENERIC_EXCEPTION_MSSG, e);
         }
     }
 
@@ -210,24 +228,28 @@ public class QRScanningActivity extends AppCompatActivity {
      * Displays the remaining time on screen and resets when completed.
      */
     private void startCountDownTimer() {
-        countDownTimer = new CountDownTimer(TIMER_DURATION, 1000) { // Countdown interval of 1 second
-            @Override
-            public void onTick(long millisUntilFinished) {
-                // Update the timer text with the remaining seconds
-                timerTextView.setVisibility(View.VISIBLE);
-                int secondsRemaining = (int) (millisUntilFinished / 1000);
-                timerTextView.setText(String.valueOf(secondsRemaining));
-            }
+        try {
+            countDownTimer = new CountDownTimer(TIMER_DURATION, 1000) { // Countdown interval of 1 second
+                @Override
+                public void onTick(long millisUntilFinished) {
+                    // Update the timer text with the remaining seconds
+                    timerTextView.setVisibility(View.VISIBLE);
+                    int secondsRemaining = (int) (millisUntilFinished / 1000);
+                    timerTextView.setText(String.valueOf(secondsRemaining));
+                }
 
-            @Override
-            public void onFinish() {
-                // Timer has finished, you can handle timeout logic here if needed
-                timerTextView.setText(CONST_ZERO);
-            }
-        };
+                @Override
+                public void onFinish() {
+                    // Timer has finished, you can handle timeout logic here if needed
+                    timerTextView.setText(CONST_ZERO);
+                }
+            };
 
-        // Start the countdown timer
-        countDownTimer.start();
+            // Start the countdown timer
+            countDownTimer.start();
+        } catch (Exception e){
+            Log.e(TAG, e.getMessage() != null ? e.getMessage() : GENERIC_EXCEPTION_MSSG, e);
+        }
     }
 
     /**
@@ -237,23 +259,28 @@ public class QRScanningActivity extends AppCompatActivity {
     private void setupTorchToggle() {
         boolean hasFlash = getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA_FLASH);
 
-        if (hasFlash) {
-            torchToggle.setVisibility(View.VISIBLE);
-        } else {
-            torchToggle.setVisibility(View.GONE);
-            return;
-        }
+        try {
 
-        torchToggle.setOnClickListener(v -> {
-            if (isTorchOn) {
-                barcodeScannerView.setTorchOff();
-                torchToggle.setImageResource(R.drawable.ic_flashlight_off_24);
+            if (hasFlash) {
+                torchToggle.setVisibility(View.VISIBLE);
             } else {
-                barcodeScannerView.setTorchOn();
-                torchToggle.setImageResource(R.drawable.ic_flashlight_on_24);
+                torchToggle.setVisibility(View.GONE);
+                return;
             }
-            isTorchOn = !isTorchOn;
-        });
+
+            torchToggle.setOnClickListener(v -> {
+                if (isTorchOn) {
+                    barcodeScannerView.setTorchOff();
+                    torchToggle.setImageResource(R.drawable.ic_flashlight_off_24);
+                } else {
+                    barcodeScannerView.setTorchOn();
+                    torchToggle.setImageResource(R.drawable.ic_flashlight_on_24);
+                }
+                isTorchOn = !isTorchOn;
+            });
+        }catch (Exception e){
+            Log.e(TAG, e.getMessage() != null ? e.getMessage() : GENERIC_EXCEPTION_MSSG, e);
+        }
     }
 
 

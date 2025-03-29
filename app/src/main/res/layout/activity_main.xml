@@ -54,6 +54,17 @@
             </LinearLayout>
         </LinearLayout>
 
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/scan_mobile_number"
+            android:layout_width="160dp"
+            android:layout_height="wrap_content"
+            android:text="Scan Mobile Number"
+            android:background="@drawable/square_blue_background"
+            android:textColor="@android:color/white"
+            android:textAllCaps="false"
+            android:visibility="gone"
+            android:layout_margin="@dimen/_8dp"/>
+
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -93,5 +104,10 @@
             android:background="@drawable/square_blue_background"
             android:scaleType="fitXY" />
 
+
     </LinearLayout>
+
+
+
+
 </ScrollView>
