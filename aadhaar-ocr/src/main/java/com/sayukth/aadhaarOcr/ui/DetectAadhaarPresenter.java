@@ -82,6 +82,9 @@ public class DetectAadhaarPresenter implements DetectAadhaarContract.Presenter {
     private static final String PINCODE_REGEX = ".*\\b\\d{6}\\b.*";
     private static final String VID_PATTERN = ".*\\bVID:\\s*\\d{16}\\b.*";
     private static final String MOBILE_REGEX = "\\b[6789]\\d{9}\\b";
+    private static final String YEAR_1947 = "1947";
+    private static final String PINCODE_FORMAT = "\\b\\d{6}\\b";
+    private static final String IMAGE_TEXT = "IMAGETEXT";
 
     private static final String EXCLUSION_KEYWORD_REGEX_FOR_FATHER_OR_SPOUSE_NAME_EXTRACTION = ".*\\b(lock|unlock|aadhaar|security|obligated|entities|unique|Authority)\\b.*";
 
@@ -158,7 +161,7 @@ public class DetectAadhaarPresenter implements DetectAadhaarContract.Presenter {
                 TextBlock textBlock = textBlockSparseArray.get(textBlockSparseArray.keyAt(i));
                 String textValue = textBlock.getValue();
                 imageText = textValue;
-                Log.d("IMAGEtEXT", "Text Block: " + imageText);
+                Log.d(IMAGE_TEXT, "Text Block: " + imageText);
                 ocrImageText.append(textValue).append("\n");
                 Log.d("Language : ", imageText + " : " + textBlock.getLanguage());
                 stringBuilder.append("#").append(textValue).append("#\n");
@@ -290,7 +293,7 @@ public class DetectAadhaarPresenter implements DetectAadhaarContract.Presenter {
                 for (String line : lines) {
                     if (line.matches(PINCODE_REGEX) || line.matches(AADHAAR_REGEX) || line.matches(VID_PATTERN))
                         continue;
-                    if (line.contains("@") || line.contains("1947")) continue;
+                    if (line.contains("@") || line.contains(YEAR_1947)) continue;
                     if (line.matches(EXCLUSION_KEYWORD_REGEX_FOR_FATHER_OR_SPOUSE_NAME_EXTRACTION))
                         continue;
 
@@ -361,7 +364,7 @@ public class DetectAadhaarPresenter implements DetectAadhaarContract.Presenter {
                 String fsName = matcher.group(2).trim(); // Extract the name
 
                 // Remove any 6-digit PIN code from fsName
-                fsName = fsName.replaceAll("\\b\\d{6}\\b", "").trim();
+                fsName = fsName.replaceAll(PINCODE_FORMAT, "").trim();
 
                 fsName = fsName.replaceAll(",", "");
 

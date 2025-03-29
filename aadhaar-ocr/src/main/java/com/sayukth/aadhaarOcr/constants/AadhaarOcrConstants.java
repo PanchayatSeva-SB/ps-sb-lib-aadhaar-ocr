@@ -143,5 +143,34 @@ public class AadhaarOcrConstants {
 
     public static final String GENERIC_EXCEPTION_MSSG = "An unexpected error occurred";
 
+    public static final String HOUSE_NUMBER = "HOUSE_NUMBER";
+
+    public static final String STREET_NAME = "STREET_NAME";
+
+    public static final String LANDMARK = "LANDMARK";
+
+    public static final String VILLAGE_TOWN_CITY = "VILLAGE_TOWN_CITY";
+
+    public static final String POST_OFFICE = "POST_OFFICE";
+
+    public static final String DISTRICT = "DISTRICT";
+
+    public static final String POSTAL_CODE = "POSTAL_CODE";
+
+    public static final String STATE = "STATE";
+
+    public static final String LOCATION = "LOCATION";
+
+    public static final String PINCODE = "PINCODE";
+
+    public static final String QDB_FORMAT_TAG = "QDB";
+
+    public static final String QDA_FORMAT_TAG = "QDA";
+
+    public static final String QPDA_FORMAT_TAG = "QPDA";
+
+    public static final String QPDB_FORMAT_TAG = "QPDB";
+
+
 
 }

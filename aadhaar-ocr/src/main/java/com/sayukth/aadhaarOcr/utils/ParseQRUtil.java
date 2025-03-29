@@ -1,5 +1,25 @@
 package com.sayukth.aadhaarOcr.utils;
 
+import static com.sayukth.aadhaarOcr.constants.AadhaarOcrConstants.AADHAAR;
+import static com.sayukth.aadhaarOcr.constants.AadhaarOcrConstants.ADDRESS;
+import static com.sayukth.aadhaarOcr.constants.AadhaarOcrConstants.DATE_OF_YEAR;
+import static com.sayukth.aadhaarOcr.constants.AadhaarOcrConstants.DISTRICT;
+import static com.sayukth.aadhaarOcr.constants.AadhaarOcrConstants.FATHER;
+import static com.sayukth.aadhaarOcr.constants.AadhaarOcrConstants.GENDER;
+import static com.sayukth.aadhaarOcr.constants.AadhaarOcrConstants.HOUSE_NUMBER;
+import static com.sayukth.aadhaarOcr.constants.AadhaarOcrConstants.LANDMARK;
+import static com.sayukth.aadhaarOcr.constants.AadhaarOcrConstants.LOCATION;
+import static com.sayukth.aadhaarOcr.constants.AadhaarOcrConstants.NAME;
+import static com.sayukth.aadhaarOcr.constants.AadhaarOcrConstants.PINCODE;
+import static com.sayukth.aadhaarOcr.constants.AadhaarOcrConstants.POSTAL_CODE;
+import static com.sayukth.aadhaarOcr.constants.AadhaarOcrConstants.POST_OFFICE;
+import static com.sayukth.aadhaarOcr.constants.AadhaarOcrConstants.QDA_FORMAT_TAG;
+import static com.sayukth.aadhaarOcr.constants.AadhaarOcrConstants.QDB_FORMAT_TAG;
+import static com.sayukth.aadhaarOcr.constants.AadhaarOcrConstants.QPDA_FORMAT_TAG;
+import static com.sayukth.aadhaarOcr.constants.AadhaarOcrConstants.QPDB_FORMAT_TAG;
+import static com.sayukth.aadhaarOcr.constants.AadhaarOcrConstants.STATE;
+import static com.sayukth.aadhaarOcr.constants.AadhaarOcrConstants.STREET_NAME;
+import static com.sayukth.aadhaarOcr.constants.AadhaarOcrConstants.VILLAGE_TOWN_CITY;
 import static com.yalantis.ucrop.UCropFragment.TAG;
 
 import android.util.Log;
@@ -25,7 +45,27 @@ public class ParseQRUtil {
     public static final String V4 = "V4";
     private static final int TERMINATOR = 255;
 
+    private static final String XML_FORMAT = "<?xml";
+    private static final String XML_FORMAT_ALTERNATE = "<PrintLetterBarcodeData";
+    private static final String SIGNATURE_BIG_QR_QDB_FORMAT = "<QDB";
+    private static final String SIGNATURE_BIG_QR_QDA_FORMAT = "<QDA";
+    private static final String SIGNATURE_BIG_QR_QPDB_FORMAT = "<QPDB";
+    private static final String SIGNATURE_BIG_QR_QPDA_FORMAT = "<QPDA";
 
+
+
+    /**
+     * Parses scanned QR code data into a HashMap of key-value pairs.
+     *
+     * Depending on the format of the scanned result, this method will:
+     * - Parse as XML data if it's in XML format.
+     * - Parse as Secured Big QR format if it matches that structure.
+     * - Otherwise, parse as byte-encoded data.
+     *
+     * @param scannedResult The raw string data scanned from the QR code.
+     * @return A HashMap containing the parsed key-value data.
+     * @throws QrParsingException if any error occurs during parsing.
+     */
     public static HashMap<String, String> parseScannedData(String scannedResult) throws QrParsingException {
         try {
             if (isXmlFormat(scannedResult)) {
@@ -41,11 +81,11 @@ public class ParseQRUtil {
     }
 
     private static boolean isXmlFormat(String scannedResult) {
-        return scannedResult.trim().startsWith("<?xml") || scannedResult.trim().contains("<PrintLetterBarcodeData");
+        return scannedResult.trim().startsWith(XML_FORMAT) || scannedResult.trim().contains(XML_FORMAT_ALTERNATE);
     }
 
     private static boolean isSecuredBigQRFormat(String scannedResult) {
-        return scannedResult.trim().startsWith("<QPDB") || scannedResult.trim().startsWith("<QPDA") || scannedResult.trim().startsWith("<QDB") || scannedResult.trim().startsWith("<QDA");
+        return scannedResult.trim().startsWith(SIGNATURE_BIG_QR_QPDB_FORMAT) || scannedResult.trim().startsWith(SIGNATURE_BIG_QR_QPDA_FORMAT) || scannedResult.trim().startsWith(SIGNATURE_BIG_QR_QDB_FORMAT) || scannedResult.trim().startsWith(SIGNATURE_BIG_QR_QDA_FORMAT);
     }
 
 
@@ -54,21 +94,21 @@ public class ParseQRUtil {
         HashMap<String, String> resultData = new HashMap<>();
         try {
             HashMap<String, String> attributeKeyMapping = new HashMap<>();
-            attributeKeyMapping.put("uid", "AADHAR");
-            attributeKeyMapping.put("name", "NAME");
-            attributeKeyMapping.put("gender", "GENDER");
-            attributeKeyMapping.put("yob", "DATE_OF_YEAR");
-            attributeKeyMapping.put("co", "FATHER");
-            attributeKeyMapping.put("gname", "FATHER");
-            attributeKeyMapping.put("house", "HouseNumber");
-            attributeKeyMapping.put("street", "StreetName");
-            attributeKeyMapping.put("lm", "Landmark");
-            attributeKeyMapping.put("vtc", "VillageTownCity");
-            attributeKeyMapping.put("po", "PostOffice");
-            attributeKeyMapping.put("dist", "District");
-            attributeKeyMapping.put("state", "State");
-            attributeKeyMapping.put("pc", "PostalCode");
-            attributeKeyMapping.put("dob", "DATE_OF_BIRTH"); // Added DOB mapping
+            attributeKeyMapping.put("uid", AADHAAR);
+            attributeKeyMapping.put("name", NAME);
+            attributeKeyMapping.put("gender", GENDER);
+            attributeKeyMapping.put("yob", DATE_OF_YEAR);
+            attributeKeyMapping.put("co", FATHER);
+            attributeKeyMapping.put("gname", FATHER);
+            attributeKeyMapping.put("house", HOUSE_NUMBER);
+            attributeKeyMapping.put("street", STREET_NAME);
+            attributeKeyMapping.put("lm", LANDMARK);
+            attributeKeyMapping.put("vtc", VILLAGE_TOWN_CITY);
+            attributeKeyMapping.put("po", POST_OFFICE);
+            attributeKeyMapping.put("dist", DISTRICT);
+            attributeKeyMapping.put("state", STATE);
+            attributeKeyMapping.put("pc", POSTAL_CODE);
+            attributeKeyMapping.put("dob", DATE_OF_YEAR);
 
 
             // Clean the input XML
@@ -101,8 +141,8 @@ public class ParseQRUtil {
                 eventType = parser.next();
             }
 
-            if (resultData.containsKey("DATE_OF_YEAR")) {
-                resultData.put("DATE_OF_YEAR", DateUtils.getFormatedDate(resultData.get("DATE_OF_YEAR")));
+            if (resultData.containsKey(DATE_OF_YEAR)) {
+                resultData.put(DATE_OF_YEAR, DateUtils.getFormatedDate(resultData.get(DATE_OF_YEAR)));
             }
         } catch (Exception e) {
             throw new QrParsingException(e);
@@ -169,7 +209,7 @@ public class ParseQRUtil {
             }
 
 
-            resultData.put("DATE_OF_YEAR", DateUtils.getFormatedDate(resultData.get("DATE_OF_YEAR")));
+            resultData.put(DATE_OF_YEAR, DateUtils.getFormatedDate(resultData.get(DATE_OF_YEAR)));
         } catch (Exception e) {
             Log.i(TAG, "date format exception" + e);
             throw new QrParsingException(e);
@@ -184,43 +224,43 @@ public class ParseQRUtil {
             int count;
 
             count = getNextValue(bin, result);
-            resultData.put("NAME", new String(result, 0, count, java.nio.charset.StandardCharsets.ISO_8859_1).trim());
+            resultData.put(NAME, new String(result, 0, count, java.nio.charset.StandardCharsets.ISO_8859_1).trim());
 
             count = getNextValue(bin, result);
-            resultData.put("DATE_OF_YEAR", new String(result, 0, count, java.nio.charset.StandardCharsets.ISO_8859_1).trim());
+            resultData.put(DATE_OF_YEAR, new String(result, 0, count, java.nio.charset.StandardCharsets.ISO_8859_1).trim());
 
             count = getNextValue(bin, result);
-            resultData.put("GENDER", new String(result, 0, count, java.nio.charset.StandardCharsets.ISO_8859_1).trim());
+            resultData.put(GENDER, new String(result, 0, count, java.nio.charset.StandardCharsets.ISO_8859_1).trim());
 
             count = getNextValue(bin, result);
-            resultData.put("FATHER", new String(result, 0, count, java.nio.charset.StandardCharsets.ISO_8859_1).trim());
+            resultData.put(FATHER, new String(result, 0, count, java.nio.charset.StandardCharsets.ISO_8859_1).trim());
 
             count = getNextValue(bin, result);
-            resultData.put("District", new String(result, 0, count, java.nio.charset.StandardCharsets.ISO_8859_1).trim());
+            resultData.put(DISTRICT, new String(result, 0, count, java.nio.charset.StandardCharsets.ISO_8859_1).trim());
 
             count = getNextValue(bin, result);
-            resultData.put("Landmark", new String(result, 0, count, java.nio.charset.StandardCharsets.ISO_8859_1).trim());
+            resultData.put(LANDMARK, new String(result, 0, count, java.nio.charset.StandardCharsets.ISO_8859_1).trim());
 
             count = getNextValue(bin, result);
-            resultData.put("House", new String(result, 0, count, java.nio.charset.StandardCharsets.ISO_8859_1).trim());
+            resultData.put(HOUSE_NUMBER, new String(result, 0, count, java.nio.charset.StandardCharsets.ISO_8859_1).trim());
 
             count = getNextValue(bin, result);
-            resultData.put("Location", new String(result, 0, count, java.nio.charset.StandardCharsets.ISO_8859_1).trim());
+            resultData.put(LOCATION, new String(result, 0, count, java.nio.charset.StandardCharsets.ISO_8859_1).trim());
 
             count = getNextValue(bin, result);
-            resultData.put("Pin Code", new String(result, 0, count, java.nio.charset.StandardCharsets.ISO_8859_1).trim());
+            resultData.put(PINCODE, new String(result, 0, count, java.nio.charset.StandardCharsets.ISO_8859_1).trim());
 
             count = getNextValue(bin, result);
-            resultData.put("Post Office", new String(result, 0, count, java.nio.charset.StandardCharsets.ISO_8859_1).trim());
+            resultData.put(POST_OFFICE, new String(result, 0, count, java.nio.charset.StandardCharsets.ISO_8859_1).trim());
 
             count = getNextValue(bin, result);
-            resultData.put("State", new String(result, 0, count, java.nio.charset.StandardCharsets.ISO_8859_1).trim());
+            resultData.put(STATE, new String(result, 0, count, java.nio.charset.StandardCharsets.ISO_8859_1).trim());
 
             count = getNextValue(bin, result);
-            resultData.put("Street", new String(result, 0, count, java.nio.charset.StandardCharsets.ISO_8859_1).trim());
+            resultData.put(STREET_NAME, new String(result, 0, count, java.nio.charset.StandardCharsets.ISO_8859_1).trim());
 
             count = getNextValue(bin, result);
-            resultData.put("VTC", new String(result, 0, count, java.nio.charset.StandardCharsets.ISO_8859_1).trim());
+            resultData.put(VILLAGE_TOWN_CITY, new String(result, 0, count, java.nio.charset.StandardCharsets.ISO_8859_1).trim());
         } catch (Exception e) {
             throw new QrParsingException(e);
         }
@@ -254,10 +294,10 @@ public class ParseQRUtil {
 
         try {
         HashMap<String, String> attributeKeyMapping = new HashMap<>();
-        attributeKeyMapping.put("n", "NAME");   // Name
-        attributeKeyMapping.put("g", "GENDER"); // Gender
-        attributeKeyMapping.put("d", "DATE_OF_YEAR"); // Date of Birth
-        attributeKeyMapping.put("a", "ADDRESS"); // Address
+        attributeKeyMapping.put("n", NAME);   // Name
+        attributeKeyMapping.put("g", GENDER); // Gender
+        attributeKeyMapping.put("d", DATE_OF_YEAR); // Date of Birth
+        attributeKeyMapping.put("a", ADDRESS); // Address
 
 
             // Clean the input XML
@@ -270,7 +310,7 @@ public class ParseQRUtil {
             int eventType = parser.getEventType();
             while (eventType != XmlPullParser.END_DOCUMENT) {
                 String tagName = parser.getName();
-                if (eventType == XmlPullParser.START_TAG && ("QPDB".equals(tagName) || "QDA".equals(tagName) || "QPDA".equals(tagName) || "QDB".equals(tagName))) {
+                if (eventType == XmlPullParser.START_TAG && (QPDB_FORMAT_TAG.equals(tagName) || QDA_FORMAT_TAG.equals(tagName) || QPDA_FORMAT_TAG.equals(tagName) || QDB_FORMAT_TAG.equals(tagName))) {
                     for (int i = 0; i < parser.getAttributeCount(); i++) {
                         String attributeName = parser.getAttributeName(i);
                         String attributeValue = parser.getAttributeValue(i);

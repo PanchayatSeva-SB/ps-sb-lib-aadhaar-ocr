@@ -59,6 +59,10 @@ public class MainActivity extends AppCompatActivity implements DetectAadhaarCont
     private static final String XML_FORMAT_ALTERNATE = "<PrintLetterBarcodeData";
     private static final String AADHAAR_REGEX = "^[2-9]{1}[0-9]{3}\\s[0-9]{4}\\s[0-9]{4}$";
     private static final String MOBILE_REGEX = "\\b[6789]\\d{9}\\b";
+    private static final String QPDA_FORMAT = "<QPDA";
+    private static final String QPDB_FORMAT = "<QPDB";
+    private static final String QDB_FORMAT ="<QDB";
+    private static final String QDA_FORMAT = "<QDA";
 
 
     boolean isBigQROCR = false;
@@ -92,7 +96,7 @@ public class MainActivity extends AppCompatActivity implements DetectAadhaarCont
             });
 
             scanMobileNumber.setOnClickListener(v -> {
-                AadhaarOcrPreferences.getInstance().put(AadhaarOcrPreferences.Key.IS_MOBILE_NUMBER_CAPTURE, true);
+                AadhaarOcrPreferences.getInstance().put(AadhaarOcrPreferences.Key.IS_MOBILE_NUMBER_CAPTURED, true);
                 Intent intent = new Intent(MainActivity.this, CustomCameraLaunchActivity.class);
                 intent.putExtra(getString(R.string.scan_type), "Mobile Number");
                 startActivityForResult(intent, AADHAAR_REQUEST_IMAGE);
@@ -255,9 +259,9 @@ public class MainActivity extends AppCompatActivity implements DetectAadhaarCont
                     presenter.handleQrCodeScan(scannedAadhaar);
 
                     // Check the format and decide next action
-                    if (!scannedAadhaar.startsWith(XML_FORMAT) && !scannedAadhaar.contains(XML_FORMAT_ALTERNATE) && !scannedAadhaar.trim().startsWith("<QPDB") && !scannedAadhaar.trim().startsWith("<QPDA") && !scannedAadhaar.trim().startsWith("QDB") && !scannedAadhaar.trim().startsWith("<QDA")) {
+                    if (!scannedAadhaar.startsWith(XML_FORMAT) && !scannedAadhaar.contains(XML_FORMAT_ALTERNATE) && !scannedAadhaar.trim().startsWith(QPDB_FORMAT) && !scannedAadhaar.trim().startsWith(QPDA_FORMAT) && !scannedAadhaar.trim().startsWith(QDB_FORMAT) && !scannedAadhaar.trim().startsWith(QDA_FORMAT)) {
                         launchCameraForBigQROCRCapture();
-                    } else if (scannedAadhaar.trim().startsWith("<QPDB") || scannedAadhaar.trim().startsWith("<QPDA") || scannedAadhaar.trim().startsWith("QDB") || scannedAadhaar.trim().startsWith("<QDA")) {
+                    } else if (scannedAadhaar.trim().startsWith(QPDB_FORMAT) || scannedAadhaar.trim().startsWith(QPDA_FORMAT) || scannedAadhaar.trim().startsWith(QDB_FORMAT) || scannedAadhaar.trim().startsWith(QDA_FORMAT)) {
                         AadhaarOcrPreferences.getInstance().put(IS_SIGNATURE_DATA_BIG_QR_OCR, true);
                         launchCameraForBackSideCapture();
                     }
@@ -294,8 +298,8 @@ public class MainActivity extends AppCompatActivity implements DetectAadhaarCont
                         isBigQROCR = true;
                         showToast(R.string.capture_complete);
                     }
-                } else if (AadhaarOcrPreferences.getInstance().getBoolean(AadhaarOcrPreferences.Key.IS_MOBILE_NUMBER_CAPTURE)) {
-                    AadhaarOcrPreferences.getInstance().put(AadhaarOcrPreferences.Key.IS_MOBILE_NUMBER_CAPTURE, false);
+                } else if (AadhaarOcrPreferences.getInstance().getBoolean(AadhaarOcrPreferences.Key.IS_MOBILE_NUMBER_CAPTURED)) {
+                    AadhaarOcrPreferences.getInstance().put(AadhaarOcrPreferences.Key.IS_MOBILE_NUMBER_CAPTURED, false);
                     if (containsMobileNumber(imageText)) {
                         showToast(R.string.mobile_number_captured);
                         isMObileNumberCapture = true;

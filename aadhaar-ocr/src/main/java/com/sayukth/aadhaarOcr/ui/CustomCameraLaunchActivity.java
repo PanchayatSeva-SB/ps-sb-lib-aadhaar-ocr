@@ -45,7 +45,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 
-
 public class CustomCameraLaunchActivity extends AppCompatActivity {
 
     private PreviewView cameraPreview;
@@ -65,6 +64,10 @@ public class CustomCameraLaunchActivity extends AppCompatActivity {
     TextView textViewBigQR;
 
     private static final String JPG = ".jpg";
+
+    private static final String CAMERA = "camera";
+
+    private static final String PHOTO = "photo-";
 
 
     @Override
@@ -202,14 +205,14 @@ public class CustomCameraLaunchActivity extends AppCompatActivity {
 
             // Set up photo capture
             capturePhotoButton.setOnClickListener(v -> capturePhoto());
-        }catch (Exception e){
+        } catch (Exception e) {
             Log.e(TAG, e.getMessage() != null ? e.getMessage() : GENERIC_EXCEPTION_MSSG, e);
         }
 
     }
 
 
-//    Starts the Camera for capture
+    //    Starts the Camera for capture
     private void startCamera() {
         ListenableFuture<ProcessCameraProvider> cameraProviderFuture =
                 ProcessCameraProvider.getInstance(this);
@@ -242,11 +245,11 @@ public class CustomCameraLaunchActivity extends AppCompatActivity {
                     camera.getCameraControl().setZoomRatio(zoomRatio);
 
                 } catch (Exception e) {
-                    Toast.makeText(this, "Failed to start camera: " + e.getMessage(),
+                    Toast.makeText(this,  getString(R.string.failed_to_start_camera)+ e.getMessage(),
                             Toast.LENGTH_SHORT).show();
                 }
             }, ContextCompat.getMainExecutor(this));
-        } catch (Exception e){
+        } catch (Exception e) {
             Log.e(TAG, e.getMessage() != null ? e.getMessage() : GENERIC_EXCEPTION_MSSG, e);
         }
     }
@@ -266,13 +269,13 @@ public class CustomCameraLaunchActivity extends AppCompatActivity {
             });
 
             // Get the cache directory and create the 'camera' subfolder if it doesn't exist
-            File cacheDir = new File(getCacheDir(), "camera");
+            File cacheDir = new File(getCacheDir(), CAMERA);
             if (!cacheDir.exists() && !cacheDir.mkdirs()) {
                 return;
             }
 
             // Create a unique file name for the photo
-            File photoFile = new File(cacheDir, "photo-" + System.currentTimeMillis() + JPG);
+            File photoFile = new File(cacheDir, PHOTO + System.currentTimeMillis() + JPG);
 
             ImageCapture.OutputFileOptions outputFileOptions =
                     new ImageCapture.OutputFileOptions.Builder(photoFile).build();
@@ -293,11 +296,11 @@ public class CustomCameraLaunchActivity extends AppCompatActivity {
                         @Override
                         public void onError(@NonNull ImageCaptureException exception) {
                             runOnUiThread(() -> Toast.makeText(CustomCameraLaunchActivity.this,
-                                    "Photo capture failed: " + exception.getMessage(),
+                                     getString(R.string.photo_catured_failed) + exception.getMessage(),
                                     Toast.LENGTH_SHORT).show());
                         }
                     });
-        } catch (Exception e){
+        } catch (Exception e) {
             Log.e(TAG, e.getMessage() != null ? e.getMessage() : GENERIC_EXCEPTION_MSSG, e);
 
         }
@@ -353,8 +356,6 @@ public class CustomCameraLaunchActivity extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
-
-
 
 
 }
