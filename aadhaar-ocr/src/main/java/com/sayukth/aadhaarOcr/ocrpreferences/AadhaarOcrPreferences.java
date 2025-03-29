@@ -7,7 +7,6 @@ import com.sayukth.aadhaarOcr.AadhaarOcrLibraryApplication;
 
 
 public class AadhaarOcrPreferences {
-    //    public static final int CAMERA_REQUEST = 999;
     private static final String SETTINGS_NAME = "aadhaar_ocr_settings";
     private static AadhaarOcrPreferences sSharedPrefs;
     private SharedPreferences mPref;

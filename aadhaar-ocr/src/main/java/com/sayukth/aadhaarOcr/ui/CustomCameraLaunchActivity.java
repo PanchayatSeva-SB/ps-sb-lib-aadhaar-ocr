@@ -203,6 +203,41 @@ public class CustomCameraLaunchActivity extends AppCompatActivity {
                 }, 3000);
             }
 
+            if (AadhaarOcrPreferences.getInstance().getBoolean(AadhaarOcrPreferences.Key.IS_SIGNATURE_DATA_BIG_QR_OCR)) {
+                // Show the flip GIF
+                gifImageView.setVisibility(View.VISIBLE);
+                flipTextView.setVisibility(View.VISIBLE);
+                cameraPreview.setVisibility(View.GONE);
+                capturePhotoButton.setVisibility(View.GONE);
+                frontBackGif.setVisibility(View.GONE);
+                overlay.setVisibility(View.GONE);
+                ocrTextView.setVisibility(View.GONE);
+                distanceImage.setVisibility(View.GONE);
+
+                //             Load GIF using Glide
+                Glide.with(this).asGif().load(R.drawable.aadhar_back).into(gifImageView);
+                flipTextView.setText("Big QR Code Scanned. Please Capture the Back Side Of the Aadhaar Card");
+
+
+                // Delay for 2 seconds, then show camera preview
+                new Handler(Looper.getMainLooper()).postDelayed(() -> {
+                    gifImageView.setVisibility(View.GONE);
+                    flipTextView.setVisibility(View.GONE);
+
+                    // Re-initialize the camera view
+                    startCamera();
+
+                    textViewBigQR.setVisibility(View.GONE);
+                    cameraPreview.setVisibility(View.VISIBLE);
+                    capturePhotoButton.setVisibility(View.VISIBLE);
+                    frontBackGif.setVisibility(View.VISIBLE);
+                    overlay.setVisibility(View.VISIBLE);
+                    ocrTextView.setVisibility(View.VISIBLE);
+                    distanceImage.setVisibility(View.VISIBLE);
+
+                }, 3000);
+            }
+
             // Set up photo capture
             capturePhotoButton.setOnClickListener(v -> capturePhoto());
         } catch (Exception e) {

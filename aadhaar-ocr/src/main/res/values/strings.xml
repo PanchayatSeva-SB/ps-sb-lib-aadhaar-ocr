@@ -30,6 +30,7 @@
     <string name="transgender">Transgender</string>
     <string name="failed_to_start_camera">Failed to start camera: </string>
     <string name="photo_catured_failed">Photo capture failed: </string>
+    <string name="signature_data_big_qr_ocr">Signature Data Big QR OCR</string>
 
 
 </resources>
