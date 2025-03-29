@@ -79,143 +79,158 @@ public class CustomCameraLaunchActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         try {
+            initializeViews();
+            initializeCameraExecutor();
+            handlePermissions();
+            handleScanType();
+            handleFlipGif();
+            handleBigQrOcr();
+            handleSignatureDataBigQrOcr();
 
-            // Initialize views
-            cameraPreview = findViewById(R.id.camera_preview);
-            capturePhotoButton = findViewById(R.id.capture_photo);
-            frontBackGif = findViewById(com.sayukth.aadhaarOcr.R.id.front_back_gif);
-            ocrTextView = findViewById(com.sayukth.aadhaarOcr.R.id.ocr_text);
-            progressBar = findViewById(R.id.progressBar);
-            gifImageView = findViewById(R.id.gifImageView);
-            overlay = findViewById(R.id.overlay);
-            flipTextView = findViewById(R.id.flip_text);
-            distanceImage = findViewById(R.id.distance_image);
-            textViewBigQR = findViewById(R.id.textViewBigQR);
-
-            // Initialize camera executor
-            cameraExecutor = Executors.newSingleThreadExecutor();
-
-            // Request camera permissions
-            if (allPermissionsGranted()) {
-                startCamera();
-            } else {
-                ActivityCompat.requestPermissions(this,
-                        new String[]{Manifest.permission.CAMERA}, 101);
-            }
-
-
-            // Retrieve the scan type from the intent
-            String scanType = getIntent().getStringExtra(getString(R.string.scan_type));
-
-            if (getString(R.string.front_side).equals(scanType)) {
-
-                // Load GIF using Glide
-                Glide.with(this)
-                        .asGif()
-                        .load(R.drawable.aadhar_front_scan)
-                        .into(frontBackGif);
-
-            } else if (getString(R.string.back_side).equals(scanType)) {
-
-                // Load GIF using Glide
-                Glide.with(this)
-                        .asGif()
-                        .load(R.drawable.aadhar_back)
-                        .into(frontBackGif);
-
-                ocrTextView.setText(getString(R.string.back_side_focus_request));
-            } else if (getString(R.string.big_qr_ocr).equals(scanType)) {
-                // Load GIF using Glide
-                Glide.with(this)
-                        .asGif()
-                        .load(R.drawable.aadhar_num_scan)
-                        .into(frontBackGif);
-                ocrTextView.setText(getString(R.string.aadhaar_number_focus_request));
-            }
-
-            if (AadhaarOcrPreferences.getInstance().getBoolean(AadhaarOcrPreferences.Key.IS_FLIP_GIF_SHOW)) {
-                AadhaarOcrPreferences.getInstance().put(AadhaarOcrPreferences.Key.IS_FLIP_GIF_SHOW, false);
-
-                // Show the flip GIF
-                gifImageView.setVisibility(View.VISIBLE);
-                flipTextView.setVisibility(View.VISIBLE);
-                cameraPreview.setVisibility(View.GONE);
-                capturePhotoButton.setVisibility(View.GONE);
-                frontBackGif.setVisibility(View.GONE);
-                overlay.setVisibility(View.GONE);
-                ocrTextView.setVisibility(View.GONE);
-                distanceImage.setVisibility(View.GONE);
-
-
-                // Load GIF using Glide
-                Glide.with(this).asGif().load(R.drawable.fip_aadhar_1).into(gifImageView);
-
-                // Delay for 2 seconds, then show camera preview
-                new Handler(Looper.getMainLooper()).postDelayed(() -> {
-                    gifImageView.setVisibility(View.GONE);
-                    flipTextView.setVisibility(View.GONE);
-
-                    // Re-initialize the camera view
-                    startCamera();
-
-                    cameraPreview.setVisibility(View.VISIBLE);
-                    capturePhotoButton.setVisibility(View.VISIBLE);
-                    frontBackGif.setVisibility(View.VISIBLE);
-                    overlay.setVisibility(View.VISIBLE);
-                    ocrTextView.setVisibility(View.VISIBLE);
-                    distanceImage.setVisibility(View.VISIBLE);
-
-                }, 3000); // 2000ms = 2 seconds
-            }
-
-            if (AadhaarOcrPreferences.getInstance().getBoolean(AadhaarOcrPreferences.Key.IS_BIG_QR_OCR)) {
-                // Show the flip GIF
-                gifImageView.setVisibility(View.VISIBLE);
-                flipTextView.setVisibility(View.VISIBLE);
-                cameraPreview.setVisibility(View.GONE);
-                capturePhotoButton.setVisibility(View.GONE);
-                frontBackGif.setVisibility(View.GONE);
-                overlay.setVisibility(View.GONE);
-                ocrTextView.setVisibility(View.GONE);
-                distanceImage.setVisibility(View.GONE);
-
-                //             Load GIF using Glide
-                Glide.with(this).asGif().load(R.drawable.aadhar_num_scan).into(gifImageView);
-                flipTextView.setText("Big QR Code Scanned. Please Capture the Photo of the Aadhaar Number");
-
-
-                // Delay for 2 seconds, then show camera preview
-                new Handler(Looper.getMainLooper()).postDelayed(() -> {
-                    gifImageView.setVisibility(View.GONE);
-                    flipTextView.setVisibility(View.GONE);
-
-                    // Re-initialize the camera view
-                    startCamera();
-
-                    textViewBigQR.setVisibility(View.GONE);
-                    cameraPreview.setVisibility(View.VISIBLE);
-                    capturePhotoButton.setVisibility(View.VISIBLE);
-                    frontBackGif.setVisibility(View.VISIBLE);
-                    overlay.setVisibility(View.VISIBLE);
-                    ocrTextView.setVisibility(View.VISIBLE);
-                    distanceImage.setVisibility(View.VISIBLE);
-
-                }, 3000);
-            }
-
-            // Set up photo capture
             capturePhotoButton.setOnClickListener(v -> capturePhoto());
         } catch (Exception e) {
             Log.e(TAG, e.getMessage() != null ? e.getMessage() : GENERIC_EXCEPTION_MSSG, e);
         }
+    }
 
+    /**
+     * Initializes all the views used in the activity.
+     */
+    private void initializeViews() {
+        cameraPreview = findViewById(R.id.camera_preview);
+        capturePhotoButton = findViewById(R.id.capture_photo);
+        frontBackGif = findViewById(com.sayukth.aadhaarOcr.R.id.front_back_gif);
+        ocrTextView = findViewById(com.sayukth.aadhaarOcr.R.id.ocr_text);
+        progressBar = findViewById(R.id.progressBar);
+        gifImageView = findViewById(R.id.gifImageView);
+        overlay = findViewById(R.id.overlay);
+        flipTextView = findViewById(R.id.flip_text);
+        distanceImage = findViewById(R.id.distance_image);
+        textViewBigQR = findViewById(R.id.textViewBigQR);
+    }
+
+    /**
+     * Initializes the camera executor to handle camera-related tasks in a separate thread.
+     */
+    private void initializeCameraExecutor() {
+        cameraExecutor = Executors.newSingleThreadExecutor();
+    }
+
+    /**
+     * Checks for camera permissions and requests them if not granted.
+     * If permissions are already granted, the camera is started.
+     */
+    private void handlePermissions() {
+        if (allPermissionsGranted()) {
+            startCamera();
+        } else {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, 101);
+        }
+    }
+
+    /**
+     * Handles the scan type received from the intent and updates the UI accordingly.
+     */
+    private void handleScanType() {
+        String scanType = getIntent().getStringExtra(getString(R.string.scan_type));
+
+        if (getString(R.string.front_side).equals(scanType)) {
+            Glide.with(this).asGif().load(R.drawable.aadhar_front_scan).into(frontBackGif);
+        } else if (getString(R.string.back_side).equals(scanType)) {
+            Glide.with(this).asGif().load(R.drawable.aadhar_back).into(frontBackGif);
+            ocrTextView.setText(getString(R.string.back_side_focus_request));
+        } else if (getString(R.string.big_qr_ocr).equals(scanType)) {
+            Glide.with(this).asGif().load(R.drawable.aadhar_num_scan).into(frontBackGif);
+            ocrTextView.setText(getString(R.string.aadhaar_number_focus_request));
+        }
+    }
+
+    /**
+     * Handles the case where the flip GIF should be displayed before scanning.
+     * Temporarily hides other UI components and displays the GIF.
+     */
+    private void handleFlipGif() {
+        if (AadhaarOcrPreferences.getInstance().getBoolean(AadhaarOcrPreferences.Key.IS_FLIP_GIF_SHOW)) {
+            AadhaarOcrPreferences.getInstance().put(AadhaarOcrPreferences.Key.IS_FLIP_GIF_SHOW, false);
+
+            toggleViewsForGif();
+            Glide.with(this).asGif().load(R.drawable.fip_aadhar_1).into(gifImageView);
+
+            new Handler(Looper.getMainLooper()).postDelayed(() -> {
+                resetViewsAfterGif();
+                startCamera();
+            }, 3000);
+        }
+    }
+
+    /**
+     * Handles the case where a big QR OCR process has been detected.
+     * Displays a loading GIF and message before allowing the user to capture the Aadhaar number.
+     */
+    private void handleBigQrOcr() {
+        if (AadhaarOcrPreferences.getInstance().getBoolean(AadhaarOcrPreferences.Key.IS_BIG_QR_OCR)) {
+            toggleViewsForGif();
+            Glide.with(this).asGif().load(R.drawable.aadhar_num_scan).into(gifImageView);
+            flipTextView.setText(getString(R.string.big_qr_ocr_capture_text));
+
+            new Handler(Looper.getMainLooper()).postDelayed(() -> {
+                resetViewsAfterGif();
+                textViewBigQR.setVisibility(View.GONE);
+                startCamera();
+            }, 3000);
+        }
+    }
+
+    /**
+     * Handles the case where a signature QR code has been detected.
+     * Displays a loading GIF and message before allowing the user to proceed.
+     */
+    private void handleSignatureDataBigQrOcr() {
+        if (AadhaarOcrPreferences.getInstance().getBoolean(AadhaarOcrPreferences.Key.IS_SIGNATURE_DATA_BIG_QR_OCR)) {
+            toggleViewsForGif();
+            Glide.with(this).asGif().load(R.drawable.aadhar_back).into(gifImageView);
+            flipTextView.setText(getString(R.string.signature_qr_data_captured));
+
+            new Handler(Looper.getMainLooper()).postDelayed(() -> {
+                resetViewsAfterGif();
+                textViewBigQR.setVisibility(View.GONE);
+                startCamera();
+            }, 3000);
+        }
+    }
+
+    /**
+     * Hides all UI elements except for the GIF and flip text view when displaying a loading animation.
+     */
+    private void toggleViewsForGif() {
+        gifImageView.setVisibility(View.VISIBLE);
+        flipTextView.setVisibility(View.VISIBLE);
+        cameraPreview.setVisibility(View.GONE);
+        capturePhotoButton.setVisibility(View.GONE);
+        frontBackGif.setVisibility(View.GONE);
+        overlay.setVisibility(View.GONE);
+        ocrTextView.setVisibility(View.GONE);
+        distanceImage.setVisibility(View.GONE);
+    }
+
+    /**
+     * Restores the UI elements after the GIF has finished playing.
+     */
+    private void resetViewsAfterGif() {
+        gifImageView.setVisibility(View.GONE);
+        flipTextView.setVisibility(View.GONE);
+        cameraPreview.setVisibility(View.VISIBLE);
+        capturePhotoButton.setVisibility(View.VISIBLE);
+        frontBackGif.setVisibility(View.VISIBLE);
+        overlay.setVisibility(View.VISIBLE);
+        ocrTextView.setVisibility(View.VISIBLE);
+        distanceImage.setVisibility(View.VISIBLE);
     }
 
 
     //    Starts the Camera for capture
     private void startCamera() {
-        ListenableFuture<ProcessCameraProvider> cameraProviderFuture =
-                ProcessCameraProvider.getInstance(this);
+        ListenableFuture<ProcessCameraProvider> cameraProviderFuture = ProcessCameraProvider.getInstance(this);
 
         try {
 
@@ -237,16 +252,14 @@ public class CustomCameraLaunchActivity extends AppCompatActivity {
                     CameraSelector cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA;
 
                     // Bind to lifecycle
-                    camera = cameraProvider.bindToLifecycle(
-                            this, cameraSelector, preview, imageCapture);
+                    camera = cameraProvider.bindToLifecycle(this, cameraSelector, preview, imageCapture);
 
                     // Set initial zoom level (e.g., 2x zoom)
                     float zoomRatio = 2.0f; // Adjust as needed
                     camera.getCameraControl().setZoomRatio(zoomRatio);
 
                 } catch (Exception e) {
-                    Toast.makeText(this,  getString(R.string.failed_to_start_camera)+ e.getMessage(),
-                            Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, getString(R.string.failed_to_start_camera) + e.getMessage(), Toast.LENGTH_SHORT).show();
                 }
             }, ContextCompat.getMainExecutor(this));
         } catch (Exception e) {
@@ -277,29 +290,25 @@ public class CustomCameraLaunchActivity extends AppCompatActivity {
             // Create a unique file name for the photo
             File photoFile = new File(cacheDir, PHOTO + System.currentTimeMillis() + JPG);
 
-            ImageCapture.OutputFileOptions outputFileOptions =
-                    new ImageCapture.OutputFileOptions.Builder(photoFile).build();
+            ImageCapture.OutputFileOptions outputFileOptions = new ImageCapture.OutputFileOptions.Builder(photoFile).build();
 
             // Capture the photo and save it in the 'camera' folder
-            imageCapture.takePicture(outputFileOptions, cameraExecutor,
-                    new ImageCapture.OnImageSavedCallback() {
-                        @Override
-                        public void onImageSaved(@NonNull ImageCapture.OutputFileResults outputFileResults) {
-                            runOnUiThread(() -> {
-                                Intent resultIntent = new Intent();
-                                resultIntent.putExtra(getString(R.string.path), photoFile.getAbsolutePath());
-                                setResult(RESULT_OK, resultIntent);
-                                finish();
-                            });
-                        }
-
-                        @Override
-                        public void onError(@NonNull ImageCaptureException exception) {
-                            runOnUiThread(() -> Toast.makeText(CustomCameraLaunchActivity.this,
-                                     getString(R.string.photo_catured_failed) + exception.getMessage(),
-                                    Toast.LENGTH_SHORT).show());
-                        }
+            imageCapture.takePicture(outputFileOptions, cameraExecutor, new ImageCapture.OnImageSavedCallback() {
+                @Override
+                public void onImageSaved(@NonNull ImageCapture.OutputFileResults outputFileResults) {
+                    runOnUiThread(() -> {
+                        Intent resultIntent = new Intent();
+                        resultIntent.putExtra(getString(R.string.path), photoFile.getAbsolutePath());
+                        setResult(RESULT_OK, resultIntent);
+                        finish();
                     });
+                }
+
+                @Override
+                public void onError(@NonNull ImageCaptureException exception) {
+                    runOnUiThread(() -> Toast.makeText(CustomCameraLaunchActivity.this, getString(R.string.photo_catured_failed) + exception.getMessage(), Toast.LENGTH_SHORT).show());
+                }
+            });
         } catch (Exception e) {
             Log.e(TAG, e.getMessage() != null ? e.getMessage() : GENERIC_EXCEPTION_MSSG, e);
 
@@ -308,8 +317,7 @@ public class CustomCameraLaunchActivity extends AppCompatActivity {
 
 
     private boolean allPermissionsGranted() {
-        return ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
-                == PackageManager.PERMISSION_GRANTED;
+        return ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED;
     }
 
     @Override
@@ -321,11 +329,9 @@ public class CustomCameraLaunchActivity extends AppCompatActivity {
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
-                                           @NonNull int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == 101 && grantResults.length > 0 &&
-                grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+        if (requestCode == 101 && grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
             startCamera();
         } else {
             Toast.makeText(this, "Camera permission denied", Toast.LENGTH_SHORT).show();

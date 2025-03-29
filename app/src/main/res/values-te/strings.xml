@@ -31,5 +31,7 @@
     <string name="front_side">Front side</string>
     <string name="back_side">Back side</string>
     <string name="big_qr_ocr">Big QR OCR</string>
+    <string name="signature_data_big_qr_ocr">Signature Data Big QR OCR</string>
+
 
 </resources>
