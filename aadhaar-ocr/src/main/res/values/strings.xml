@@ -31,6 +31,7 @@
     <string name="failed_to_start_camera">Failed to start camera: </string>
     <string name="photo_catured_failed">Photo capture failed: </string>
     <string name="signature_data_big_qr_ocr">Signature Data Big QR OCR</string>
+    <string name="signature_qr_data_captured">Big QR Code Scanned. Please Capture the Back Side Of the Aadhaar Card</string>
 
 
 </resources>

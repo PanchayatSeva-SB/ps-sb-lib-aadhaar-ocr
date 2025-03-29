@@ -214,7 +214,7 @@ public class CustomCameraLaunchActivity extends AppCompatActivity {
                 ocrTextView.setVisibility(View.GONE);
                 distanceImage.setVisibility(View.GONE);
 
-                //             Load GIF using Glide
+                //Load GIF using Glide
                 Glide.with(this).asGif().load(R.drawable.aadhar_back).into(gifImageView);
                 flipTextView.setText("Big QR Code Scanned. Please Capture the Back Side Of the Aadhaar Card");
 
