@@ -216,7 +216,7 @@ public class CustomCameraLaunchActivity extends AppCompatActivity {
 
                 //Load GIF using Glide
                 Glide.with(this).asGif().load(R.drawable.aadhar_back).into(gifImageView);
-                flipTextView.setText("Big QR Code Scanned. Please Capture the Back Side Of the Aadhaar Card");
+                flipTextView.setText(getString(R.string.signature_qr_data_captured));
 
 
                 // Delay for 2 seconds, then show camera preview
