@@ -91,6 +91,7 @@ public class DetectAadhaarPresenter implements DetectAadhaarContract.Presenter {
     private static final String YEAR_1947 = "1947";
     private static final String PINCODE_FORMAT = "\\b\\d{6}\\b";
     private static final String IMAGE_TEXT = "IMAGETEXT";
+    private static final String SPECIAL_CHARCTERS_MATCHING_REGEX = "[^a-zA-Z\\s]";
 
     private static final String EXCLUSION_KEYWORD_REGEX_FOR_FATHER_OR_SPOUSE_NAME_EXTRACTION = ".*\\b(lock|unlock|aadhaar|security|obligated|entities|unique|Authority)\\b.*";
 
@@ -791,7 +792,7 @@ public class DetectAadhaarPresenter implements DetectAadhaarContract.Presenter {
 
     private String removeSpecialCharacters(String input) {
         if (input == null) return null;
-        Matcher specialCharacterMatcher = Pattern.compile("[^a-zA-Z\\s]").matcher(input);
+        Matcher specialCharacterMatcher = Pattern.compile(SPECIAL_CHARCTERS_MATCHING_REGEX).matcher(input);
         if (specialCharacterMatcher.find()) {
             return input.substring(0, specialCharacterMatcher.start()).trim();
         }
