@@ -765,7 +765,7 @@ public class DetectAadhaarPresenter implements DetectAadhaarContract.Presenter {
             if (val.contains("\n")) {
                 for (String line : val.split("\n")) {
                     String extractedName = setMetaDataForPatternThreeApproachOne(line);
-                    extractedName = removeSpecialCharactersFromFirstOccurrence(extractedName);
+                    extractedName = removeSpecialCharacters(extractedName);
                     metadataMap.put(NAME, extractedName);
 
                     if (!isExtractedNameValid(extractedName)) {
@@ -789,7 +789,7 @@ public class DetectAadhaarPresenter implements DetectAadhaarContract.Presenter {
         }
     }
 
-    private String removeSpecialCharactersFromFirstOccurrence(String input) {
+    private String removeSpecialCharacters(String input) {
         if (input == null) return null;
         Matcher specialCharacterMatcher = Pattern.compile("[^a-zA-Z\\s]").matcher(input);
         if (specialCharacterMatcher.find()) {
