@@ -34,6 +34,7 @@ import static com.sayukth.aadhaarOcr.constants.AadhaarOcrConstants.OFFLINE;
 import static com.sayukth.aadhaarOcr.constants.AadhaarOcrConstants.OTHER;
 import static com.sayukth.aadhaarOcr.constants.AadhaarOcrConstants.SIGNATURE;
 import static com.sayukth.aadhaarOcr.constants.AadhaarOcrConstants.SIGNED;
+import static com.sayukth.aadhaarOcr.constants.AadhaarOcrConstants.THIS;
 import static com.sayukth.aadhaarOcr.constants.AadhaarOcrConstants.TO;
 import static com.sayukth.aadhaarOcr.constants.AadhaarOcrConstants.UNIOUE;
 import static com.sayukth.aadhaarOcr.constants.AadhaarOcrConstants.UNIQLE;
@@ -73,11 +74,16 @@ import java.util.regex.Pattern;
 public class DetectAadhaarPresenter implements DetectAadhaarContract.Presenter {
     private static final String TAG = "DetectAadhaarPresent";
     HashMap<String, String> metadataMap = new HashMap<String, String>();
+
     private DetectAadhaarContract.View detectAadharView;
     private Activity activity;
+    private String lastValidName = null;
+
     StringBuilder ocrImageText = new StringBuilder();
+
     private static final String AADHAAR_REGEX = "^[2-9]{1}[0-9]{3}\\s*[0-9]{4}\\s*[0-9]{4}$";
     private static final String NAME_REGEX = "^[a-zA-Z\\s]*$";
+    private static final String NAME_REGEX_WITH_PARENTHESIS = "^[a-zA-Z\\s]+(\\(.*\\))?$";
     private static final String DATE_FORMAT = "01-01-";
     private static final String PINCODE_REGEX = ".*\\b\\d{6}\\b.*";
     private static final String VID_PATTERN = ".*\\bVID:\\s*\\d{16}\\b.*";
@@ -85,37 +91,27 @@ public class DetectAadhaarPresenter implements DetectAadhaarContract.Presenter {
     private static final String YEAR_1947 = "1947";
     private static final String PINCODE_FORMAT = "\\b\\d{6}\\b";
     private static final String IMAGE_TEXT = "IMAGETEXT";
+    private static final String SPECIAL_CHARCTERS_MATCHING_REGEX = "[^a-zA-Z\\s]";
 
     private static final String EXCLUSION_KEYWORD_REGEX_FOR_FATHER_OR_SPOUSE_NAME_EXTRACTION = ".*\\b(lock|unlock|aadhaar|security|obligated|entities|unique|Authority)\\b.*";
 
 
     Pattern datePattern = Pattern.compile("(\\d{4}[-/]\\d{1,2}[-/]\\d{1,2})|((\\d{1,2})[-/](\\d{1,2})[-/](\\d{4}))");
-    // Regex pattern
     Pattern datePatternWithAnyCharacter = Pattern.compile(
             "(\\d{4})\\D(\\d{1,2})\\D(\\d{1,2})" +  // YYYY-anything-MM-anything-DD
                     "|(\\d{1,2})\\D(\\d{1,2})\\D(\\d{4})"   // DD-anything-MM-anything-YYYY
     );
     Pattern onlyYear = Pattern.compile("\\d{4}");
-
     Pattern namePattern = Pattern.compile("(?:D/O|S/O|W/O|C/O|DIO|SIO|WIO|CIO)[:\\s]+([^,]+)", Pattern.CASE_INSENSITIVE);
-
     Pattern mobilePattern = Pattern.compile(MOBILE_REGEX);
-
     Pattern addressPattern = Pattern.compile(
             "(C/O|S/O|D/O|W/O)\\s+[A-Z\\s]+,?\\s*(.*?)\\s*(?=\\n(?:VTC:|PO:|Sub District:|District:|State:|PIN Code:|Mobile:|$))",
             Pattern.DOTALL
     );
-
     Pattern fatherOrSpouseNamePattern = Pattern.compile("(CIO|C/O|S/O|D/O|W/O|SIO|DIO|WIO):?\\s*(.*)");
-
     Pattern pincodePattern = Pattern.compile("\\b\\d{6}\\b");
-
-    String relationshipPattern = "(?i)\\b(C/O|S/O|W/O|D/O|CIO|SIO|WIO|DIO)\\b";
-
     Pattern exclusionPattern = Pattern.compile("(?i)\\b(To|Enrolment No|Government|India|Unique|Identification)\\b");
-
-
-
+    String relationshipPattern = "(?i)\\b(C/O|S/O|W/O|D/O|CIO|SIO|WIO|DIO)\\b";
 
     List<String> genderListFemale = List.of("FEMALE", "TEMALE", "HEMALE", "FEEMALE");
     List<String> genderListMale = List.of("MALE");
@@ -558,8 +554,8 @@ public class DetectAadhaarPresenter implements DetectAadhaarContract.Presenter {
     // Check if name is valid (not containing restricted words)
     private boolean isValidName(String srcVal, String val) {
         return !containsAny(srcVal, DIGITALLY, SIGNED, UNIQUE, AUTHORITY, GOVERNMENT, INDIA,
-                FATHER, AADHAAR_, CITIZENSHIP, VERIFICATION, AUTHENTICATION, OFFLINE, XML, ENROLLMENT, NOT_VERIFIED, DIGITALTY, SIGNATURE, NOT_VERIFIED_ANOTHER, UNIOUE, DIGTALLY, DIGILALLY, UNIQLE, LNDIA, IDENTIFICATION, IST, UTC)
-                && getPatternMatcher(NAME_REGEX, val).matches();
+                FATHER, AADHAAR_, CITIZENSHIP, VERIFICATION, AUTHENTICATION, OFFLINE, XML, ENROLLMENT, NOT_VERIFIED, DIGITALTY, SIGNATURE, NOT_VERIFIED_ANOTHER, UNIOUE, DIGTALLY, DIGILALLY, UNIQLE, LNDIA, IDENTIFICATION, IST, UTC, THIS)
+                && (getPatternMatcher(NAME_REGEX, val).matches() || getPatternMatcher(NAME_REGEX_WITH_PARENTHESIS, val).matches());
     }
 
     // Utility method to check if text contains any keyword
@@ -607,7 +603,6 @@ public class DetectAadhaarPresenter implements DetectAadhaarContract.Presenter {
 
             parsedDataStr = ParseQRUtil.parseScannedData(scanContent.trim());
             detectAadharView.showAadhaarInfo(parsedDataStr);
-
             return parsedDataStr;
         } catch (Exception e){
             throw new PresenterException(e);
@@ -694,10 +689,14 @@ public class DetectAadhaarPresenter implements DetectAadhaarContract.Presenter {
      */
     private void classifyTextBlock(String textValue) throws PresenterException {
         try {
-
+            metadataMap.clear();
             if(AadhaarOcrPreferences.getInstance().getBoolean(AadhaarOcrPreferences.Key.IS_SIGNATURE_DATA_BIG_QR_OCR)){
                 getTextTypeBigQR(textValue);
                 setFatherOrSpouseMetaData(textValue);
+                return;
+            }
+            if(AadhaarOcrPreferences.getInstance().getBoolean(AadhaarOcrPreferences.Key.IS_BIG_QR_OCR)){
+                getTextTypeBigQR(textValue);
                 return;
             }
              if (isFrontMatch(textValue)) {
@@ -712,15 +711,10 @@ public class DetectAadhaarPresenter implements DetectAadhaarContract.Presenter {
                 processFullFrontScan(textValue); // Process full front scan
                 return;
             }
-
-            if (containsAadhaar(textValue)) {
-                getTextTypeBigQR(textValue); // Process Aadhaar number
-                return;
-            }
-
             if (containsMobileNumber(textValue)) {
                 getTextTypeMobileNumber(textValue); // Process mobile number
             }
+
         }  catch (Exception e) {
             throw new PresenterException(e); // Catch any other unexpected exceptions
         }
@@ -772,6 +766,8 @@ public class DetectAadhaarPresenter implements DetectAadhaarContract.Presenter {
             if (val.contains("\n")) {
                 for (String line : val.split("\n")) {
                     String extractedName = setMetaDataForPatternThreeApproachOne(line);
+                    extractedName = removeSpecialCharacters(extractedName);
+                    metadataMap.put(NAME, extractedName);
 
                     if (!isExtractedNameValid(extractedName)) {
                         metadataMap.remove(NAME);
@@ -793,6 +789,16 @@ public class DetectAadhaarPresenter implements DetectAadhaarContract.Presenter {
             throw new PresenterException(e);
         }
     }
+
+    private String removeSpecialCharacters(String input) {
+        if (input == null) return null;
+        Matcher specialCharacterMatcher = Pattern.compile(SPECIAL_CHARCTERS_MATCHING_REGEX).matcher(input);
+        if (specialCharacterMatcher.find()) {
+            return input.substring(0, specialCharacterMatcher.start()).trim();
+        }
+        return input.trim();
+    }
+
 
 
     /**
@@ -818,6 +824,7 @@ public class DetectAadhaarPresenter implements DetectAadhaarContract.Presenter {
      * @return The extracted name if valid, otherwise {@code null}.
      * @throws ActivityException If an unexpected error occurs during processing.
      */
+
     public String setMetaDataForPatternThreeApproachOne(String val) throws PresenterException {
         try {
             String srcVal = val.toUpperCase();
@@ -826,17 +833,24 @@ public class DetectAadhaarPresenter implements DetectAadhaarContract.Presenter {
 
             if (isValidName(srcVal, val)) {
                 metaData = NAME;
-                metadataMap.put(metaData, tgtVal.trim());
-                return tgtVal.trim(); // Return extracted name
+                if(isExtractedNameValid(tgtVal)) {
+                    metadataMap.put(metaData, tgtVal.trim());
+                    lastValidName = tgtVal.trim(); // Store the latest valid name
+                    return lastValidName;
+                }
             }
 
+            // No valid name found - just update OTHER
             metadataMap.put(metaData, tgtVal.trim());
-            return null; // Return null if no valid name is found
+
+            // Return previously stored name if current line doesn't have a valid name
+            return lastValidName;
 
         } catch (Exception e) {
             throw new PresenterException(e);
         }
     }
+
 
     /**
      * Attempts to extract a valid name from the given input string using the second approach for pattern three.

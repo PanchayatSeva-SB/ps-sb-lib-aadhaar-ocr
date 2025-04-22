@@ -210,6 +210,8 @@ public class MainActivity extends AppCompatActivity implements DetectAadhaarCont
 
 
     public void launchCameraForFrontSideCapture() {
+        AadhaarOcrPreferences.getInstance().put(AadhaarOcrPreferences.Key.IS_BIG_QR_OCR, false);
+        AadhaarOcrPreferences.getInstance().put(IS_SIGNATURE_DATA_BIG_QR_OCR, false);
         isFrontCaptured = false;
         isBackCaptured = false;
         Intent intent = new Intent(MainActivity.this, CustomCameraLaunchActivity.class);
@@ -219,6 +221,8 @@ public class MainActivity extends AppCompatActivity implements DetectAadhaarCont
     }
 
     public void launchCameraForBackSideCapture() {
+        AadhaarOcrPreferences.getInstance().put(AadhaarOcrPreferences.Key.IS_BIG_QR_OCR, false);
+        AadhaarOcrPreferences.getInstance().put(IS_SIGNATURE_DATA_BIG_QR_OCR, false);
         Intent intent = new Intent(MainActivity.this, CustomCameraLaunchActivity.class);
         intent.putExtra(getString(R.string.scan_type), getString(R.string.back_side));
         startActivityForResult(intent, AADHAAR_REQUEST_IMAGE);
@@ -226,6 +230,7 @@ public class MainActivity extends AppCompatActivity implements DetectAadhaarCont
 
     public void launchCameraForBigQROCRCapture() {
         AadhaarOcrPreferences.getInstance().put(AadhaarOcrPreferences.Key.IS_BIG_QR_OCR, true);
+        AadhaarOcrPreferences.getInstance().put(IS_SIGNATURE_DATA_BIG_QR_OCR, false);
         Intent intent = new Intent(MainActivity.this, CustomCameraLaunchActivity.class);
         intent.putExtra(getString(R.string.scan_type), getString(R.string.big_qr_ocr));
         startActivityForResult(intent, AADHAAR_REQUEST_IMAGE);

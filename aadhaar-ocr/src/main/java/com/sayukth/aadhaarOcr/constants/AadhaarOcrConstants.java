@@ -141,6 +141,8 @@ public class AadhaarOcrConstants {
 
     public static final String UTC = "UTC";
 
+    public static final String THIS = "THIS";
+
     public static final String GENERIC_EXCEPTION_MSSG = "An unexpected error occurred";
 
     public static final String HOUSE_NUMBER = "HOUSE_NUMBER";
