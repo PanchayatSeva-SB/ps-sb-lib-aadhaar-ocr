@@ -1,0 +1,2 @@
+                  									  <?xml version="1.0" encoding="UTF-8"?>
+<PrintLetterBarcodeData uid="819845570495" name="RUDDARRAJU VIJAYA LAKSHMI" gender="F" yob="1959" gname="VEGESNA SUBBA RAJU" house="2-24" street="OPPOSITE RAMALAYAM" lm="VELIVARRU POST" vtc="Velivarru" po="Undi" dist="West Godavari" subdist="Undi" state="Andhra Pradesh" pc="534199" dob="22/10/1959"></PrintLetterBarcodeData>

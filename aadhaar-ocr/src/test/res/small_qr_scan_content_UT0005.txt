@@ -1,0 +1,2 @@
+                  									  <?xml version="1.0" encoding="UTF-8"?>
+<PrintLetterBarcodeData uid="277538146178" name="Balam Lakshmi" gender="F" yob="1964" gname="TANGELLA NAGARAJU" house="2-7" street="MAIN ROAD" lm="VELIVARRU POST" vtc="Velivarru" po="Undi" dist="West Godavari" subdist="Undi" state="Andhra Pradesh" pc="534199" dob="16/11/1964"></PrintLetterBarcodeData>

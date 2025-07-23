@@ -43,6 +43,7 @@ public class ParseQRUtil {
     public static final String V3 = "V3";
     public static final String V_2 = "2";
     public static final String V4 = "V4";
+    public static final String V5 = "V5";
     private static final int TERMINATOR = 255;
 
     private static final String XML_FORMAT = "<?xml";
@@ -182,7 +183,7 @@ public class ParseQRUtil {
 
             System.out.println("emailMobilePresentBitIndicatorStr: " + emailMobilePresentBitIndicatorStr);
 
-            if (List.of(V2, V3, V_2, V4).contains(emailMobilePresentBitIndicatorStr)) {
+            if (List.of(V2, V3, V_2, V4, V5).contains(emailMobilePresentBitIndicatorStr)) {
                 if (V_2.equals(emailMobilePresentBitIndicatorStr)) {
                     Log.e("v2", "v2");
                     count = getNextValue(bin, result);

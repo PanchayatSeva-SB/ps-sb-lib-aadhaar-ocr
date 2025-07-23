@@ -1,0 +1,2 @@
+                  									  <?xml version="1.0" encoding="UTF-8"?>
+<PrintLetterBarcodeData uid="761350178792" name="Kallepalle Durga Bhavani" gender="F" yob="1988" gname="Vegesna Venkateswara Raju" house="1-14" street="KALLEPALLI VARI STREET" lm="UNDI POST" vtc="Velivarru" po="Undi" dist="West Godavari" subdist="Undi" state="Andhra Pradesh" pc="534199" dob="20/04/1988"></PrintLetterBarcodeData>

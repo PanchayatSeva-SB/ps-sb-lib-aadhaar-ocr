@@ -1,0 +1,2 @@
+ <?xml version="1.0" encoding="UTF-8"?>
+<PrintLetterBarcodeData uid="254099559880" name="BODDU LAZARU" gender="M" yob="1988" gname="BODDU SURYA PRAKASH" house="1-60" street="-" lm="UNDI POST" vtc="Velivarru" po="Undi" dist="West Godavari" subdist="Undi" state="Andhra Pradesh" pc="534199" dob="19/05/1988"></PrintLetterBarcodeData>

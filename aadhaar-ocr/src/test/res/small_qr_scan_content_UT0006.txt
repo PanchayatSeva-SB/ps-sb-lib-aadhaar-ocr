@@ -1,0 +1,2 @@
+                  									  <?xml version="1.0" encoding="UTF-8"?>
+<PrintLetterBarcodeData uid="703943132206" name="EELI ADAMU" gender="M" yob="1968" gname="EALI KRUPA DANAM" house="1-99" street="-" lm="UNDI POST" vtc="Velivarru" po="Undi" dist="West Godavari" subdist="Undi" state="Andhra Pradesh" pc="534199" dob="10/07/1968"></PrintLetterBarcodeData>

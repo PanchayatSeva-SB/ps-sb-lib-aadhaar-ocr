@@ -1,0 +1,2 @@
+                  									  <?xml version="1.0" encoding="UTF-8"?>
+<PrintLetterBarcodeData uid="482250205896" name="PALA SANKAR" gender="M" yob="1984" gname="Pala Chandra Rao" house="2-105" street="VELIVARRU GARUVU" lm="VELIVARRU POST" vtc="Velivarru" po="Undi" dist="West Godavari" subdist="Undi" state="Andhra Pradesh" pc="534199" dob="05/05/1984"></PrintLetterBarcodeData>

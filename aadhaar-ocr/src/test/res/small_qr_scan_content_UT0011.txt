@@ -1,0 +1,2 @@
+                  									  <?xml version="1.0" encoding="UTF-8"?>
+<PrintLetterBarcodeData uid="854610792834" name="KONALA PRAKASAM" gender="M" yob="1957" gname="KONALA SUNDARA RAO" house="1-61" street="-" lm="UNDI POST" vtc="Velivarru" po="Undi" dist="West Godavari" subdist="Undi" state="Andhra Pradesh" pc="534199" dob="11/10/1957"></PrintLetterBarcodeData>

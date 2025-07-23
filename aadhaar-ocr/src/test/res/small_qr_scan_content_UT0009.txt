@@ -1,0 +1,2 @@
+                  									  <?xml version="1.0" encoding="UTF-8"?>
+<PrintLetterBarcodeData uid="974283139627" name="KONALA SUNDARA RAO" gender="M" yob="1985" gname="KONALA GEORGE" house="1-66" street="CHURCH STREET" lm="UNDI POST" vtc="Velivarru" po="Undi" dist="West Godavari" subdist="Undi" state="Andhra Pradesh" pc="534199" dob="01/07/1985"></PrintLetterBarcodeData>

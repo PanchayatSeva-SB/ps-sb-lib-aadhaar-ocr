@@ -1,0 +1,2 @@
+                  									  <?xml version="1.0" encoding="UTF-8"?>
+<PrintLetterBarcodeData uid="300018377489" name="Gudipalli Riya" gender="F" yob="1984" co="Govind" house="14-138/2" street="SANTHIPURAM" loc="PIDIMGOYYA" vtc="Rajahmundry (Urban)" po="Danavaipeta" dist="East Godavari" state="Andhra Pradesh" pc="533103"></PrintLetterBarcodeData>
