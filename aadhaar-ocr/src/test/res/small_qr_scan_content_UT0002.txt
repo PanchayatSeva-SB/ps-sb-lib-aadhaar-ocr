@@ -1,0 +1,2 @@
+                  									  <?xml version="1.0" encoding="UTF-8"?>
+<PrintLetterBarcodeData uid="872334534993" name="KUDUPUDI SATYANARAYANA" gender="M" yob="1950" gname="KUDUPUDI PATTABHI" house="2-78" street="VELIVARRU GARUVU" lm="VELIVARRU POST" vtc="Velivarru" po="Undi" dist="West Godavari" subdist="Undi" state="Andhra Pradesh" pc="534199" dob="06/09/1950"></PrintLetterBarcodeData>

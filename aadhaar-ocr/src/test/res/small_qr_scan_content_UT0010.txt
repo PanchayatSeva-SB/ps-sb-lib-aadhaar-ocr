@@ -1,0 +1,2 @@
+                  									  <?xml version="1.0" encoding="UTF-8"?>
+<PrintLetterBarcodeData uid="908895691113" name="KONALA PRASANNA" gender="F" yob="1990" gname="G Kutumba Rao" house="1-66" street="CHURCH STREET" lm="UNDI POST" vtc="Velivarru" po="Undi" dist="West Godavari" subdist="Undi" state="Andhra Pradesh" pc="534199" dob="10/06/1990"></PrintLetterBarcodeData>

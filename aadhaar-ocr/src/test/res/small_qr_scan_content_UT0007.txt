@@ -1,0 +1,2 @@
+                  									  <?xml version="1.0" encoding="UTF-8"?>
+<PrintLetterBarcodeData uid="340207765382" name="EELI DHANALAKSHMI" gender="F" yob="1973" gname="TULASI SURAYYA" house="1-99" street="-" lm="UNDI POST" vtc="Velivarru" po="Undi" dist="West Godavari" subdist="Undi" state="Andhra Pradesh" pc="534199" dob="07/06/1973"></PrintLetterBarcodeData>

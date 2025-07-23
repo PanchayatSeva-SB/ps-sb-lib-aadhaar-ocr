@@ -1,0 +1,2 @@
+                  									  <?xml version="1.0" encoding="UTF-8"?>
+<PrintLetterBarcodeData uid="895626582540" name="PILLI SAROJINI" gender="F" yob="1990" gname="Mangabathula China Marthin" house="1-96" street="-" lm="UNDI POST" vtc="Velivarru" po="Undi" dist="West Godavari" subdist="Undi" state="Andhra Pradesh" pc="534199" dob="09/11/1990"></PrintLetterBarcodeData>

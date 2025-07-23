@@ -1,0 +1,2 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PrintLetterBarcodeData uid="300007536729" name="Kaveri Gopi" gender="M" yob="1985" co="Father Gopi" house="14-138/2" street="SANTHIPURAM" loc="PIDIMGOYYA" vtc="Rajahmundry (Urban)" po="Danavaipeta" dist="East Godavari" state="Andhra Pradesh" pc="533103"></PrintLetterBarcodeData>
