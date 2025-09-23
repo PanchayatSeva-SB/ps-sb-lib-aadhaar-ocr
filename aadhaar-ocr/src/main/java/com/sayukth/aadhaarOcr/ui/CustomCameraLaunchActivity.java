@@ -14,6 +14,7 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
+import android.view.ScaleGestureDetector;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -30,7 +31,6 @@ import androidx.camera.core.ImageCaptureException;
 import androidx.camera.core.Preview;
 import androidx.camera.lifecycle.ProcessCameraProvider;
 import androidx.camera.view.PreviewView;
-import androidx.camera.view.video.ExperimentalVideo;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
@@ -63,6 +63,8 @@ public class CustomCameraLaunchActivity extends AppCompatActivity {
     ImageView distanceImage;
     TextView textViewBigQR;
 
+    private ScaleGestureDetector scaleGestureDetector;
+    private float currentZoomRatio = 1f;
     private static final String JPG = ".jpg";
 
     private static final String CAMERA = "camera";
@@ -88,6 +90,29 @@ public class CustomCameraLaunchActivity extends AppCompatActivity {
             handleSignatureDataBigQrOcr();
 
             capturePhotoButton.setOnClickListener(v -> capturePhoto());
+
+            scaleGestureDetector = new ScaleGestureDetector(this, new ScaleGestureDetector.SimpleOnScaleGestureListener() {
+                @Override
+                public boolean onScale(ScaleGestureDetector detector) {
+                    if (camera != null) {
+                        currentZoomRatio *= detector.getScaleFactor();
+
+                        // Clamp zoom ratio between min and max
+                        float minZoom = camera.getCameraInfo().getZoomState().getValue().getMinZoomRatio();
+                        float maxZoom = camera.getCameraInfo().getZoomState().getValue().getMaxZoomRatio();
+
+                        currentZoomRatio = Math.max(minZoom, Math.min(currentZoomRatio, maxZoom));
+                        camera.getCameraControl().setZoomRatio(currentZoomRatio);
+                    }
+                    return true;
+                }
+            });
+
+            cameraPreview.setOnTouchListener((v, event) -> {
+                scaleGestureDetector.onTouchEvent(event);
+                return true;
+            });
+
         } catch (Exception e) {
             Log.e(TAG, e.getMessage() != null ? e.getMessage() : GENERIC_EXCEPTION_MSSG, e);
         }
